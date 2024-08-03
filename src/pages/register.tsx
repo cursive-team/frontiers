@@ -21,6 +21,7 @@ import { encryptRegisteredMessage } from "@/lib/client/jubSignal/registered";
 import { generateRegistrationOptions } from "@simplewebauthn/server";
 import { startRegistration } from "@simplewebauthn/browser";
 import {
+  farcasterUsernameRegex,
   telegramUsernameRegex,
   twitterUsernameRegex,
 } from "@/lib/shared/utils";
@@ -31,8 +32,11 @@ import { Card } from "@/components/cards/Card";
 import { Spinner } from "@/components/Spinner";
 import Link from "next/link";
 import { logClientEvent } from "@/lib/client/metrics";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 enum DisplayState {
+  GITHUB,
+  USER_INFO,
   PASSKEY,
   PASSWORD,
   CREATING,
@@ -46,11 +50,13 @@ const Description = classed.div(
 const Underline = classed.span("text-primary");
 export default function Register() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [displayState, setDisplayState] = useState<DisplayState>(
-    DisplayState.PASSKEY
+    DisplayState.GITHUB
   );
   const [displayName, setDisplayName] = useState<string>();
   const [twitter, setTwitter] = useState<string>("@");
+  const [farcaster, setFarcaster] = useState<string>("@");
   const [telegram, setTelegram] = useState<string>("@");
   const [bio, setBio] = useState<string>();
   const [password, setPassword] = useState<string>("");
@@ -64,6 +70,15 @@ export default function Register() {
       setChipEnc(router.query.chipEnc as string);
     }
   }, [router.query]);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      setDisplayState(DisplayState.USER_INFO);
+    } else if (status === "unauthenticated") {
+      toast.error("Failed to sign in with Github. Please try again.");
+      setDisplayState(DisplayState.GITHUB);
+    }
+  }, [status]);
 
   const checkUsernameIsUnique = async (
     displayName: string
@@ -83,8 +98,8 @@ export default function Register() {
     return data.isUnique;
   };
 
-  const handleCreateWithPassword = async () => {
-    logClientEvent("registerAttemptCreateWithPassword", {});
+  const handleSubmitUserInfo = async () => {
+    logClientEvent("registerAttemptUserInfo", {});
 
     if (
       !displayName ||
@@ -102,13 +117,36 @@ export default function Register() {
       return;
     }
 
+    if (farcaster !== "@" && !farcasterUsernameRegex.test(farcaster)) {
+      toast.error("Please enter a valid Farcaster username.");
+    }
+
     if (telegram !== "@" && !telegramUsernameRegex.test(telegram)) {
-      toast.error("Please enter a valid Daimo username.");
+      toast.error("Please enter a valid Telegram username.");
       return;
     }
 
     if (bio && bio.length > 200) {
       toast.error("Bio must be 200 characters or less.");
+      return;
+    }
+
+    const isUsernameUnique = await checkUsernameIsUnique(displayName);
+    if (!isUsernameUnique) {
+      toast.error("Display name is already taken.");
+      return;
+    }
+
+    logClientEvent("registerSuccessUserInfo", {});
+
+    setDisplayState(DisplayState.PASSKEY);
+  };
+
+  const handleCreateWithPassword = async () => {
+    logClientEvent("registerAttemptCreateWithPassword", {});
+
+    if (!displayName) {
+      toast.error("Error creating account. Please try again");
       return;
     }
 
@@ -134,33 +172,10 @@ export default function Register() {
 
     logClientEvent("registerAttemptSubmitWithPasskey", {});
 
-    if (
-      !displayName ||
-      /^\s|\s$/.test(displayName) ||
-      displayName.length > 20
-    ) {
-      toast.error(
-        "Display name cannot have leading or trailing whitespace and must be 20 characters or less"
-      );
+    if (!displayName) {
+      toast.error("Error creating account. Please try again");
       return;
     }
-
-    if (twitter !== "@" && !twitterUsernameRegex.test(twitter)) {
-      toast.error("Please enter a valid Twitter username.");
-      return;
-    }
-
-    if (telegram !== "@" && !telegramUsernameRegex.test(telegram)) {
-      toast.error("Please enter a valid Daimo username.");
-      return;
-    }
-
-    if (bio && bio.length > 200) {
-      toast.error("Bio must be 200 characters or less.");
-      return;
-    }
-
-    logClientEvent("registerSuccessSubmitWithPasskey", {});
 
     setLoading(true);
 
@@ -186,6 +201,8 @@ export default function Register() {
       if (!authPublicKey) {
         throw new Error("No public key returned from authenticator");
       }
+
+      logClientEvent("registerSuccessSubmitWithPasskey", {});
 
       await createAccount(displayName, id, authPublicKey);
     } catch (error) {
@@ -389,23 +406,31 @@ export default function Register() {
   };
 
   const StateContent: Record<DisplayState, JSX.Element> = {
-    [DisplayState.PASSKEY]: (
+    [DisplayState.GITHUB]: (
+      <>
+        <Button variant="primary" onClick={() => signIn("github")}>
+          {status === "loading" ? "Signing in..." : "Sign In With Github"}
+        </Button>
+        <Button variant="primary" onClick={() => console.log(session)}>
+          Log Session
+        </Button>
+        <div className="text-center">
+          <span className="text-sm" onClick={() => router.push("/login")}>
+            <u>Already have account</u>
+          </span>
+        </div>
+      </>
+    ),
+    [DisplayState.USER_INFO]: (
       <FormStepLayout
         title="Backpocket Alpha"
         subtitle={
           <div className="flex flex-col gap-2">
-            <div>
-              Tap NFC rings to build your social graph, use MPC to query
-              efficiently.
-            </div>
-            <div>
-              Set up socials to share, register to maintain an encrypted backup
-              of your data.
-            </div>
+            <div>Input your socials!</div>
           </div>
         }
         className="pt-4"
-        onSubmit={handleSubmitWithPasskey}
+        onSubmit={handleSubmitUserInfo}
       >
         <Input
           type="text"
@@ -431,8 +456,22 @@ export default function Register() {
         />
         <Input
           type="text"
+          id="farcaster"
+          label="Farcaster"
+          placeholder="@username"
+          value={farcaster}
+          onChange={(e) =>
+            setFarcaster(
+              e.target.value.charAt(0) === "@"
+                ? e.target.value
+                : "@" + e.target.value
+            )
+          }
+        />
+        <Input
+          type="text"
           id="telegram"
-          label="Daimo"
+          label="Telegram"
           placeholder="@username"
           value={telegram}
           onChange={(e) =>
@@ -451,6 +490,29 @@ export default function Register() {
           value={bio}
           onChange={(e) => setBio(e.target.value)}
         />
+        <Button type="submit" loading={loading}>
+          Next
+        </Button>
+      </FormStepLayout>
+    ),
+    [DisplayState.PASSKEY]: (
+      <FormStepLayout
+        title="Backpocket Alpha"
+        subtitle={
+          <div className="flex flex-col gap-2">
+            <div>
+              Tap NFC rings to build your social graph, use MPC to query
+              efficiently.
+            </div>
+            <div>
+              Set up socials to share, register to maintain an encrypted backup
+              of your data.
+            </div>
+          </div>
+        }
+        className="pt-4"
+        onSubmit={handleSubmitWithPasskey}
+      >
         <div className="flex flex-col gap-2">
           <Button type="submit" loading={loading}>
             Register with passkey
@@ -461,11 +523,6 @@ export default function Register() {
               onClick={handleCreateWithPassword}
             >
               <u>Register with password</u>
-            </span>
-          </div>
-          <div className="text-center">
-            <span className="text-sm" onClick={() => router.push("/login")}>
-              <u>Already have account</u>
             </span>
           </div>
         </div>
