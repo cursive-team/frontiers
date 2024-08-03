@@ -18,6 +18,7 @@ model User {
   isUserSpeaker Boolean @default(false)
   displayName   String  @unique
   twitter       String?
+  farcaster     String?
   telegram      String?
   bio           String?
 

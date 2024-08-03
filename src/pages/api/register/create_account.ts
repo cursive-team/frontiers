@@ -4,6 +4,7 @@ import { object, string } from "yup";
 import { ErrorResponse } from "@/types";
 import { AuthTokenResponse, generateAuthToken } from "@/lib/server/auth";
 import {
+  farcasterUsernameRegex,
   telegramUsernameRegex,
   twitterUsernameRegex,
 } from "@/lib/shared/utils";
@@ -21,6 +22,7 @@ const createAccountSchema = object({
   passwordHash: string().optional().default(undefined),
   authPublicKey: string().optional().default(undefined),
   twitter: string().optional().default(undefined),
+  farcaster: string().optional().default(undefined),
   telegram: string().optional().default(undefined),
   bio: string().optional().default(undefined),
 });
@@ -69,6 +71,7 @@ export default async function handler(
     passwordHash,
     authPublicKey,
     twitter,
+    farcaster,
     telegram,
     bio,
   } = validatedData;
@@ -82,6 +85,14 @@ export default async function handler(
 
   if (twitter && twitter !== "@" && !twitterUsernameRegex.test(twitter)) {
     return res.status(400).json({ error: "Invalid Twitter username" });
+  }
+
+  if (
+    farcaster &&
+    farcaster !== "@" &&
+    !farcasterUsernameRegex.test(farcaster)
+  ) {
+    return res.status(400).json({ error: "Invalid Farcaster username" });
   }
 
   if (telegram && telegram !== "@" && !telegramUsernameRegex.test(telegram)) {
@@ -135,6 +146,15 @@ export default async function handler(
     parsedTwitter = undefined;
   } else {
     parsedTwitter = twitter.startsWith("@") ? twitter.slice(1) : twitter;
+  }
+
+  let parsedFarcaster: string | undefined;
+  if (farcaster === undefined || farcaster === "" || farcaster === "@") {
+    parsedFarcaster = undefined;
+  } else {
+    parsedFarcaster = farcaster.startsWith("@")
+      ? farcaster.slice(1)
+      : farcaster;
   }
 
   let parsedTelegram: string | undefined;
@@ -215,6 +235,7 @@ export default async function handler(
       passwordHash,
       authPublicKey,
       twitter: parsedTwitter,
+      farcaster: parsedFarcaster,
       telegram: parsedTelegram,
       bio,
     },

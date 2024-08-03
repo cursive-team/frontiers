@@ -291,6 +291,7 @@ export default function Register() {
         passwordHash,
         authPublicKey,
         twitter,
+        farcaster,
         telegram,
         bio,
       }),
