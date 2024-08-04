@@ -16,6 +16,7 @@ import type { AppProps } from "next/app";
 import { useEffect, useState } from "react";
 import { toast, Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/react";
+import { SessionProvider } from "next-auth/react";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -63,41 +64,43 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <StateMachineProvider>
       <QueryClientProvider client={queryClient}>
-        <OnlyMobileLayout>
-          <main
-            className={`flex flex-col ${dmSans.variable} font-sans`}
-            style={{
-              height: `${pageHeight}px`,
-            }}
-          >
-            <div className="flex flex-col grow">
-              {showHeader && !fullPage && (
-                <AppHeader
-                  isMenuOpen={isMenuOpen}
-                  setIsMenuOpen={setIsMenuOpen}
-                />
-              )}
-              <div
-                className={`flex flex-col grow px-4 xs:px-4 ${
-                  footerVisible ? "mb-20" : ""
-                }`}
-              >
-                <Component {...pageProps} />
-                <Analytics />
+        <SessionProvider session={pageProps.session}>
+          <OnlyMobileLayout>
+            <main
+              className={`flex flex-col ${dmSans.variable} font-sans`}
+              style={{
+                height: `${pageHeight}px`,
+              }}
+            >
+              <div className="flex flex-col grow">
+                {showHeader && !fullPage && (
+                  <AppHeader
+                    isMenuOpen={isMenuOpen}
+                    setIsMenuOpen={setIsMenuOpen}
+                  />
+                )}
+                <div
+                  className={`flex flex-col grow px-4 xs:px-4 ${
+                    footerVisible ? "mb-20" : ""
+                  }`}
+                >
+                  <Component {...pageProps} />
+                  <Analytics />
+                </div>
+                <TransitionWrapper.Fade show={!isMenuOpen}>
+                  <>{footerVisible && <AppFooter />}</>
+                </TransitionWrapper.Fade>
               </div>
-              <TransitionWrapper.Fade show={!isMenuOpen}>
-                <>{footerVisible && <AppFooter />}</>
-              </TransitionWrapper.Fade>
-            </div>
-          </main>
-        </OnlyMobileLayout>
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            duration: 5000,
-            className: "font-sans text-iron-950",
-          }}
-        />
+            </main>
+          </OnlyMobileLayout>
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 5000,
+              className: "font-sans text-iron-950",
+            }}
+          />
+        </SessionProvider>
       </QueryClientProvider>
     </StateMachineProvider>
   );

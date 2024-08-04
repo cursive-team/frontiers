@@ -9,6 +9,8 @@ import {
   twitterUsernameRegex,
 } from "@/lib/shared/utils";
 import { verifyCmac } from "@/lib/server/cmac";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]";
 
 const createAccountSchema = object({
   chipEnc: string().optional().default(undefined),
@@ -57,6 +59,11 @@ export default async function handler(
   if (!validatedData) {
     console.log("Account creation failed: no validated data");
     return res.status(500).json({ error: "Internal Server Error" });
+  }
+
+  const session = await getServerSession(req, res, authOptions);
+  if (!session) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
   const {

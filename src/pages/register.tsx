@@ -74,9 +74,6 @@ export default function Register() {
   useEffect(() => {
     if (status === "authenticated") {
       setDisplayState(DisplayState.USER_INFO);
-    } else if (status === "unauthenticated") {
-      toast.error("Failed to sign in with Github. Please try again.");
-      setDisplayState(DisplayState.GITHUB);
     }
   }, [status]);
 
@@ -98,7 +95,9 @@ export default function Register() {
     return data.isUnique;
   };
 
-  const handleSubmitUserInfo = async () => {
+  const handleSubmitUserInfo = async (e: FormEvent<Element>) => {
+    e.preventDefault();
+
     logClientEvent("registerAttemptUserInfo", {});
 
     if (
@@ -246,6 +245,13 @@ export default function Register() {
     setLoading(true);
     const prevDisplayState = displayState;
     setDisplayState(DisplayState.CREATING); // Show the loading spinner
+
+    if (!session) {
+      toast.error("Error creating account! Please try again.");
+      setLoading(false);
+      setDisplayState(prevDisplayState);
+      return;
+    }
 
     const { privateKey, publicKey } = await generateEncryptionKeyPair();
     const { psiPrivateKeys, psiPublicKeys } = await generatePSIKeys();
