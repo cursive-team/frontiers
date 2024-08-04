@@ -77,7 +77,7 @@ export default function Register() {
         const githubIsUnique = await checkGithubIsUnique();
         if (!githubIsUnique) {
           toast.error("Github account is already taken.");
-          signOut();
+          await signOut();
           return;
         }
 
@@ -562,6 +562,17 @@ export default function Register() {
               onClick={handleCreateWithPassword}
             >
               <u>Register with password</u>
+            </span>
+          </div>
+          <div className="text-center">
+            <span
+              className="text-center text-sm"
+              onClick={async () => {
+                await signOut();
+                window.location.reload();
+              }}
+            >
+              <u>Change Github Account</u>
             </span>
           </div>
         </div>

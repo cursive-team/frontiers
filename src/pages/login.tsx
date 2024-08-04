@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/router";
 import { hashPassword } from "@/lib/client/utils";
 import {
@@ -17,21 +17,55 @@ import { loadMessages } from "@/lib/client/jubSignalClient";
 import { supabase } from "@/lib/client/realtime";
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
 import { startAuthentication } from "@simplewebauthn/browser";
-import { signOut } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 enum DisplayState {
+  GITHUB,
   PASSKEY,
   PASSWORD,
 }
 
 export default function Login() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [displayState, setDisplayState] = useState<DisplayState>(
-    DisplayState.PASSKEY
+    DisplayState.GITHUB
   );
   const [displayName, setDisplayName] = useState<string>();
   const [password, setPassword] = useState<string>();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const handleGithubLogin = async () => {
+      if (status === "authenticated") {
+        const existingDisplayName = await getExistingUserDisplayName();
+        if (!existingDisplayName) {
+          toast.error("This GitHub account is not registered.");
+          await signOut();
+          window.location.href = "/";
+          return;
+        }
+
+        setDisplayName(existingDisplayName);
+        setDisplayState(DisplayState.PASSKEY);
+      }
+    };
+    handleGithubLogin();
+  }, [status]);
+
+  const getExistingUserDisplayName = async (): Promise<string | undefined> => {
+    const response = await fetch(`/api/login/get_username`);
+    if (!response.ok) {
+      console.error(
+        `HTTP error when getting user display name! status: ${response.status}`
+      );
+      return undefined;
+    }
+
+    const data = await response.json();
+
+    return data.displayName;
+  };
 
   const handlePasswordLogin = () => {
     setDisplayState(DisplayState.PASSWORD);
@@ -176,7 +210,13 @@ export default function Login() {
     router.push("/");
   };
 
-  if (displayState === DisplayState.PASSKEY) {
+  if (displayState === DisplayState.GITHUB) {
+    return (
+      <Button variant="primary" onClick={() => signIn("github")}>
+        Login with GitHub
+      </Button>
+    );
+  } else if (displayState === DisplayState.PASSKEY) {
     return (
       <FormStepLayout
         title="Backpocket Alpha"
@@ -191,6 +231,7 @@ export default function Login() {
           placeholder="Name you registered with"
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
+          disabled={true}
         />
         <Button type="submit">
           {loading ? "Logging in..." : "Login with passkey"}
@@ -204,6 +245,17 @@ export default function Login() {
         >
           Login with password instead
         </Button>
+        <div className="text-center">
+          <span
+            className="text-center text-sm"
+            onClick={async () => {
+              await signOut();
+              window.location.reload();
+            }}
+          >
+            <u>Change Github Account</u>
+          </span>
+        </div>
       </FormStepLayout>
     );
   } else if (displayState === DisplayState.PASSWORD) {
@@ -221,6 +273,7 @@ export default function Login() {
           placeholder="Name you registered with"
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
+          disabled={true}
         />
         <Input
           type="password"

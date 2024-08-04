@@ -4,6 +4,8 @@ import { ErrorResponse } from "../../../types";
 import { AuthTokenResponse, generateAuthToken } from "@/lib/server/auth";
 import { BackupResponse } from "../backup";
 import { logServerEvent } from "@/lib/server/metrics";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]";
 
 export type LoginResponse =
   | {
@@ -42,6 +44,16 @@ export default async function handler(
     });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
+    }
+
+    // Check user github is authenticated
+    const session = await getServerSession(req, res, authOptions);
+    if (!session || !session.user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const githubEmail = session.user.email;
+    if (user.githubEmail !== githubEmail) {
+      return res.status(401).json({ error: "Unauthorized" });
     }
 
     // Generate auth token
