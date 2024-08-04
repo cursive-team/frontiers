@@ -17,6 +17,7 @@ import { loadMessages } from "@/lib/client/jubSignalClient";
 import { supabase } from "@/lib/client/realtime";
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
 import { startAuthentication } from "@simplewebauthn/browser";
+import { signOut } from "next-auth/react";
 
 enum DisplayState {
   PASSKEY,
@@ -139,6 +140,7 @@ export default function Login() {
     if (!profile) {
       console.error("Profile not found");
       deleteAccountFromLocalStorage();
+      signOut();
       toast.error("Error logging in. Please try again.");
       setLoading(false);
       return;
@@ -164,6 +166,7 @@ export default function Login() {
       await loadMessages({ forceRefresh: true });
     } catch (error) {
       deleteAccountFromLocalStorage();
+      signOut();
       toast.error("Error logging in. Please try again.");
       setLoading(false);
       return;

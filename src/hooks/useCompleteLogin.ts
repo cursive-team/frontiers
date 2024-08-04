@@ -9,6 +9,7 @@ import { loadMessages } from "@/lib/client/jubSignalClient";
 import { useRouter } from "next/router";
 import { useStateMachine } from "little-state-machine";
 import updateStateFromAction from "@/lib/shared/updateAction";
+import { signOut } from "next-auth/react";
 
 interface CompleteLoginProps {
   backup: string;
@@ -45,6 +46,7 @@ export const useCompleteLogin = ({
       await loadMessages({ forceRefresh: true });
     } catch (error) {
       deleteAccountFromLocalStorage(); // Clear localStorage if login fails
+      signOut();
       toast.error("Error logging in. Please try again.");
       return;
     }

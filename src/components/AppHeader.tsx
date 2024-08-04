@@ -12,6 +12,7 @@ import { supabase } from "@/lib/client/realtime";
 import { Button } from "./Button";
 import { LINKS } from "@/hooks/useSettings";
 import { cn } from "@/lib/client/utils";
+import { signOut } from "next-auth/react";
 
 const Title = classed.h3("block font-sans text-iron-950", {
   variants: {
@@ -247,9 +248,11 @@ interface AppHeaderProps {
 }
 const AppHeader = ({ isMenuOpen, setIsMenuOpen }: AppHeaderProps) => {
   const { actions, getState } = useStateMachine({ updateStateFromAction });
+
   const handleSignout = async () => {
     deleteAccountFromLocalStorage();
     supabase.auth.signOut();
+    signOut();
     window.location.href = "/";
   };
 
