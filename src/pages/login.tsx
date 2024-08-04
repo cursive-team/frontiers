@@ -174,7 +174,7 @@ export default function Login() {
     if (!profile) {
       console.error("Profile not found");
       deleteAccountFromLocalStorage();
-      signOut();
+      await signOut();
       toast.error("Error logging in. Please try again.");
       setLoading(false);
       return;
@@ -200,7 +200,7 @@ export default function Login() {
       await loadMessages({ forceRefresh: true });
     } catch (error) {
       deleteAccountFromLocalStorage();
-      signOut();
+      await signOut();
       toast.error("Error logging in. Please try again.");
       setLoading(false);
       return;
@@ -227,7 +227,7 @@ export default function Login() {
         <Input
           type="text"
           id="displayName"
-          label="Display name"
+          label="Github account"
           placeholder="Name you registered with"
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
@@ -269,7 +269,7 @@ export default function Login() {
         <Input
           type="text"
           id="displayName"
-          label="Display name"
+          label="Github account"
           placeholder="Name you registered with"
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}

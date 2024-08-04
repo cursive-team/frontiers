@@ -251,8 +251,8 @@ const AppHeader = ({ isMenuOpen, setIsMenuOpen }: AppHeaderProps) => {
 
   const handleSignout = async () => {
     deleteAccountFromLocalStorage();
-    supabase.auth.signOut();
-    signOut();
+    await supabase.auth.signOut();
+    await signOut();
     window.location.href = "/";
   };
 

@@ -46,7 +46,7 @@ export const useCompleteLogin = ({
       await loadMessages({ forceRefresh: true });
     } catch (error) {
       deleteAccountFromLocalStorage(); // Clear localStorage if login fails
-      signOut();
+      await signOut();
       toast.error("Error logging in. Please try again.");
       return;
     }
