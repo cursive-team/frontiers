@@ -31,6 +31,7 @@ import { IconCircle } from "@/components/IconCircle";
 import { NoResultContent } from "@/components/NoResultContent";
 import { classed } from "@tw-classed/react";
 import { logClientEvent } from "@/lib/client/metrics";
+import { useSession } from "next-auth/react";
 
 interface LinkCardProps {
   name: string;
@@ -201,6 +202,7 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
 
 export default function Social() {
   const router = useRouter();
+  const { data: session } = useSession();
   const { getState } = useStateMachine({ updateStateFromAction });
   const { pageWidth } = useSettings();
   const [showSliderModal, setShowSliderModal] = useState(false);

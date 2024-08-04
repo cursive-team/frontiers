@@ -77,6 +77,14 @@ export default function Register() {
     }
   }, [status]);
 
+  useEffect(() => {
+    if (displayState === DisplayState.USER_INFO) {
+      if (session?.user?.name) {
+        setDisplayName(session.user.name);
+      }
+    }
+  }, [displayState, session]);
+
   const checkUsernameIsUnique = async (
     displayName: string
   ): Promise<boolean> => {

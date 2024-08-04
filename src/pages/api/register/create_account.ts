@@ -62,9 +62,12 @@ export default async function handler(
   }
 
   const session = await getServerSession(req, res, authOptions);
-  if (!session) {
+  if (!session || !session.user) {
     return res.status(401).json({ error: "Unauthorized" });
   }
+  const githubName = session.user.name;
+  const githubEmail = session.user.email;
+  const githubImage = session.user.image;
 
   const {
     chipEnc,
@@ -245,6 +248,9 @@ export default async function handler(
       farcaster: parsedFarcaster,
       telegram: parsedTelegram,
       bio,
+      githubName,
+      githubEmail,
+      githubImage,
     },
   });
 

@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "githubEmail" DROP NOT NULL,
+ALTER COLUMN "githubImage" DROP NOT NULL,
+ALTER COLUMN "githubName" DROP NOT NULL;

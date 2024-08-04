@@ -22,6 +22,10 @@ model User {
   telegram      String?
   bio           String?
 
+  githubName  String?
+  githubEmail String?
+  githubImage String?
+
   encryptionPublicKey String
   signaturePublicKey  String
   psiPublicKeysLink   String
