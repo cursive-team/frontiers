@@ -12,6 +12,7 @@ export type Profile = {
   encryptionPublicKey: string;
   signaturePublicKey: string;
   twitterUsername?: string;
+  farcasterUsername?: string;
   telegramUsername?: string;
   bio?: string;
 };
@@ -21,6 +22,7 @@ export const profileSchema = object({
   encryptionPublicKey: string().required(),
   signaturePublicKey: string().required(),
   twitterUsername: string().optional().default(undefined),
+  farcasterUsername: string().optional().default(undefined),
   telegramUsername: string().optional().default(undefined),
   bio: string().optional().default(undefined),
 });

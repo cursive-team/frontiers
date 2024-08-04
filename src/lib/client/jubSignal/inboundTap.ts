@@ -7,6 +7,7 @@ export type InboundTapMessage = {
   psiPkLink: string; // Link to PSI public keys
   pkId: string; // Public key index for PSI
   x?: string; // Twitter handle
+  fc?: string; // Farcaster handle
   tg?: string; // Telegram handle
   bio?: string; // Bio
   pk: string; // Signature public key
@@ -21,6 +22,7 @@ export const inboundTapMessageSchema = object({
   psiPkLink: string().required(),
   pkId: string().required(),
   x: string().optional(),
+  fc: string().optional(),
   tg: string().optional(),
   bio: string().optional(),
   pk: string().required(),
@@ -35,6 +37,7 @@ export type EncryptInboundTapMessageArgs = {
   psiPublicKeysLink: string;
   pkId: string;
   twitterUsername?: string;
+  farcasterUsername?: string;
   telegramUsername?: string;
   bio?: string;
   signaturePublicKey: string;
@@ -51,6 +54,7 @@ export async function encryptInboundTapMessage({
   psiPublicKeysLink,
   pkId,
   twitterUsername,
+  farcasterUsername,
   telegramUsername,
   bio,
   signaturePublicKey,
@@ -66,6 +70,7 @@ export async function encryptInboundTapMessage({
     psiPkLink: psiPublicKeysLink,
     pkId,
     x: twitterUsername,
+    fc: farcasterUsername,
     tg: telegramUsername,
     bio,
     pk: signaturePublicKey,

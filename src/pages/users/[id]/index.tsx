@@ -481,16 +481,6 @@ const UserProfilePage = () => {
                   value={labelStartWith(user.x, "@")}
                 />
               )}
-              {(user.tg?.length ?? 0) > 1 && (
-                <LinkCard
-                  label="Daimo"
-                  href={`https://daimo.com/l/account/${removeLabelStartWith(
-                    user.tg,
-                    "@"
-                  )}`}
-                  value={labelStartWith(user.tg, "@")}
-                />
-              )}
               {(user.fc?.length ?? 0) > 1 && (
                 <LinkCard
                   label="Farcaster"
@@ -499,6 +489,13 @@ const UserProfilePage = () => {
                     "@"
                   )}`}
                   value={labelStartWith(user.fc, "@")}
+                />
+              )}
+              {(user.tg?.length ?? 0) > 1 && (
+                <LinkCard
+                  label="Telegram"
+                  href={`https://t.me/${removeLabelStartWith(user.tg, "@")}`}
+                  value={labelStartWith(user.tg, "@")}
                 />
               )}
             </div>

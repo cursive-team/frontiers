@@ -66,6 +66,7 @@ export default function Tap() {
         pkId: person.pkId,
         psiPublicKeysLink: person.psiPublicKeysLink,
         twitterUsername: person.twitter,
+        farcasterUsername: person.farcaster,
         telegramUsername: person.telegram,
         bio: person.bio,
         signaturePublicKey: person.signaturePublicKey,

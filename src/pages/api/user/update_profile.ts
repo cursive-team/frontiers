@@ -4,6 +4,7 @@ import { object, string, boolean } from "yup";
 import { EmptyResponse, ErrorResponse } from "@/types";
 import { verifyAuthToken } from "@/lib/server/auth";
 import {
+  farcasterUsernameRegex,
   telegramUsernameRegex,
   twitterUsernameRegex,
 } from "@/lib/shared/utils";
@@ -11,6 +12,7 @@ import {
 const updateProfileSchema = object({
   authToken: string().required(),
   twitterUsername: string().optional().default(undefined),
+  farcasterUsername: string().optional().default(undefined),
   telegramUsername: string().optional().default(undefined),
   bio: string().optional().default(undefined),
 });
@@ -38,7 +40,13 @@ export default async function handler(
     return res.status(500).json({ error: "Internal Server Error" });
   }
 
-  const { authToken, twitterUsername, telegramUsername, bio } = validatedData;
+  const {
+    authToken,
+    twitterUsername,
+    farcasterUsername,
+    telegramUsername,
+    bio,
+  } = validatedData;
 
   if (
     twitterUsername &&
@@ -46,6 +54,14 @@ export default async function handler(
     !twitterUsernameRegex.test(twitterUsername)
   ) {
     return res.status(400).json({ error: "Invalid Twitter username" });
+  }
+
+  if (
+    farcasterUsername &&
+    farcasterUsername !== "@" &&
+    !farcasterUsernameRegex.test(farcasterUsername)
+  ) {
+    return res.status(400).json({ error: "Invalid Farcaster username" });
   }
 
   if (
@@ -90,6 +106,19 @@ export default async function handler(
       : twitterUsername;
   }
 
+  let parsedFarcaster: string | undefined;
+  if (
+    farcasterUsername === undefined ||
+    farcasterUsername === "" ||
+    farcasterUsername === "@"
+  ) {
+    parsedFarcaster = undefined;
+  } else {
+    parsedFarcaster = farcasterUsername.startsWith("@")
+      ? farcasterUsername.slice(1)
+      : farcasterUsername;
+  }
+
   let parsedTelegram: string | undefined;
   if (
     telegramUsername === undefined ||
@@ -110,6 +139,7 @@ export default async function handler(
       },
       data: {
         twitter: parsedTwitter,
+        farcaster: parsedFarcaster,
         telegram: parsedTelegram,
         bio,
       },

@@ -46,8 +46,13 @@ const Profile = ({ handleSignout }: ProfileProps) => {
   const updateProfile = async () => {
     logClientEvent("profileUpdate", {});
 
-    const { displayName, twitterUsername, telegramUsername, bio } =
-      getState().profile;
+    const {
+      displayName,
+      twitterUsername,
+      farcasterUsername,
+      telegramUsername,
+      bio,
+    } = getState().profile;
 
     setLoading(true);
 
@@ -74,6 +79,7 @@ const Profile = ({ handleSignout }: ProfileProps) => {
       body: JSON.stringify({
         authToken: authToken.value,
         twitterUsername,
+        farcasterUsername,
         telegramUsername,
         bio,
       }),
@@ -93,6 +99,7 @@ const Profile = ({ handleSignout }: ProfileProps) => {
       encryptionPublicKey: previousProfile.encryptionPublicKey,
       signaturePublicKey: previousProfile.signaturePublicKey,
       twitterUsername,
+      farcasterUsername,
       telegramUsername,
       bio,
     };

@@ -375,6 +375,7 @@ export default function Register() {
       encryptionPublicKey: publicKey,
       signaturePublicKey: verifyingKey,
       twitterUsername: twitter,
+      farcasterUsername: farcaster,
       telegramUsername: telegram,
       bio,
     });

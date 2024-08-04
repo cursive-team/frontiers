@@ -14,8 +14,8 @@ export type User = {
   pkId: string; // User's public key index for PSI
   psiPkLink?: string; // Link to user's PSI public keys
   x?: string; // User's Twitter username
-  tg?: string; // User's Telegram username
   fc?: string; // User's Farcaster username
+  tg?: string; // User's Telegram username
   bio?: string; // User's bio
   note?: string; // Private note
   sigPk?: string; // User's signature public key

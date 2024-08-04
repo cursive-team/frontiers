@@ -139,6 +139,7 @@ export default function Login() {
       backup,
       password: passwordData,
       twitterUsername,
+      farcasterUsername,
       telegramUsername,
       bio,
     } = await response.json();
@@ -182,6 +183,7 @@ export default function Login() {
       saveProfile({
         ...profile,
         twitterUsername,
+        farcasterUsername,
         telegramUsername,
         bio,
       });

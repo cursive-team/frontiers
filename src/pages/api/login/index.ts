@@ -18,6 +18,7 @@ export type LoginResponse =
           }
         | undefined;
       twitterUsername?: string;
+      farcasterUsername?: string;
       telegramUsername?: string;
       bio?: string;
     }
@@ -86,6 +87,7 @@ export default async function handler(
         hash: user.passwordHash,
       },
       twitterUsername: user.twitter ? user.twitter : undefined,
+      farcasterUsername: user.farcaster ? user.farcaster : undefined,
       telegramUsername: user.telegram ? user.telegram : undefined,
       bio: user.bio ? user.bio : undefined,
     };

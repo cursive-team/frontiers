@@ -94,6 +94,6 @@ export const displayNameRegex = /^[a-zA-Z0-9]{1,20}$/;
 
 export const twitterUsernameRegex = /^@[a-zA-Z0-9_]{1,15}$/;
 
-export const telegramUsernameRegex = /^@[a-zA-Z0-9_]{2,32}$/; // actually Daimo
+export const telegramUsernameRegex = /^@[a-zA-Z0-9_]{2,32}$/;
 
 export const farcasterUsernameRegex = /^@[a-zA-Z0-9_.]{1,20}$/;

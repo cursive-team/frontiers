@@ -54,9 +54,16 @@ export const ProfileSchema = object({
     })
     .trim()
     .optional(),
+  farcasterUsername: string()
+    .matches(farcasterUsernameRegex, {
+      message: "Invalid Farcaster username.",
+      excludeEmptyString: true,
+    })
+    .trim()
+    .optional(),
   telegramUsername: string()
     .matches(telegramUsernameRegex, {
-      message: "Invalid Daimo username.",
+      message: "Invalid Telegram username.",
       excludeEmptyString: true,
     })
     .trim()

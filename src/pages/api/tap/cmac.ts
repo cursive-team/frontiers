@@ -26,6 +26,7 @@ export type PersonTapResponse = {
   psiPublicKeysLink: string;
   pkId: string;
   twitter?: string;
+  farcaster?: string;
   telegram?: string;
   bio?: string;
   isUserSpeaker: boolean;
@@ -40,6 +41,7 @@ export const personTapResponseSchema = object({
   psiPublicKeysLink: string().required(),
   pkId: string().required(),
   twitter: string().optional().default(undefined),
+  farcaster: string().optional().default(undefined),
   telegram: string().optional().default(undefined),
   bio: string().optional().default(undefined),
   isUserSpeaker: boolean().required(),
@@ -191,6 +193,7 @@ export default async function handler(
       psiPublicKeysLink: user.psiPublicKeysLink,
       encryptionPublicKey: user.encryptionPublicKey,
       twitter: user.twitter ? user.twitter : undefined,
+      farcaster: user.farcaster ? user.farcaster : undefined,
       telegram: user.telegram ? user.telegram : undefined,
       bio: user.bio ? user.bio : undefined,
       isUserSpeaker: user.isUserSpeaker,

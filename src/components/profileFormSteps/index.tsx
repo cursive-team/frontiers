@@ -45,6 +45,7 @@ export const DEFAULT_PROFILE_VALUES: ProfileFormProps = {
   displayName: "",
   bio: "",
   twitterUsername: "",
+  farcasterUsername: "",
   telegramUsername: "",
 };
 
@@ -91,6 +92,9 @@ const ProfileForm = ({
         twitterUsername:
           handleNickName(profile?.twitterUsername) ??
           handleNickName(previousProfile?.twitterUsername),
+        farcasterUsername:
+          handleNickName(profile?.farcasterUsername) ??
+          handleNickName(previousProfile?.farcasterUsername),
         telegramUsername:
           handleNickName(profile?.telegramUsername) ??
           handleNickName(previousProfile?.telegramUsername),
@@ -189,7 +193,17 @@ const ProfileForm = ({
               })}
             />
             <Input
-              label="Daimo"
+              label="Farcaster"
+              error={errors.farcasterUsername?.message}
+              {...register("farcasterUsername", {
+                onChange: (e) => {
+                  const value = e.target.value;
+                  handleUsername("farcasterUsername", value);
+                },
+              })}
+            />
+            <Input
+              label="Telegram"
               error={errors.telegramUsername?.message}
               {...register("telegramUsername", {
                 onChange: (e) => {

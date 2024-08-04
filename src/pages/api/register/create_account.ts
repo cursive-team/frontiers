@@ -217,6 +217,7 @@ export default async function handler(
         passwordHash,
         authPublicKey,
         twitter: parsedTwitter,
+        farcaster: parsedFarcaster,
         telegram: parsedTelegram,
         bio,
       },
