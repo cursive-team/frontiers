@@ -72,9 +72,19 @@ export default function Register() {
   }, [router.query]);
 
   useEffect(() => {
-    if (status === "authenticated") {
-      setDisplayState(DisplayState.USER_INFO);
-    }
+    const handleGithubLogin = async () => {
+      if (status === "authenticated") {
+        const githubIsUnique = await checkGithubIsUnique();
+        if (!githubIsUnique) {
+          toast.error("Github account is already taken.");
+          signOut();
+          return;
+        }
+
+        setDisplayState(DisplayState.USER_INFO);
+      }
+    };
+    handleGithubLogin();
   }, [status]);
 
   useEffect(() => {
@@ -84,6 +94,20 @@ export default function Register() {
       }
     }
   }, [displayState, session]);
+
+  const checkGithubIsUnique = async (): Promise<boolean> => {
+    const response = await fetch(`/api/register/check_github`);
+    if (!response.ok) {
+      console.error(
+        `HTTP error when checking github uniqueness! status: ${response.status}`
+      );
+      return false;
+    }
+
+    const data = await response.json();
+
+    return data.isUnique;
+  };
 
   const checkUsernameIsUnique = async (
     displayName: string
