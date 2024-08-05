@@ -1,12 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { ErrorResponse, LocationWithQuests } from "@/types";
-import {
-  LocationSignature,
-  getLocationSignature,
-} from "@/lib/client/localStorage";
 import { classed } from "@tw-classed/react";
-import useSettings from "@/hooks/useSettings";
 import { AppBackHeader } from "@/components/AppHeader";
 import { toast } from "sonner";
 import { LoadingWrapper } from "@/components/wrappers/LoadingWrapper";
@@ -15,21 +10,16 @@ import { Card } from "@/components/cards/Card";
 import Link from "next/link";
 import { Button } from "@/components/Button";
 import { Icons } from "@/components/Icons";
+import { getUsers, User } from "@/lib/client/localStorage";
 
 const Title = classed.span("text-iron-800 text-xs font-normal font-sans");
 const Description = classed.h5("text-iron-950 font-normal text-sm");
-
-const stageMapping: Record<string, string> = {
-  main: "Mainstage",
-  side: "Sidestage",
-  breakout: "Breakout room",
-  workshop: "Workshop room",
-};
 
 const LocationDetails = () => {
   const router = useRouter();
   const { id } = router.query;
   const [location, setLocation] = useState<LocationWithQuests>();
+  const [users, setUsers] = useState<Record<string, User>>({});
 
   useEffect(() => {
     const fetchLocation = async () => {
@@ -62,6 +52,35 @@ const LocationDetails = () => {
     fetchLocation();
   }, [router, id]);
 
+  useEffect(() => {
+    const users = getUsers();
+    setUsers(users);
+  }, []);
+
+  const getSpeakerComponent = (): JSX.Element | null => {
+    if (!location) {
+      return null;
+    }
+    if (!users || !location.speakerUser) {
+      return <Description>{location.speaker}</Description>;
+    }
+
+    const speakerUserEncPk = location.speakerUser.encryptionPublicKey;
+    const userKey = Object.keys(users).find(
+      (key) => users[key].encPk === speakerUserEncPk
+    );
+
+    if (userKey) {
+      return (
+        <Link href={`/users/${userKey}`}>
+          <Description>{location.speaker}</Description>
+        </Link>
+      );
+    } else {
+      return <Description>{location.speaker}</Description>;
+    }
+  };
+
   return (
     <div>
       <AppBackHeader redirectTo="/" />
@@ -79,9 +98,6 @@ const LocationDetails = () => {
               }}
             >
               <div className="flex flex-col py-4 px-3 min-h-[180px]">
-                <span className="text-primary text-xs font-semibold font-sans">
-                  {stageMapping[location.stage]}
-                </span>
                 <h5 className="mt-auto text-primary font-medium text-[21px] leading-[21px]">
                   {location.name}
                 </h5>
@@ -90,7 +106,7 @@ const LocationDetails = () => {
             {location.speaker && (
               <div className="flex flex-col gap-1">
                 <Title>Speaker</Title>
-                <Description>{location.speaker}</Description>
+                {getSpeakerComponent()}
               </div>
             )}
             {location.description && (

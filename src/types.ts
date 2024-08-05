@@ -71,4 +71,9 @@ export type LocationWithQuests = Location & {
     id: number;
     questId: number;
   }[];
+  speakerUser: {
+    displayName: string;
+    encryptionPublicKey: string;
+    signaturePublicKey: string;
+  } | null;
 };

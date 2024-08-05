@@ -25,6 +25,13 @@ export default async function handler(
               questId: true,
             },
           },
+          speakerUser: {
+            select: {
+              displayName: true,
+              encryptionPublicKey: true,
+              signaturePublicKey: true,
+            },
+          },
         },
       });
 

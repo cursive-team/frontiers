@@ -12,7 +12,6 @@ import {
   getActivities,
   getAuthToken,
   getKeys,
-  getLocationSignatures,
   getProfile,
   getUsers,
 } from "@/lib/client/localStorage";
@@ -31,7 +30,7 @@ import { IconCircle } from "@/components/IconCircle";
 import { NoResultContent } from "@/components/NoResultContent";
 import { classed } from "@tw-classed/react";
 import { logClientEvent } from "@/lib/client/metrics";
-import { useSession } from "next-auth/react";
+import { Location } from "@prisma/client";
 
 interface LinkCardProps {
   name: string;
@@ -202,7 +201,6 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
 
 export default function Social() {
   const router = useRouter();
-  const { data: session } = useSession();
   const { getState } = useStateMachine({ updateStateFromAction });
   const { pageWidth } = useSettings();
   const [showSliderModal, setShowSliderModal] = useState(false);
@@ -217,7 +215,8 @@ export default function Social() {
   const computeTabsItems = (
     profileData: Profile,
     users: Record<string, User>,
-    activities: Activity[]
+    activities: Activity[],
+    locations: Location[]
   ): TabsProps["items"] => {
     // Group activities by date
     const groupedActivities: Activity[][] = [];
@@ -268,13 +267,27 @@ export default function Social() {
     });
     groupedContactUsers.push(currentLetterUsers);
 
-    const locationSignatures = getLocationSignatures();
-    const locations = Object.entries(locationSignatures)
-      .map(([key, value]) => ({
-        ...value,
-        id: key,
-      }))
-      .sort((a, b) => new Date(a.ts).getTime() - new Date(b.ts).getTime());
+    // Group locations by date and time
+    const groupedLocations: Location[][] = [];
+    let currentLocationDate: string | undefined = undefined;
+    let currentDateLocations: Location[] = [];
+    locations.sort(
+      (a, b) => new Date(a.talkTime).getTime() - new Date(b.talkTime).getTime()
+    );
+    locations.forEach((location) => {
+      const date = new Date(location.talkTime).toDateString();
+      if (currentLocationDate === undefined) {
+        currentDateLocations.push(location);
+        currentLocationDate = date;
+      } else if (currentLocationDate === date) {
+        currentDateLocations.push(location);
+      } else {
+        groupedLocations.push(currentDateLocations);
+        currentDateLocations = [location];
+        currentLocationDate = date;
+      }
+    });
+    groupedLocations.push(currentDateLocations);
 
     return [
       {
@@ -356,22 +369,31 @@ export default function Social() {
         children: (
           <div className="flex flex-col gap-5 mt-2">
             {locations.length === 0 ? (
-              <NoResultContent>
-                {"Tap talk stickers to prove attendance and get talk details!"}
-              </NoResultContent>
+              <NoResultContent>{"No talks available."}</NoResultContent>
             ) : (
-              <div className="flex flex-col gap-2 w-full">
-                {locations.map((location, index) => {
-                  return (
-                    <LinkCard
-                      key={index}
-                      name={location.name}
-                      date={formatDate(location.ts)}
-                      href={`/locations/${location.id}`}
-                    />
-                  );
-                })}
-              </div>
+              groupedLocations.map((locations, index) => {
+                return (
+                  <ListLayout
+                    key={index}
+                    label={new Date(locations[0].talkTime).toLocaleDateString(
+                      "en-US",
+                      { month: "long", day: "numeric" }
+                    )}
+                    spacing="sm"
+                  >
+                    {locations.map((location, index) => {
+                      return (
+                        <LinkCard
+                          key={index}
+                          name={location.name}
+                          date={formatDate(location.talkTime.toString())}
+                          href={`/locations/${location.id}`}
+                        />
+                      );
+                    })}
+                  </ListLayout>
+                );
+              })
             )}
           </div>
         ),
@@ -416,6 +438,19 @@ export default function Social() {
         }
       }
 
+      // Fetch locations
+      const fetchLocations = async (): Promise<Location[]> => {
+        const response = await fetch(`/api/location`);
+        if (!response.ok) {
+          console.error("Error fetching locations: ", response.statusText);
+          return [];
+        }
+
+        const locations = await response.json();
+        return locations;
+      };
+      const locations = await fetchLocations();
+
       // Compute tabs items
       const users = getUsers();
       const activities = getActivities();
@@ -424,7 +459,7 @@ export default function Social() {
           (user) => user.inTs && user.encPk !== profileData.encryptionPublicKey
         ).length
       );
-      setTabsItems(computeTabsItems(profileData, users, activities));
+      setTabsItems(computeTabsItems(profileData, users, activities, locations));
       setLoading(false);
     };
 

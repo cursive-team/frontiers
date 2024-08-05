@@ -34,6 +34,7 @@ type CreateLocationData = {
   startTime: string;
   endTime: string;
   signaturePublicKey: string;
+  talkTime: Date;
 };
 
 export default async function handler(
@@ -121,6 +122,7 @@ export default async function handler(
         startTime,
         endTime,
         signaturePublicKey: verifyingKey,
+        talkTime: new Date(),
       });
       allTalkIds.push(locationIndex);
       locationIndex++;

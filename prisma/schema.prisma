@@ -43,6 +43,8 @@ model User {
   admin                     Admin?
   Room                      Room[]
   RoomMember                RoomMember[]
+
+  talks Location[]
 }
 
 model Admin {
@@ -77,6 +79,9 @@ model Location {
 
   slidesLink    String?
   speakerSocial String?
+  speakerUserId Int?
+  speakerUser   User?    @relation(fields: [speakerUserId], references: [id])
+  talkTime      DateTime
 }
 
 model SigninCode {
