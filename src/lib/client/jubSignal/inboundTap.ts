@@ -14,6 +14,8 @@ export type InboundTapMessage = {
   msg: string; // Signature message
   sig: string; // Signature
   isSpk?: boolean; // Is speaker
+  ghUserId: string; // GitHub ID
+  ghLogin: string; // GitHub username
 };
 
 export const inboundTapMessageSchema = object({
@@ -29,6 +31,8 @@ export const inboundTapMessageSchema = object({
   msg: string().required(),
   sig: string().required(),
   isSpk: boolean().optional().default(false),
+  ghUserId: string().required(),
+  ghLogin: string().required(),
 });
 
 export type EncryptInboundTapMessageArgs = {
@@ -44,6 +48,8 @@ export type EncryptInboundTapMessageArgs = {
   signatureMessage: string;
   signature: string;
   isSpeaker?: boolean;
+  githubUserId: string;
+  githubLogin: string;
   senderPrivateKey: string;
   recipientPublicKey: string;
 };
@@ -61,6 +67,8 @@ export async function encryptInboundTapMessage({
   signatureMessage,
   signature,
   isSpeaker,
+  githubUserId,
+  githubLogin,
   senderPrivateKey,
   recipientPublicKey,
 }: EncryptInboundTapMessageArgs): Promise<string> {
@@ -77,6 +85,8 @@ export async function encryptInboundTapMessage({
     msg: signatureMessage,
     sig: signature,
     isSpk: isSpeaker,
+    ghUserId: githubUserId,
+    ghLogin: githubLogin,
   };
 
   const encryptedMessage = await encryptMessage(

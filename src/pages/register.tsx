@@ -284,6 +284,14 @@ export default function Register() {
       setDisplayState(prevDisplayState);
       return;
     }
+    const githubUserId = (session as any).githubUserId;
+    const githubLogin = (session as any).githubLogin;
+    if (!githubUserId || !githubLogin) {
+      toast.error("Error creating account! Please try again.");
+      setLoading(false);
+      setDisplayState(prevDisplayState);
+      return;
+    }
 
     const { privateKey, publicKey } = await generateEncryptionKeyPair();
     const { psiPrivateKeys, psiPublicKeys } = await generatePSIKeys();
@@ -378,6 +386,8 @@ export default function Register() {
       farcasterUsername: farcaster,
       telegramUsername: telegram,
       bio,
+      githubUserId,
+      githubLogin,
     });
     saveAuthToken({
       value: authToken.value,

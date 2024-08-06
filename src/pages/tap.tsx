@@ -73,6 +73,8 @@ export default function Tap() {
         signatureMessage: person.signatureMessage,
         signature: person.signature,
         isSpeaker: person.isUserSpeaker,
+        githubUserId: profile.githubUserId,
+        githubLogin: profile.githubLogin,
         senderPrivateKey,
         recipientPublicKey: thisUserPublicKey,
       });

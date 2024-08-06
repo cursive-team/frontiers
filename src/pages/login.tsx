@@ -142,6 +142,8 @@ export default function Login() {
       farcasterUsername,
       telegramUsername,
       bio,
+      githubUserId,
+      githubLogin,
     } = await response.json();
     if (!authToken) {
       console.error("No auth token found");
@@ -186,6 +188,8 @@ export default function Login() {
         farcasterUsername,
         telegramUsername,
         bio,
+        githubUserId,
+        githubLogin,
       });
     }
 

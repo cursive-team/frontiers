@@ -22,6 +22,11 @@ type PrecreateUserData = {
   encryptionPublicKey: string;
   signaturePublicKey: string;
   psiPublicKeysLink: string;
+  githubName: string;
+  githubEmail: string;
+  githubImage: string;
+  githubUserId: string;
+  githubLogin: string;
 };
 
 type CreateLocationData = {
@@ -86,6 +91,11 @@ export default async function handler(
         encryptionPublicKey: "",
         signaturePublicKey: verifyingKey,
         psiPublicKeysLink: "",
+        githubName: "",
+        githubEmail: "",
+        githubImage: "",
+        githubUserId: "",
+        githubLogin: "",
       });
     }
 

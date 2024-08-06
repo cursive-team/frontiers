@@ -15,6 +15,8 @@ export type Profile = {
   farcasterUsername?: string;
   telegramUsername?: string;
   bio?: string;
+  githubUserId: string;
+  githubLogin: string;
 };
 
 export const profileSchema = object({
@@ -25,6 +27,8 @@ export const profileSchema = object({
   farcasterUsername: string().optional().default(undefined),
   telegramUsername: string().optional().default(undefined),
   bio: string().optional().default(undefined),
+  githubUserId: string().required(),
+  githubLogin: string().required(),
 });
 
 export const saveProfile = (profile: Profile): void => {

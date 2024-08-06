@@ -16,11 +16,14 @@ export default async function handler(
   if (!session || !session.user) {
     return res.status(401).json({ error: "Session not found" });
   }
-  const githubEmail = session.user.email;
+  const githubUserId = (session as any).githubUserId;
+  if (!githubUserId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
   const existingUser = await prisma.user.findFirst({
     where: {
-      githubEmail,
+      githubUserId,
     },
   });
   if (existingUser) {

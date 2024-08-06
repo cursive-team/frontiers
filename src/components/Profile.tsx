@@ -102,6 +102,8 @@ const Profile = ({ handleSignout }: ProfileProps) => {
       farcasterUsername,
       telegramUsername,
       bio,
+      githubUserId: previousProfile.githubUserId,
+      githubLogin: previousProfile.githubLogin,
     };
     saveProfile(profile);
 

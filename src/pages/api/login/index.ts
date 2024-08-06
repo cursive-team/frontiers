@@ -21,6 +21,8 @@ export type LoginResponse =
       farcasterUsername?: string;
       telegramUsername?: string;
       bio?: string;
+      githubUserId: string;
+      githubLogin: string;
     }
   | ErrorResponse;
 
@@ -90,6 +92,8 @@ export default async function handler(
       farcasterUsername: user.farcaster ? user.farcaster : undefined,
       telegramUsername: user.telegram ? user.telegram : undefined,
       bio: user.bio ? user.bio : undefined,
+      githubUserId: user.githubUserId,
+      githubLogin: user.githubLogin,
     };
     return res.status(200).json(responseData);
   } catch (error) {

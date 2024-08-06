@@ -62,7 +62,6 @@ export default async function handler(
   }
 
   const session = await getServerSession(req, res, authOptions);
-  console.log(session);
   if (!session || !session.user) {
     return res.status(401).json({ error: "Unauthorized" });
   }
@@ -71,6 +70,17 @@ export default async function handler(
   const githubImage = session.user.image;
   const githubUserId = (session as any).githubUserId;
   const githubLogin = (session as any).githubLogin;
+
+  if (
+    !githubName ||
+    !githubEmail ||
+    !githubImage ||
+    !githubUserId ||
+    !githubLogin
+  ) {
+    console.error("No github found");
+    return res.status(401).json({ error: "No github found" });
+  }
 
   const {
     chipEnc,
@@ -223,6 +233,11 @@ export default async function handler(
         farcaster: parsedFarcaster,
         telegram: parsedTelegram,
         bio,
+        githubName,
+        githubEmail,
+        githubImage,
+        githubUserId,
+        githubLogin,
       },
     });
 
