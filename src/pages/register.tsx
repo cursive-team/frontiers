@@ -89,8 +89,8 @@ export default function Register() {
 
   useEffect(() => {
     if (displayState === DisplayState.USER_INFO) {
-      if (session?.user?.name) {
-        setDisplayName(session.user.name);
+      if (session && (session as any).githubLogin) {
+        setDisplayName((session as any).githubLogin);
       }
     }
   }, [displayState, session]);

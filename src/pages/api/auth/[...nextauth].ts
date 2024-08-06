@@ -10,14 +10,17 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, account }) {
-      if (account) {
+    async jwt({ token, account, user, profile }) {
+      if (account?.provider === "github") {
         token.accessToken = account.access_token;
+        token.githubLogin = (profile as any).login;
       }
       return token;
     },
     async session({ session, token }) {
       (session as any).accessToken = token.accessToken;
+      (session as any).githubUserId = token.sub;
+      (session as any).githubLogin = token.githubLogin;
       return session;
     },
   },
