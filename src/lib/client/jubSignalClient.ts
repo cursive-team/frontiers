@@ -333,6 +333,7 @@ const processEncryptedMessages = async (args: {
             name,
             encPk,
             x,
+            fc,
             tg,
             bio,
             pk,
@@ -352,6 +353,7 @@ const processEncryptedMessages = async (args: {
             user.encPk = encPk;
             user.psiPkLink = psiPkLink;
             user.x = x;
+            user.fc = fc;
             user.tg = tg;
             user.bio = bio;
             user.sigPk = pk;
@@ -370,6 +372,7 @@ const processEncryptedMessages = async (args: {
               encPk,
               psiPkLink,
               x,
+              fc,
               tg,
               bio,
               sigPk: pk,

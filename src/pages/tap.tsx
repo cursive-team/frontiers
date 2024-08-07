@@ -1,11 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
-import {
-  LocationTapResponse,
-  PersonTapResponse,
-  TapResponseCode,
-  tapResponseSchema,
-} from "./api/tap/cmac";
 import LoginForm from "@/components/LoginForm";
 import {
   getAuthToken,
@@ -26,6 +20,12 @@ import { toast } from "sonner";
 import { Spinner } from "@/components/Spinner";
 import { hashPublicKeyToUUID } from "@/lib/client/utils";
 import { logClientEvent } from "@/lib/client/metrics";
+import {
+  LocationTapResponse,
+  PersonTapResponse,
+  TapResponseCode,
+  tapResponseSchema,
+} from "./api/tap/plain";
 
 export default function Tap() {
   const router = useRouter();
@@ -73,8 +73,8 @@ export default function Tap() {
         signatureMessage: person.signatureMessage,
         signature: person.signature,
         isSpeaker: person.isUserSpeaker,
-        githubUserId: profile.githubUserId,
-        githubLogin: profile.githubLogin,
+        githubUserId: person.githubUserId,
+        githubLogin: person.githubLogin,
         senderPrivateKey,
         recipientPublicKey: thisUserPublicKey,
       });

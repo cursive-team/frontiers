@@ -461,9 +461,6 @@ export default function Register() {
         <Button variant="primary" onClick={() => signIn("github")}>
           {status === "loading" ? "Signing in..." : "Sign In With Github"}
         </Button>
-        <Button variant="primary" onClick={() => console.log(session)}>
-          Log Session
-        </Button>
         <div className="text-center">
           <span className="text-sm" onClick={() => router.push("/login")}>
             <u>Already have account</u>

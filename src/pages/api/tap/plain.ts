@@ -29,6 +29,8 @@ export type PersonTapResponse = {
   signaturePublicKey: string;
   signatureMessage: string;
   signature: string;
+  githubUserId: string;
+  githubLogin: string;
 };
 
 export const personTapResponseSchema = object({
@@ -44,6 +46,8 @@ export const personTapResponseSchema = object({
   signaturePublicKey: string().required(),
   signatureMessage: string().required(),
   signature: string().required(),
+  githubUserId: string().required(),
+  githubLogin: string().required(),
 });
 
 export type LocationTapResponse = {
@@ -154,8 +158,6 @@ export default async function handler(
     });
   }
 
-  console.log(chipKey);
-
   // if user is registered, return user data
   const user = await prisma.user.findUnique({
     where: {
@@ -186,6 +188,8 @@ export default async function handler(
       signaturePublicKey: user.signaturePublicKey,
       signatureMessage: message,
       signature,
+      githubUserId: user.githubUserId,
+      githubLogin: user.githubLogin,
     };
     return res
       .status(200)

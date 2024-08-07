@@ -491,7 +491,7 @@ const UserProfilePage = () => {
 
           // get talks info
           const talksResponse = await fetch(
-            `/api/user/get_talks?encPk=${fetchedUser.encPk}`
+            `/api/user/get_talks?encPk=${encodeURIComponent(fetchedUser.encPk)}`
           );
           if (talksResponse.ok) {
             const talksData = await talksResponse.json();
