@@ -42,26 +42,28 @@ interface LinkCardProps {
 const LinkCard = ({ name, date, href, other }: LinkCardProps) => {
   return (
     <Link href={href}>
-      <Button className="w-full !bg-white/40" variant="white">
+      <div className="w-full border border-white/50 p-3">
         <div className="grid grid-cols-[1fr_90px] w-full">
           {other ? (
             <div className="flex flex-row gap-2 truncate items-end">
-              <span className="text-iron-950 font-bold text-sm text-left">
+              <span className="text-white font-medium text-sm  text-left">
                 {name}
               </span>
-              <span className="text-iron-600 font-medium text-xs text-left truncate">
+              <span className="text-white/50 font-medium text-xs text-left truncate">
                 {other}
               </span>
             </div>
           ) : (
-            <span className="text-iron-950 font-bold text-sm text-left truncate">
+            <span className="text-white font-bold text-sm text-left truncate">
               {name}
             </span>
           )}
 
-          <span className="text-iron-600 font-bold text-xs">{date}</span>
+          <span className="text-white/50 font-inter font-medium text-xs">
+            {date}
+          </span>
         </div>
-      </Button>
+      </div>
     </Link>
   );
 };
@@ -73,7 +75,9 @@ interface ActivityFeedProps {
   date: string;
 }
 
-const CardTitleOverride = classed.h1("text-sm leading-5 font-bold");
+const CardTitleOverride = classed.h1(
+  "text-sm font-normal leading-6 font-inter"
+);
 
 interface FeedContentProps {
   title: React.ReactNode;
@@ -112,7 +116,7 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
               {"Sent socials to "} {name}
             </>
           }
-          icon={<CircleCard icon="person" />}
+          icon={<Icons.Person className="text-secondary" />}
           description={date}
         />
       );
@@ -123,7 +127,7 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
             title={
               <>
                 <span className="text-iron-600">{"Overlapped with "}</span>
-                <span className="text-iron-750">{name}</span>
+                <span className="text-white">{name}</span>
               </>
             }
             titleOverride={true}
@@ -141,11 +145,11 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
                 <span className="text-iron-600">
                   {"Received socials from "}
                 </span>
-                <span className="text-iron-750">{name}</span>
+                <span className="text-white">{name}</span>
               </>
             }
             titleOverride={true}
-            icon={<CircleCard icon="person" />}
+            icon={<Icons.Person className="text-secondary" />}
             description={date}
           />
         </Link>
@@ -157,7 +161,7 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
             title={
               <>
                 <span className="text-iron-600">{"Attended talk "}</span>
-                <span className="text-iron-750">{name}</span>
+                <span className="text-white">{name}</span>
               </>
             }
             titleOverride={true}
@@ -174,7 +178,7 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
             title={
               <>
                 <span className="text-iron-600">{"Made a proof "}</span>
-                <span className="text-iron-750">{name}</span>
+                <span className="text-white">{name}</span>
               </>
             }
             titleOverride={true}
@@ -504,17 +508,17 @@ export default function Social() {
 
           <div className="flex flex-col justify-center gap-4 py-2">
             <div className="flex flex-col gap-2">
-              <h2 className="text-xl leading-6 tracking-[-0.2px] text-iron-950 font-bold">
+              <h2 className="text-xl leading-6 font-inter tracking-[-0.1px] text-white font-semibold">
                 {profile?.displayName}
               </h2>
-              <span className="text-sm font-normal text-iron-950">
+              <span className="text-xs font-inter font-normal text-white/50">
                 {numConnections === 1
                   ? `1 contact`
                   : `${numConnections} contacts`}
               </span>
             </div>
             <Link href="/leaderboard">
-              <Button size="small" variant="tertiary">
+              <Button size="small" variant="gray">
                 View leaderboard
               </Button>
             </Link>

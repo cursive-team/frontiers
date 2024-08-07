@@ -36,7 +36,7 @@ export default function OnlyMobileLayout({ children }: OnlyMobileProps) {
   if (!isLoaded) return null;
   return (
     <>
-      {!isMobile ? (
+      {false ? (
         <FullPageBanner
           description={`${APP_CONFIG.APP_NAME} is only available on mobile devices. Please visit the website on your phone in order to take part in the experience.`}
         />

@@ -15,7 +15,7 @@ import { classed } from "@tw-classed/react";
 
 export type ProfileFormProps = InferType<typeof ProfileSchema>;
 
-const Title = classed.h3("block font-sans text-iron-950", {
+const Title = classed.h3("block font-sans text-white", {
   variants: {
     size: {
       small: "text-base leading-1 font-semibold",
@@ -27,7 +27,7 @@ const Title = classed.h3("block font-sans text-iron-950", {
   },
 });
 
-const Description = classed.span("text-sm text-iron-600 leading-5");
+const Description = classed.span("text-sm text-white/50 leading-5");
 
 type ProfileProps = {
   onHandleSignout: () => void;
@@ -142,6 +142,7 @@ const ProfileForm = ({
       actions={
         <div className="flex flex-col gap-2">
           <Button
+            variant="black"
             disabled={!formState.isDirty || loading}
             onClick={async () => {
               const isValid = await trigger();
@@ -153,7 +154,7 @@ const ProfileForm = ({
           >
             Save Changes
           </Button>
-          <Button type="button" onClick={onHandleSignout}>
+          <Button variant="black" type="button" onClick={onHandleSignout}>
             Logout
           </Button>
         </div>

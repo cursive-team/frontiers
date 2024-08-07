@@ -33,6 +33,10 @@ import { Spinner } from "@/components/Spinner";
 import Link from "next/link";
 import { logClientEvent } from "@/lib/client/metrics";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { AppHeaderLogo } from "@/components/AppHeader";
+import { Icon } from "@mui/material";
+import { Icons } from "@/components/Icons";
+import { AppLink } from "@/components/AppLink";
 
 enum DisplayState {
   GITHUB,
@@ -45,7 +49,7 @@ enum DisplayState {
 const Title = classed.h3("font-medium text-primary text-base text-center");
 const Description = classed.div(
   Card.Base,
-  "p-2 text-[14px] font-normal font-sans !border-none text-iron-950 !rounded-[8px]"
+  "p-2 text-sm font-normal text-white/75 font-inter !border-none  !rounded-[8px]"
 );
 const Underline = classed.span("text-primary");
 export default function Register() {
@@ -457,26 +461,50 @@ export default function Register() {
 
   const StateContent: Record<DisplayState, JSX.Element> = {
     [DisplayState.GITHUB]: (
-      <>
-        <Button variant="primary" onClick={() => signIn("github")}>
-          {status === "loading" ? "Signing in..." : "Sign In With Github"}
-        </Button>
-        <div className="text-center">
-          <span className="text-sm" onClick={() => router.push("/login")}>
-            <u>Already have account</u>
+      <div className="grid grid-rows-[1fr_auto] h-full">
+        <div className="flex flex-col  justify-center">
+          <span className="text-center text-base leading-6 text-white/75 font-sans px-10">
+            This app will allow you to share and collect encrypted data with
+            other event attendees.
           </span>
         </div>
-      </>
+        <div className="flex flex-col gap-4 mt-auto pb-4">
+          <Button
+            icon={<Icons.Github className="mr-2" />}
+            variant="black"
+            onClick={() => signIn("github")}
+          >
+            {status === "loading" ? "Signing in..." : "Sign In With Github"}
+          </Button>
+        </div>
+      </div>
     ),
     [DisplayState.USER_INFO]: (
       <FormStepLayout
-        title="Backpocket Alpha"
-        subtitle={
-          <div className="flex flex-col gap-2">
-            <div>Input your socials!</div>
-          </div>
+        description={
+          <span className="pb-4 block">
+            What do you want others to see when they tap your badge?
+          </span>
         }
         className="pt-4"
+        footer={
+          <div className="flex flex-col gap-2 mt-auto">
+            <Button variant="black" type="submit" loading={loading}>
+              Next
+            </Button>
+            <div className="text-center">
+              <span
+                className="text-center font-sans text-sm text-white/50"
+                onClick={async () => {
+                  await signOut();
+                  window.location.reload();
+                }}
+              >
+                <u>Change Github Account</u>
+              </span>
+            </div>
+          </div>
+        }
         onSubmit={handleSubmitUserInfo}
       >
         <Input
@@ -537,61 +565,53 @@ export default function Register() {
           value={bio}
           onChange={(e) => setBio(e.target.value)}
         />
-        <Button type="submit" loading={loading}>
-          Next
-        </Button>
-        <div className="text-center">
-          <span
-            className="text-center text-sm"
-            onClick={async () => {
-              await signOut();
-              window.location.reload();
-            }}
-          >
-            <u>Change Github Account</u>
-          </span>
-        </div>
       </FormStepLayout>
     ),
     [DisplayState.PASSKEY]: (
       <FormStepLayout
-        title="Backpocket Alpha"
-        subtitle={
-          <div className="flex flex-col gap-2">
-            <div>
-              Tap NFC rings to build your social graph, use MPC to query
-              efficiently.
-            </div>
-            <div>
-              Set up socials to share, register to maintain an encrypted backup
-              of your data.
-            </div>
-          </div>
-        }
+        description="How do you want to save your information?"
         className="pt-4"
         onSubmit={handleSubmitWithPasskey}
-      >
-        <div className="flex flex-col gap-2">
-          <Button type="submit" loading={loading}>
-            Register with passkey
-          </Button>
-          <div className="text-center">
-            <span
-              className="text-center text-sm"
-              onClick={handleCreateWithPassword}
-            >
-              <u>Register with password</u>
+        footer={
+          <div className="flex flex-col gap-4">
+            <Button variant="black" onClick={handleCreateWithPassword}>
+              Set a password
+            </Button>
+            <span className="h-6 relative font-normal text-sm text-white font-inter text-center">
+              <div className="after:content-[''] after:top-[12px] after:absolute after:h-[1px] after:bg-white/40 after:w-full after:left-0"></div>
+              <div className="absolute right-1/2 translate-x-3 bg-black px-2 z-10">
+                or
+              </div>
             </span>
+            <Button variant="black" type="submit" loading={loading}>
+              Register with passkey
+            </Button>
           </div>
-        </div>
-      </FormStepLayout>
+        }
+      ></FormStepLayout>
     ),
     [DisplayState.PASSWORD]: (
       <FormStepLayout
-        title="Backpocket Alpha"
-        subtitle="Choose a master password to maintain an encrypted backup your data."
+        subtitle={
+          <span className="pb-4 block">
+            Choose a master password to maintain an encrypted backup your data.
+          </span>
+        }
         className="pt-4"
         onSubmit={handleSubmitWithPassword}
+        footer={
+          <div className="flex flex-col gap-4">
+            <Button variant="black" type="submit" loading={loading}>
+              Register
+            </Button>
+            <span
+              className="text-center text-white/50 text-sm"
+              onClick={handleCreateWithPasskey}
+            >
+              <u>Register with passkey instead</u>
+            </span>
+          </div>
+        }
       >
         <Input
           type="password"
@@ -609,19 +629,13 @@ export default function Register() {
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
-        <Button type="submit" loading={loading}>
-          Register
-        </Button>
-        <span className="text-center text-sm" onClick={handleCreateWithPasskey}>
-          <u>Register with passkey instead</u>
-        </span>
       </FormStepLayout>
     ),
     [DisplayState.CREATING]: (
       <div className="h-full flex flex-col pt-4 pb-8 ">
         <div className="flex flex-col my-auto justify-center">
           <Title>
-            <div className="flex items-center justify-center m-4 gap-2">
+            <div className="flex items-center justify-center m-4 gap-2 text-white font-bold">
               {isAccountReady ? "Account created!" : "Creating account"}
               {!isAccountReady && (
                 <Spinner size={20} className="!text-primary" />
@@ -658,14 +672,33 @@ export default function Register() {
         </div>
         {isAccountReady && (
           <Link href="/">
-            <Button className="mt-auto">Enter the app!</Button>
+            <Button variant="black" className="mt-auto">
+              Enter the app!
+            </Button>
           </Link>
         )}
       </div>
     ),
   };
 
-  return <>{StateContent?.[displayState]}</>;
+  return (
+    <div className="flex flex-col grow pb-4">
+      <AppHeaderLogo className="mx-auto py-5" />
+      <div className="flex flex-col h-full">
+        {StateContent?.[displayState]}
+        <span className="text-xs text-white/50 text-center mt-auto font-sans ">
+          App built by{" "}
+          <AppLink
+            href="https://cursive.team/"
+            className="text-white underline"
+          >
+            Cursive
+          </AppLink>{" "}
+          for Paradigm Frontiers.
+        </span>
+      </div>
+    </div>
+  );
 }
 
 Register.getInitialProps = () => {

@@ -2,7 +2,7 @@ import { classed } from "@tw-classed/react";
 import type * as Classed from "@tw-classed/react";
 import { ReactNode } from "react";
 
-const InputLabel = classed.div("text-iron-800", {
+const InputLabel = classed.div("text-white/75 font-medium font-inter", {
   variants: {
     size: {
       xs: "text-xs leading-4",

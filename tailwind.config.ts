@@ -21,6 +21,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: "var(--font-dm-sans)",
+        inter: "var(--font-inter)",
       },
       colors: {
         skeleton: "#1b1b1b",
@@ -42,6 +43,7 @@ const config: Config = {
           DEFAULT: "#111",
         },
         gray: {
+          DEFAULT: "#666",
           100: "#D7D7D7",
           200: "#1B1B1B",
           300: "#282828",

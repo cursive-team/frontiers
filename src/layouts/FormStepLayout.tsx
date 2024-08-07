@@ -1,28 +1,33 @@
 "use client";
 
-import { ReactNode } from "react";
+import { cn } from "@/lib/client/utils";
+import { ReactNode, FormEvent } from "react";
 
 type FormStepLayoutProps = {
   title?: ReactNode;
-  description?: string;
+  description?: ReactNode;
   subtitle?: ReactNode;
-  children: React.ReactNode;
-  header?: React.ReactNode;
-  onSubmit?: (event: React.FormEvent) => void;
+  children?: ReactNode;
+  footer?: ReactNode;
+  header?: ReactNode;
+  onSubmit?: (event: FormEvent) => void;
   onChange?: (formValues: any) => void;
   className?: string;
-  actions?: React.ReactNode; // actions are the buttons at the bottom of the form
+  childrenClassName?: string;
+  actions?: ReactNode; // actions are the buttons at the bottom of the form
 };
 
 const FormStepLayout = ({
   title,
   description,
   children,
+  footer,
   header,
   className = "",
   actions,
   onChange,
   subtitle,
+  childrenClassName,
   ...props
 }: FormStepLayoutProps) => {
   return (
@@ -35,7 +40,7 @@ const FormStepLayout = ({
         <div className="flex flex-col gap-1 xs:mb-4">
           <div className="flex flex-col gap-3">
             {description && (
-              <span className="font-normal text-[13px] leading-[18px] text-black">
+              <span className="font-normal font-sans text-sm leading-5 text-white">
                 {description}
               </span>
             )}
@@ -51,7 +56,7 @@ const FormStepLayout = ({
               </>
             )}
             {subtitle && (
-              <span className="font-normal text-[13px] leading-[18px] text-black">
+              <span className="font-normal text-sm leading-5 text-white">
                 {subtitle}
               </span>
             )}
@@ -59,9 +64,15 @@ const FormStepLayout = ({
         </div>
         {header}
       </div>
-      {children && (
-        <div className="flex flex-col gap-6 w-full mt-auto mb-4">
+      {(children || footer) && (
+        <div
+          className={cn(
+            "flex flex-col gap-6 w-full h-full mb-4",
+            childrenClassName
+          )}
+        >
           {children}
+          <div className="mt-auto">{footer}</div>
         </div>
       )}
       {actions && (

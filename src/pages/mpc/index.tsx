@@ -71,7 +71,7 @@ export default function MPCPage() {
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-2">
                 <Card.Title className="text-iron-950 text-sm font-bold">
-                  3️⃣ Top 3 Talks
+                   Top 3 Talks
                 </Card.Title>
                 <span className="text-xs font-iron-600 font-sans">
                   Rate some talks, only reveal the top 3 after everyone votes.

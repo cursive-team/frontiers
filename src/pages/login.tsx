@@ -18,6 +18,8 @@ import { supabase } from "@/lib/client/realtime";
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { AppHeaderLogo } from "@/components/AppHeader";
+import { AppLink } from "@/components/AppLink";
 
 enum DisplayState {
   GITHUB,
@@ -216,19 +218,67 @@ export default function Login() {
     router.push("/");
   };
 
-  if (displayState === DisplayState.GITHUB) {
-    return (
-      <Button variant="primary" onClick={() => signIn("github")}>
-        Login with GitHub
-      </Button>
-    );
-  } else if (displayState === DisplayState.PASSKEY) {
-    return (
+  const LoginStateContentMapping: Record<DisplayState, any> = {
+    [DisplayState.GITHUB]: (
+      <div className="grid grid-rows-[1fr_auto] h-full">
+        <div className="flex flex-col  justify-center">
+          <span className="text-center text-base leading-6 text-white/75 font-sans px-10">
+            This app will allow you to share and collect encrypted data with
+            other event attendees.
+          </span>
+        </div>
+        <div className="mt-auto mb-4">
+          <Button variant="black" onClick={() => signIn("github")}>
+            Login with GitHub
+          </Button>
+        </div>
+      </div>
+    ),
+    [DisplayState.PASSKEY]: (
       <FormStepLayout
-        title="Backpocket Alpha"
-        subtitle="Login to view your social graph and make queries."
+        subtitle={
+          <span className="pb-4 block">
+            Login to view your social graph and make queries.
+          </span>
+        }
         className="pt-4"
         onSubmit={handleSubmitWithPasskey}
+        footer={
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-4">
+              <Button variant="black" type="submit">
+                {loading ? "Logging in..." : "Login with passkey"}
+              </Button>
+              <span className="h-6 relative font-normal text-sm text-white font-inter text-center">
+                <div className="after:content-[''] after:top-[12px] after:absolute after:h-[1px] after:bg-white/40 after:w-full after:left-0"></div>
+                <div className="absolute right-1/2 translate-x-3 bg-black px-2 z-10">
+                  or
+                </div>
+              </span>
+              <Button
+                variant="black"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handlePasswordLogin();
+                }}
+              >
+                Login with password instead
+              </Button>
+            </div>
+
+            <div className="text-center">
+              <span
+                className="text-center text-white/50 text-sm"
+                onClick={async () => {
+                  await signOut();
+                  window.location.reload();
+                }}
+              >
+                <u>Change Github Account</u>
+              </span>
+            </div>
+          </div>
+        }
       >
         <Input
           type="text"
@@ -239,38 +289,34 @@ export default function Login() {
           onChange={(e) => setDisplayName(e.target.value)}
           disabled={true}
         />
-        <Button type="submit">
-          {loading ? "Logging in..." : "Login with passkey"}
-        </Button>
-        <Button
-          variant="transparent"
-          onClick={(e) => {
-            e.preventDefault();
-            handlePasswordLogin();
-          }}
-        >
-          Login with password instead
-        </Button>
-        <div className="text-center">
-          <span
-            className="text-center text-sm"
-            onClick={async () => {
-              await signOut();
-              window.location.reload();
-            }}
-          >
-            <u>Change Github Account</u>
-          </span>
-        </div>
       </FormStepLayout>
-    );
-  } else if (displayState === DisplayState.PASSWORD) {
-    return (
+    ),
+    [DisplayState.PASSWORD]: (
       <FormStepLayout
-        title="Backpocket Alpha"
-        subtitle="Login to view your social graph and event activity, or tap your card if you haven’t registered."
+        subtitle={
+          <span className="block pb-4">
+            {`Login to view your social graph and event activity, or tap your
+            card if you haven't registered.`}
+          </span>
+        }
         className="pt-4"
         onSubmit={handleSubmitWithPassword}
+        footer={
+          <div className="flex flex-col gap-4">
+            <Button variant="black" type="submit">
+              {loading ? "Logging in..." : "Login"}
+            </Button>
+            <span className="h-6 relative font-normal text-sm text-white font-inter text-center">
+              <div className="after:content-[''] after:top-[12px] after:absolute after:h-[1px] after:bg-white/40 after:w-full after:left-0"></div>
+              <div className="absolute right-1/2 translate-x-3 bg-black px-2 z-10">
+                or
+              </div>
+            </span>
+            <Button variant="black" onClick={handlePasskeyLogin}>
+              Login with passkey instead
+            </Button>
+          </div>
+        }
       >
         <Input
           type="text"
@@ -289,13 +335,28 @@ export default function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button type="submit">{loading ? "Logging in..." : "Login"}</Button>
-        <Button variant="transparent" onClick={handlePasskeyLogin}>
-          Login with passkey instead
-        </Button>
       </FormStepLayout>
-    );
-  }
+    ),
+  };
+
+  return (
+    <div className="flex flex-col grow pb-4">
+      <AppHeaderLogo className="mx-auto py-5" />
+      <div className="flex flex-col h-full">
+        {LoginStateContentMapping?.[displayState]}
+        <span className="text-xs text-white/50 text-center mt-auto font-sans ">
+          App built by{" "}
+          <AppLink
+            href="https://cursive.team/"
+            className="text-primary underline"
+          >
+            Cursive
+          </AppLink>{" "}
+          for Paradigm Frontiers.
+        </span>
+      </div>
+    </div>
+  );
 }
 
 Login.getInitialProps = () => {

@@ -4,16 +4,16 @@ import { CSSProperties, HTMLAttributes, useEffect, useState } from "react";
 const CardBase = classed.div("relative rounded overflow-hidden ", {
   variants: {
     variant: {
-      primary: "bg-tertiary border border-iron-300",
+      primary: "bg-gray/10 border border-iron-300",
     },
   },
   defaultVariants: {
     variant: "primary",
   },
 });
-const CardTitle = classed.h1("text-sm leading-5 text-iron-600 font-bold");
+const CardTitle = classed.h1("text-sm leading-5 text-white/50 font-bold");
 const CardDescription = classed.span(
-  "text-xs leading-4 text-iron-600 font-bold"
+  "text-xs leading-4 text-white/50 font-bold font-inter font-normal"
 );
 const Artwork = classed.div("rounded-[8px] p-0 m-0");
 

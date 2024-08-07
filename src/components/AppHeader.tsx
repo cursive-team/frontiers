@@ -13,8 +13,9 @@ import { Button } from "./Button";
 import { LINKS } from "@/hooks/useSettings";
 import { cn } from "@/lib/client/utils";
 import { signOut } from "next-auth/react";
+import { AppLink } from "./AppLink";
 
-const Title = classed.h3("block font-sans text-iron-950", {
+const Title = classed.h3("block font-sans text-white", {
   variants: {
     size: {
       small: "text-base leading-1 font-semibold",
@@ -60,7 +61,7 @@ export const AppBackHeader = ({
     >
       <button
         type="button"
-        className="flex items-center gap-1 text-iron-950"
+        className="flex items-center gap-1 text-white"
         onClick={() => {
           if (typeof onBackClick === "function") {
             onBackClick?.();
@@ -74,7 +75,7 @@ export const AppBackHeader = ({
         }}
       >
         <Icons.ArrowLeft />
-        <span className="text-sm font-normal text-iron-950">
+        <span className="text-sm font-normal text-white">
           {label || "Back"}
         </span>
       </button>
@@ -107,7 +108,7 @@ const AppHeaderContent = ({
         <>
           <ContentWrapper>
             <Title>About the app</Title>
-            <Description>
+            <Description className="!text-white">
               This app allows you to verifiably digitize your Signature
               Signularity residency experience and make provable claims about
               the people you have met. Every single tap gives you a digital
@@ -116,12 +117,12 @@ const AppHeaderContent = ({
               residents without revealing who they were or the signatures
               themselves.
             </Description>
-            <Description>
+            <Description className="!text-white">
               Crucially, all the data you collect in this app is yours - our
               servers only store an encrypted backup. You get to decide who sees
               your data and how it is used.
             </Description>
-            <Description>
+            <Description className="!text-white">
               Cursive{" "}
               <a
                 target="_blank"
@@ -137,28 +138,38 @@ const AppHeaderContent = ({
             </Description>
             <Description>
               <Link href={LINKS.GITHUB} target="_blank">
-                <Button variant="white">
+                <div className="border border-white/50 p-3">
                   <div className="flex w-full items-center justify-between">
-                    <span className="text-iron-600 font-semibold text-xs">
+                    <span className="text-white font-semibold text-xs">
                       App GitHub
                     </span>
-                    <Icons.ExternalLink className="text-gray-10" />
+                    <Icons.ExternalLink className="text-white " />
                   </div>
-                </Button>
+                </div>
               </Link>
             </Description>
             <Description>
               <Link href={LINKS.CURSIVE_SITE} target="_blank">
-                <Button variant="white">
+                <div className="border border-white/50 p-3">
                   <div className="flex w-full items-center justify-between">
-                    <span className="text-iron-600 font-semibold text-xs">
+                    <span className="text-white font-semibold text-xs">
                       Cursive homepage
                     </span>
-                    <Icons.ExternalLink className="text-gray-10" />
+                    <Icons.ExternalLink className="text-white" />
                   </div>
-                </Button>
+                </div>
               </Link>
             </Description>
+            <span className="text-xs text-white/50 text-center mt-20 font-sans ">
+              App built by{" "}
+              <AppLink
+                href="https://cursive.team/"
+                className="text-primary underline"
+              >
+                Cursive
+              </AppLink>{" "}
+              for Paradigm Frontiers.
+            </span>
           </ContentWrapper>
         </>
       ),
@@ -188,7 +199,7 @@ const AppHeaderContent = ({
           <button
             onClick={onBack}
             type="button"
-            className="flex gap-2 items-center text-iron-950"
+            className="flex gap-2 items-center text-white"
           >
             <Icons.ArrowLeft />
             <span>Back</span>
@@ -206,7 +217,7 @@ const AppHeaderContent = ({
             // reset active menu
             setActiveMenuIndex(null);
           }}
-          className="flex gap-3 items-center ml-auto text-iron-950"
+          className="flex gap-3 items-center ml-auto text-white"
         >
           <span>Close</span>
           {isMenuOpen ? <Icons.Close /> : <Icons.Burgher />}
@@ -246,6 +257,17 @@ interface AppHeaderProps {
   isMenuOpen: boolean;
   setIsMenuOpen: (value: boolean) => void;
 }
+export const AppHeaderLogo = ({ className = "" }: any) => {
+  return (
+    <Link className={cn(className)} href="/">
+      <button type="button" className="flex gap-2 items-center">
+        <Icons.Frontiers />
+        <Icons.X />
+        <Icons.Cursive />
+      </button>
+    </Link>
+  );
+};
 const AppHeader = ({ isMenuOpen, setIsMenuOpen }: AppHeaderProps) => {
   const { actions, getState } = useStateMachine({ updateStateFromAction });
 
@@ -276,18 +298,20 @@ const AppHeader = ({ isMenuOpen, setIsMenuOpen }: AppHeaderProps) => {
       {!isMenuOpen && (
         <Link href="/">
           <button type="button" className="flex gap-2 items-center">
-            <Icons.Logo className="text-iron-950" />
+            <Icons.Frontiers />
+            <Icons.X />
+            <Icons.Cursive />
           </button>
         </Link>
       )}
 
       <div className="flex gap-4 items-center ml-auto">
-        <span className="text-primary">{isMenuOpen && "Close"}</span>
-        <button className="text-iron-950" onClick={toggleMenu}>
+        <span className="text-white">{isMenuOpen && "Close"}</span>
+        <button className="text-white" onClick={toggleMenu}>
           {isMenuOpen ? (
-            <Icons.Close className="text-primary" />
+            <Icons.Close className="text-white" />
           ) : (
-            <Icons.Burgher className="text-primary" />
+            <Icons.Burgher className="text-white" />
           )}
         </button>
       </div>

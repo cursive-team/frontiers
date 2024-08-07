@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type * as Classed from "@tw-classed/react";
 import { IconCircle } from "../IconCircle";
+import { cn } from "@/lib/client/utils";
 
 type CardIconType = "person" | "location" | "proof" | "overlap";
 
@@ -40,7 +41,7 @@ const CircleCard = ({ icon, color, border }: CircleCardProps) => {
         src={CardIconMapping[icon]}
         height={iconSize}
         width={iconSize}
-        className={iconSizeClass}
+        className={cn("text-secondary", iconSizeClass)}
         alt={`${icon} icon`}
       />
     </IconCircle>

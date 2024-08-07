@@ -15,7 +15,7 @@ interface RouterItem {
 const TabItem = ({ label, href, icon, isActive, iconSize }: RouterItem) => {
   const Icon: any = icon;
 
-  const textColor = isActive ? "text-iron-950" : "text-iron-600";
+  const textColor = isActive ? "text-white" : "text-white/50";
 
   return (
     <Link href={href}>
@@ -61,9 +61,9 @@ const AppFooter = () => {
   return (
     <footer
       id="footer"
-      className="fixed border-t border-iron-50 w-full bottom-0 mt-4 z-[50]"
+      className="fixed border-t border-white/50 w-full bottom-0 mt-4 z-[50]"
     >
-      <div className="bg-white md:container grid grid-cols-3 bottom-0 py-3 xs:pt-[17px] xs:pb-[13px]">
+      <div className="bg-black md:container grid grid-cols-3 bottom-0 py-3 xs:pt-[17px] xs:pb-[13px]">
         {routerItems?.map((route, index) => {
           const pathParts = route.href.split("/").filter(Boolean);
           const isHome = pathname === "/" && route.href === "/";

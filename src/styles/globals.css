@@ -7,9 +7,9 @@
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
   /* Colors */
-  --bg-primary: #DFF1FF;
-  --color-primary: #4015EC;
-  --color-secondary: #8C73F4;
+  --bg-primary: #000;
+  --color-primary: #00E100;
+  --color-secondary: #C100A3;
   --color-tertiary: #E9F3FF;
   --color-error: #D40018;
 }
@@ -28,7 +28,7 @@ body {
   padding: 0;
   height: 100%;
   @apply text-iron-950;
-  background-image: url('/bg-gradient.jpg');
+  @apply bg-black;
   background-repeat: no-repeat;
   background-size: cover;
   text-rendering: geometricPrecision;

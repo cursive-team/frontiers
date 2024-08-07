@@ -4,7 +4,7 @@ import { FullPageBanner } from "@/components/FullPageBanner";
 import { TransitionWrapper } from "@/components/Transition";
 import useSettings from "@/hooks/useSettings";
 import OnlyMobileLayout from "@/layouts/OnlyMobileLayout";
-import { DM_Sans } from "next/font/google";
+import { DM_Sans, Inter } from "next/font/google";
 import "@/styles/globals.css";
 import {
   QueryCache,
@@ -27,6 +27,11 @@ const queryClient = new QueryClient({
 const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -67,7 +72,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <SessionProvider session={pageProps.session}>
           <OnlyMobileLayout>
             <main
-              className={`flex flex-col ${dmSans.variable} font-sans`}
+              className={`flex flex-col ${dmSans.variable} ${inter.variable} font-sans`}
               style={{
                 height: `${pageHeight}px`,
               }}

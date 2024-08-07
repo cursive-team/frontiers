@@ -24,7 +24,7 @@ const ArtworkSnapshot = ({
   pubKey,
   title,
   homePage = false,
-  background = "bg-white/40",
+  background = "bg-gray/20",
   ...props
 }: ArtworkSnapshotProps) => {
   const isLoaded = useScripts();

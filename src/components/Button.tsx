@@ -4,23 +4,25 @@ import type * as Classed from "@tw-classed/react";
 import { classed } from "@tw-classed/react";
 
 const ButtonComponent = classed.button(
-  "font-sans flex items-center disabled:opacity-20 disabled:pointer-events-none w-full flex focus:ring-0 focus:outline-none active:scale-95",
+  "font-inter flex items-center disabled:opacity-20 disabled:pointer-events-none w-full flex focus:ring-0 focus:outline-none active:scale-95",
   {
     variants: {
       size: {
         small: "px-4 py-1 text-sm font-normal leading-5",
-        medium: "py-[12px] px-[16px] text-[14px] leading-[19px] font-bold",
+        medium: "py-[14px] px-4 text-sm leading-6 font-normal",
       },
       variant: {
-        primary: "bg-primary text-white border border-primary",
-        secondary: "bg-secondary text-iron-950 border border-transparent",
-        tertiary: "bg-tertiary text-iron-950 border border-black",
+        primary: "bg-primary text-black border border-primary",
+        secondary: "bg-secondary text-white border border-secondary",
+        tertiary: "bg-tertiary text-white border border-tertiary",
+        black: "bg-black text-white border border-white",
+        gray: "bg-white/10 text-white",
         white: "bg-white/40 text-iron-950",
         transparent:
           "bg-transparent text-primary border border-transparent underline",
       },
       rounded: {
-        true: "rounded-[4px]",
+        true: "rounded-[40px]",
       },
       align: {
         center: "justify-center",
