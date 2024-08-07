@@ -661,6 +661,60 @@ const UserProfilePage = () => {
           </Accordion>
         )}
 
+        {userTalkInfo && (
+          <Accordion label="Speaker">
+            <div className="flex flex-col gap-1">
+              {userTalkInfo.map((talkInfo, index) => (
+                <span
+                  key={index}
+                  className="text-iron-600 text-[14px] mt-1 left-5"
+                >
+                  <Link href={"/talks/" + talkInfo.talkId}>
+                    {talkInfo.talkName}
+                  </Link>
+                </span>
+              ))}
+            </div>
+          </Accordion>
+        )}
+
+        {userGithubInfo && (
+          <Accordion label="Github">
+            <div className="flex flex-col gap-1">
+              {userGithubInfo.foundry && (
+                <span className="text-iron-600 text-[14px] mt-1 left-5">
+                  Foundry: {userGithubInfo.foundry.total} commits, first commit
+                  on {userGithubInfo.foundry.first.toDateString()}, rank{" "}
+                  {userGithubInfo.foundry.rank}
+                </span>
+              )}
+              {userGithubInfo.reth && (
+                <span className="text-iron-600 text-[14px] mt-1 left-5">
+                  Reth: {userGithubInfo.reth.total} commits, first commit on{" "}
+                  {userGithubInfo.reth.first.toDateString()}, rank{" "}
+                  {userGithubInfo.reth.rank}
+                </span>
+              )}
+              {userGithubInfo.cursiveZkSummit && (
+                <span className="text-iron-600 text-[14px] mt-1 left-5">
+                  Cursive ZK Summit: {userGithubInfo.cursiveZkSummit.total}{" "}
+                  commits, first commit on{" "}
+                  {userGithubInfo.cursiveZkSummit.first.toDateString()}, rank{" "}
+                  {userGithubInfo.cursiveZkSummit.rank}
+                </span>
+              )}
+              {userGithubInfo.cursiveDenver && (
+                <span className="text-iron-600 text-[14px] mt-1 left-5">
+                  Cursive Denver: {userGithubInfo.cursiveDenver.total} commits,
+                  first commit on{" "}
+                  {userGithubInfo.cursiveDenver.first.toDateString()}, rank{" "}
+                  {userGithubInfo.cursiveDenver.rank}
+                </span>
+              )}
+            </div>
+          </Accordion>
+        )}
+
         <Card.Base className="flex flex-col p-4 gap-6 !bg-white/20 mt-4 mb-8">
           <div className="flex flex-col gap-1">
             <span className="font-bold text-iron-950 text-sm">
