@@ -30,6 +30,7 @@ import { Accordion } from "@/components/Accordion";
 import { handleUsername } from "@/lib/client/utils";
 import { Icons } from "@/components/Icons";
 import { logClientEvent } from "@/lib/client/metrics";
+import { useSession } from "next-auth/react";
 
 const Label = classed.span("text-sm text-gray-12");
 
@@ -71,6 +72,19 @@ const PSIStateMapping: Record<PSIState, string> = {
   [PSIState.COMPLETE]: "Complete",
 };
 
+type RepoContributionData = {
+  first: Date;
+  total: number;
+  rank: number;
+};
+
+type UserGithubInfo = {
+  foundry?: RepoContributionData;
+  reth?: RepoContributionData;
+  cursiveZkSummit?: RepoContributionData;
+  cursiveDenver?: RepoContributionData;
+};
+
 const UserProfilePage = () => {
   const router = useRouter();
   const { id } = router.query;
@@ -100,6 +114,12 @@ const UserProfilePage = () => {
   >([]);
   const [locationOverlap, setLocationOverlap] = useState<
     { locationId: string; name: string }[]
+  >([]);
+
+  const { data: githubSession } = useSession();
+  const [userGithubInfo, setUserGithubInfo] = useState<UserGithubInfo>();
+  const [userTalkInfo, setUserTalkInfo] = useState<
+    { talkName: string; talkId: string }[]
   >([]);
 
   // set up channel for PSI
@@ -358,32 +378,171 @@ const UserProfilePage = () => {
     handleOverlapRounds();
   }, [psiState, selfEncPk, otherEncPk, channelName]);
 
-  useEffect(() => {
-    if (typeof id === "string") {
-      const profile = getProfile();
-      const keys = getKeys();
-      if (!profile || !keys) {
-        toast.error("You must be logged in to view this page.");
-        router.push("/");
-        return;
+  const getRepoContributionStats = async (
+    owner: string,
+    repo: string,
+    userGithubId: number,
+    githubToken: string
+  ): Promise<RepoContributionData | undefined> => {
+    try {
+      const commits: any[] = [];
+      let page = 1;
+      const perPage = 100;
+      let isFetching = true;
+
+      // Fetch all commits from the repository
+      while (isFetching) {
+        const response = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}/commits?per_page=${perPage}&page=${page}`,
+          {
+            headers: {
+              Authorization: `token ${githubToken}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `GitHub API responded with status ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+        if (data.length === 0) break;
+        commits.push(...data);
+        page++;
       }
 
-      const fetchedUser = fetchUserByUUID(id);
-      setUser(fetchedUser);
+      // Filter commits by the given user's GitHub ID
+      const userCommits = commits.filter(
+        (commit) => commit.author && commit.author.id === userGithubId
+      );
 
-      if (fetchedUser) {
-        setOtherEncPk(fetchedUser.encPk);
-        setSelfEncPk(profile.encryptionPublicKey);
-        setChannelName(
-          [fetchedUser.encPk, profile.encryptionPublicKey].sort().join("")
-        );
-        if (fetchedUser.oI) {
-          processOverlap(JSON.parse(fetchedUser.oI));
-          setPsiState(PSIState.COMPLETE);
+      if (userCommits.length === 0) {
+        return undefined;
+      }
+
+      // Determine the date of the user's first commit
+      const firstCommitDate = new Date(
+        userCommits[userCommits.length - 1].commit.author.date
+      );
+
+      // Count the total number of commits by the user
+      const totalUserCommits = userCommits.length;
+
+      // Rank the user across all committers
+      const contributorsMap: Map<string, number> = new Map();
+      commits.forEach((commit) => {
+        const authorLogin = commit.author?.login;
+        if (authorLogin) {
+          contributorsMap.set(
+            authorLogin,
+            (contributorsMap.get(authorLogin) || 0) + 1
+          );
+        }
+      });
+
+      const contributors: { login: string; commits: number }[] = Array.from(
+        contributorsMap,
+        ([login, commits]) => ({ login, commits })
+      ).sort((a, b) => b.commits - a.commits);
+
+      const userRank =
+        contributors.findIndex(
+          (contributor) => contributor.login === userCommits[0].author!.login
+        ) + 1;
+
+      return {
+        first: firstCommitDate,
+        total: totalUserCommits,
+        rank: userRank,
+      };
+    } catch (error) {
+      console.error("Error fetching commits:", error);
+      return undefined;
+    }
+  };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (typeof id === "string") {
+        const profile = getProfile();
+        const keys = getKeys();
+        if (!profile || !keys) {
+          toast.error("You must be logged in to view this page.");
+          router.push("/");
+          return;
+        }
+
+        const fetchedUser = fetchUserByUUID(id);
+        setUser(fetchedUser);
+
+        if (fetchedUser) {
+          // set psi info
+          setOtherEncPk(fetchedUser.encPk);
+          setSelfEncPk(profile.encryptionPublicKey);
+          setChannelName(
+            [fetchedUser.encPk, profile.encryptionPublicKey].sort().join("")
+          );
+          if (fetchedUser.oI) {
+            processOverlap(JSON.parse(fetchedUser.oI));
+            setPsiState(PSIState.COMPLETE);
+          }
+
+          // get talks info
+          const talksResponse = await fetch(
+            `/api/user/get_talks?encPk=${fetchedUser.encPk}`
+          );
+          if (talksResponse.ok) {
+            const talksData = await talksResponse.json();
+            setUserTalkInfo(talksData.talks);
+          }
+
+          // get github info
+          if (
+            githubSession &&
+            (githubSession as any).accessToken &&
+            fetchedUser.ghUserId &&
+            !isNaN(parseInt(fetchedUser.ghUserId, 10))
+          ) {
+            const userGithubId = parseInt(fetchedUser.ghUserId, 10);
+            const githubToken = (githubSession as any).accessToken as string;
+            const foundryContribution = await getRepoContributionStats(
+              "paradigmxyz",
+              "foundry",
+              userGithubId,
+              githubToken
+            );
+            const rethContribution = await getRepoContributionStats(
+              "paradigmxyz",
+              "reth",
+              userGithubId,
+              githubToken
+            );
+            const zkSummitContribution = await getRepoContributionStats(
+              "cursive-team",
+              "zk-summit",
+              userGithubId,
+              githubToken
+            );
+            const denverContribution = await getRepoContributionStats(
+              "cursive-team",
+              "nfc-denver",
+              userGithubId,
+              githubToken
+            );
+            setUserGithubInfo({
+              foundry: foundryContribution,
+              reth: rethContribution,
+              cursiveZkSummit: zkSummitContribution,
+              cursiveDenver: denverContribution,
+            });
+          }
         }
       }
-    }
-  }, [id, router]);
+    };
+    fetchUser();
+  }, [id, router, githubSession]);
 
   if (!user) {
     return <div>User not found</div>;

@@ -25,6 +25,8 @@ export type User = {
   inTs?: string; // Time of last inbound tap as ISO string
   oI?: string; // User's PSI overlap indices
   isSpeaker?: boolean; // Whether the user is a speaker
+  ghUserId?: string; // User's GitHub user ID
+  ghLogin?: string; // User's GitHub username
 };
 
 export const saveUsers = (users: Record<string, User>): void => {

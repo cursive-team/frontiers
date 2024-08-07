@@ -341,6 +341,8 @@ const processEncryptedMessages = async (args: {
             pkId,
             psiPkLink,
             isSpk,
+            ghUserId,
+            ghLogin,
           } = await inboundTapMessageSchema.validate(data);
           const userId = await hashPublicKeyToUUID(encPk);
           const user = users[userId];
@@ -356,6 +358,8 @@ const processEncryptedMessages = async (args: {
             user.msg = msg;
             user.sig = sig;
             user.isSpeaker = isSpk;
+            user.ghUserId = ghUserId;
+            user.ghLogin = ghLogin;
             user.inTs = metadata.timestamp.toISOString();
 
             users[userId] = user;
@@ -372,6 +376,8 @@ const processEncryptedMessages = async (args: {
               msg,
               sig,
               isSpeaker: isSpk,
+              ghUserId,
+              ghLogin,
               inTs: metadata.timestamp.toISOString(),
             };
           }
