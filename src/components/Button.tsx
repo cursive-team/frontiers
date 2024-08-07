@@ -32,7 +32,7 @@ const ButtonComponent = classed.button(
     },
     defaultVariants: {
       size: "medium",
-      variant: "primary",
+      variant: "black",
       rounded: true,
       align: "center",
     },
