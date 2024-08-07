@@ -20,6 +20,7 @@ const ButtonComponent = classed.button(
         white: "bg-white/40 text-iron-950",
         transparent:
           "bg-transparent text-primary border border-transparent underline",
+        link: "bg-transparent !p-0 !text-primary underline",
       },
       rounded: {
         true: "rounded-[40px]",

@@ -1,10 +1,11 @@
 import { AppHeaderLogo } from "@/components/AppHeader";
 import { Button } from "@/components/Button";
+import { RegisterCard } from "@/components/cards/RegisterCard";
 import React from "react";
 
 export default function ComponentsPage() {
   return (
-    <div className="flex flex-col gap-10 pt-20">
+    <div className="flex flex-col gap-10 py-20">
       <AppHeaderLogo />
       <div className="flex flex-col gap-5">
         <div className="flex gap-2 items-center">
@@ -29,7 +30,14 @@ export default function ComponentsPage() {
             primary small
           </Button>
         </div>
+        <div className="flex items-center gap-2">
+          <Button variant="link">Link</Button>
+          <Button variant="link" size="small">
+            Link small
+          </Button>
+        </div>
       </div>
+      <RegisterCard />
     </div>
   );
 }
