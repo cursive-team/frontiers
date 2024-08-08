@@ -1,5 +1,6 @@
 import { Button } from "@/components/Button";
 import { Checkbox } from "@/components/Checkbox";
+import { InputRange } from "@/components/InputRange";
 import { FormStepLayout } from "@/layouts/FormStepLayout";
 import React from "react";
 
@@ -28,11 +29,24 @@ export default function JobSearch() {
         <Checkbox id="level" label="Senior" />
         <Checkbox id="level" label="Staff" />
       </Section>
-      <Section title="Minimum salary (in thousands)"></Section>
-      <Section title="Experience"></Section>
+      <Section title="Minimum salary (in thousands)">
+        <InputRange id="salary" />
+      </Section>
+      <Section title="Experience">
+        <InputRange id="salary" />
+      </Section>
       <Section title="Constraints">
         <Checkbox id="constraints" label="open-source only" />
       </Section>
+      <div className="flex flex-col gap-2">
+        <h3 className="font-semibold text-white text-[21px] leading-6">
+          Github data
+        </h3>
+        <span className="font-normal text-sm leading-5 text-white/50">
+          We have pulled the following public commit data from your GitHub, to
+          be used in discovering overlap with recruiting opportunities.
+        </span>
+      </div>
     </FormStepLayout>
   );
 }
