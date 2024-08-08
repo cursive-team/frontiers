@@ -609,20 +609,6 @@ export const Icons: Record<string, any> = {
       />
     </svg>
   ),
-  Person: (props: any) => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={props.size || 12}
-      height={props.size || 12}
-      viewBox="0 0 12 12"
-      fill="none"
-    >
-      <path
-        d="M3.75 3.25C3.75 4.4905 4.7595 5.5 6 5.5C7.2405 5.5 8.25 4.4905 8.25 3.25C8.25 2.0095 7.2405 1 6 1C4.7595 1 3.75 2.0095 3.75 3.25ZM10 10.5H10.5V10C10.5 8.0705 8.9295 6.5 7 6.5H5C3.07 6.5 1.5 8.0705 1.5 10V10.5H10Z"
-        fill="currentColor"
-      />
-    </svg>
-  ),
   Location: (props: any) => (
     <svg
       width="24"
