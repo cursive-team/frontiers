@@ -47,7 +47,7 @@ const FormStepLayout = ({
             {title && (
               <>
                 {typeof title === "string" ? (
-                  <h3 className="font-medium text-primary text-[21px] leading-[21px]">
+                  <h3 className="font-semibold text-white text-[21px] leading-6">
                     {title}
                   </h3>
                 ) : (
