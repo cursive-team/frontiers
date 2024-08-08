@@ -40,7 +40,7 @@ export interface InputWrapperProps
     InputLabelVariants,
     InputDescriptionVariants,
     InputSpacingVariants {
-  label?: string;
+  label?: ReactNode;
   error?: string;
   description?: ReactNode;
   children: ReactNode;

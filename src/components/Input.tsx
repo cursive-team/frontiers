@@ -16,6 +16,9 @@ const InputComponent = classed.input(
       hasError: {
         true: "!border-b-error",
       },
+      border: {
+        full: "border !border-white/80 !rounded-[6px]",
+      },
     },
     defaultVariants: {
       variant: "primary",
@@ -38,8 +41,16 @@ interface InputProps
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   (props: InputProps, ref: ForwardedRef<HTMLInputElement>) => {
-    const { label, variant, placeholder, description, icon, textSize, error } =
-      props;
+    const {
+      label,
+      variant,
+      placeholder,
+      description,
+      icon,
+      textSize,
+      error,
+      border,
+    } = props;
 
     return (
       <InputWrapper
@@ -63,6 +74,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               hasIcon={!!icon}
               hasError={!!error}
               autoComplete="off"
+              border={border}
             />
           </div>
         </label>
