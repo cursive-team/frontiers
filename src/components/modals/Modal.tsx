@@ -78,7 +78,7 @@ const Modal = ({
                       {withBackButton ? (
                         <div className="flex items-center gap-1">
                           <Icons.ArrowLeft />
-                          <span className="text-iron-950 font-sans text-sm">
+                          <span className="text-white font-sans text-sm">
                             Back
                           </span>
                         </div>

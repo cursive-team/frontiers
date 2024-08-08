@@ -22,7 +22,7 @@ enum OutputState {
   ERROR,
 }
 
-const Title = classed.h3("block font-sans text-iron-950", {
+const Title = classed.h3("block font-sans text-white
   variants: {
     size: {
       small: "text-base leading-1 font-semibold",
@@ -343,14 +343,14 @@ export default function Fruits() {
 
         <div className="flex flex-col gap-6 h-modal">
           <div className="flex flex-col gap-6">
-            <span className="text-lg xs:text-xl text-iron-950 leading-6 font-medium">
+            <span className="text-lg xs:text-xl text-whiteading-6 font-medium">
               🍎 Rate fruits
             </span>
             <span className="text-iron-600 text-sm font-normal">{`Rate some fruits with your friends, discover how aligned you
                       are without revealing any specific votes.`}</span>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-lg xs:text-xl text-iron-950 leading-6 font-medium">
+            <span className="text-lg xs:text-xl text-white leading-6 font-medium">
               {roomName}
             </span>
             <Description>{getButtonDisplay()}</Description>
@@ -412,7 +412,7 @@ export default function Fruits() {
 
       <div className="flex flex-col gap-6 h-modal">
         <div className="flex flex-col gap-6">
-          <span className="text-lg xs:text-xl text-iron-950 leading-6 font-medium">
+          <span className="text-lg xs:text-xl text-white leading-6 font-medium">
             🍎 Rate fruits
           </span>
           <div className="flex flex-col gap-2">

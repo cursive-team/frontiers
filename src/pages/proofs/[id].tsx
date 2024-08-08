@@ -75,7 +75,7 @@ export const UserDetail = ({
                       <Icons.Person size={12} />
                     </IconCircle>
                     <Card.Title
-                      className={"text-sm font-sans text-iron-950 font-bold"}
+                      className={"text-sm font-sans text-white font-bold"}
                     >
                       {displayName}
                     </Card.Title>
@@ -147,7 +147,7 @@ export const LocationDetail = ({
                       <Icons.Location size={12} />
                     </IconCircle>
                     <Card.Title
-                      className={"text-sm font-sans text-iron-950 font-bold"}
+                      className={"text-sm font-sans text-white font-bold"}
                     >
                       {name}
                     </Card.Title>
@@ -190,7 +190,7 @@ const QuestDetail = ({ quest }: QuestDetailProps) => {
 
   return (
     <div className="flex flex-col gap-6">
-      <span className="text-lg xs:text-xl text-iron-950 leading-6 font-medium">
+      <span className="text-lg xs:text-xl text-white leading-6 font-medium">
         {title}
       </span>
       <span className="text-iron-600 text-sm font-normal">{description}</span>

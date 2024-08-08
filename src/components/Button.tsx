@@ -17,7 +17,7 @@ const ButtonComponent = classed.button(
         tertiary: "bg-tertiary text-white border border-tertiary",
         black: "bg-black text-white border border-white",
         gray: "bg-white/10 text-white",
-        white: "bg-white/40 text-iron-950",
+        white: "bg-white/40 text-white",
         transparent:
           "bg-transparent text-primary border border-transparent underline",
         link: "bg-transparent !p-0 !text-primary underline",

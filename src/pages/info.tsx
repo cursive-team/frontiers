@@ -6,7 +6,7 @@ const Title = classed.h1(
 );
 const Description = classed.div(
   Card.Base,
-  "p-2 text-[14px] font-normal font-sans !border-none text-iron-950 !rounded-[8px]"
+  "p-2 text-[14px] font-normal font-sans !border-none text-white !rounded-[8px]"
 );
 
 export default function Info() {

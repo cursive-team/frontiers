@@ -27,7 +27,7 @@ const FullPageBanner = ({ description, title }: FullPageBannerProps) => {
       <div className="flex flex-col gap-2 my-auto mx-auto px-10">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-4 mx-auto">
-            <Icons.Cursive className="text-iron-950" height={80} width={120} />
+            <Icons.Cursive className="text-white" height={80} width={120} />
           </div>
           <span className="text-[36px] font-bold font-sans text-center">
             {APP_CONFIG.APP_NAME}
@@ -37,7 +37,7 @@ const FullPageBanner = ({ description, title }: FullPageBannerProps) => {
           {title && <Card.Title className="!text-lg">{title}</Card.Title>}
           <Card.Base className="p-2">
             <Card.Description>
-              <span className="font-sans text-sm text-iron-950">
+              <span className="font-sans text-sm text-white">
                 {description}
               </span>
             </Card.Description>

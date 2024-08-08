@@ -183,9 +183,7 @@ const CompleteQuestModal = ({
           <span className="text-iron-600 text-sm font-bold">
             Requirements met!
           </span>
-          <span className="text-xl font-medium text-iron-950">
-            {quest.name}
-          </span>
+          <span className="text-xl font-medium text-white">{quest.name}</span>
         </div>
       </div>
     );
@@ -224,7 +222,7 @@ const CompleteQuestModal = ({
             <div className="flex flex-col gap-6">
               <ContentHeader />
               <div className="flex flex-col gap-2">
-                <span className="text-iron-950 text-xs text-center">
+                <span className="text-white text-xs text-center">
                   {provingState.currentRequirementNumSigsProven ===
                   provingState.currentRequirementNumSigsTotal
                     ? "Submitting proof for verification..."
@@ -248,7 +246,7 @@ const CompleteQuestModal = ({
             <div className="flex flex-col gap-6 self-center">
               <div className="flex flex-col gap-1">
                 <span className="text-sm text-iron-600 font-bold">Proof:</span>
-                <span className="text-[21px] font-sans text-iron-950 font-medium">
+                <span className="text-[21px] font-sans text-white font-medium">
                   {quest.name}
                 </span>
               </div>
@@ -259,7 +257,7 @@ const CompleteQuestModal = ({
                   value={qrCodeData}
                   viewBox={`0 0 156 156`}
                 />
-                <span className="block text-xs px-10 pb-3 text-iron-950 text-center leading-[16px] break-all">
+                <span className="block text-xs px-10 pb-3 text-white text-center leading-[16px] break-all">
                   Anyone can scan this QR code to verify your proof
                 </span>
               </QRCodeWrapper>

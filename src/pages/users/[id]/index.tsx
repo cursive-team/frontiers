@@ -578,7 +578,7 @@ const UserProfilePage = () => {
       <AppBackHeader redirectTo="/" />
       {alreadyConnected && (
         <div className="flex items-start justify-center py-28">
-          <span className="text-xl text-iron-950">
+          <span className="text-xl text-white">
             You have already connected with this user!
           </span>
         </div>
@@ -821,7 +821,7 @@ const UserProfilePage = () => {
             </Button>
           ) : (
             <div className="flex flex-col gap-2">
-              <span className="text-iron-950 text-xs text-center">
+              <span className="text-white text-xs text-center">
                 {PSIStateMapping[psiState]}
               </span>
               <div className="relative">
