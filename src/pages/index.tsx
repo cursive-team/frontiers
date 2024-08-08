@@ -391,7 +391,7 @@ export default function Social() {
                           key={index}
                           name={location.name}
                           date={formatDate(location.talkTime.toString())}
-                          href={`/locations/${location.id}`}
+                          href={`/talks/${location.id}`}
                         />
                       );
                     })}

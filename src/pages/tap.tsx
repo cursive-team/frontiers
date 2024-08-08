@@ -52,7 +52,10 @@ export default function Tap() {
 
       const user = fetchUserByUUID(userId);
       if (user && user.sig) {
-        toast.error("You have already met this user!");
+        // don't show this toast if you tap yourself
+        if (user.encPk !== profile.encryptionPublicKey) {
+          toast.info("You have already met this user!");
+        }
         router.push("/users/" + userId + "?tap=true");
         return;
       }
