@@ -690,7 +690,7 @@ export default function Register() {
           App built by{" "}
           <AppLink
             href="https://cursive.team/"
-            className="text-white underline"
+            className="text-primary underline"
           >
             Cursive
           </AppLink>{" "}
