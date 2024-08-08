@@ -13,7 +13,7 @@ const Accordion = ({ label, children }: AccordionProps) => {
 
   return (
     <div
-      className="flex flex-col p-3 bg-black border border-white rounded-lg"
+      className="flex flex-col p-3 bg-black border border-white/20"
       aria-expanded={isOpen}
     >
       <div
