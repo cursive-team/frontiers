@@ -12,8 +12,9 @@ import { Button } from "@/components/Button";
 import { Icons } from "@/components/Icons";
 import { getUsers, User } from "@/lib/client/localStorage";
 
-const Title = classed.span("text-iron-800 text-xs font-normal font-sans");
-const Description = classed.h5("text-iron-950 font-normal text-sm");
+const Title = classed.span("text-white text-xs font-normal font-inter");
+const Description = classed.h5("text-white/50 font-inter font-normal text-sm");
+const LinkCard = classed.div("p-3 border border-white/20");
 
 const LocationDetails = () => {
   const router = useRouter();
@@ -92,13 +93,13 @@ const LocationDetails = () => {
         {location && (
           <div className="flex flex-col gap-4">
             <Card.Base
-              className="!border-primary/10 bg-cover bg-center bg-no-repeat"
+              className="!border-white/20 !rounded-none bg-cover bg-center bg-no-repeat"
               style={{
-                backgroundImage: "url('/bg-gradient-card.png')",
+                backgroundImage: "url('/shapes/card-shape-2.svg')",
               }}
             >
               <div className="flex flex-col py-4 px-3 min-h-[180px]">
-                <h5 className="mt-auto text-primary font-medium text-[21px] leading-[21px]">
+                <h5 className="mt-auto text-white font-inter font-semibold text-xl leading-6">
                   {location.name}
                 </h5>
               </div>
@@ -115,31 +116,29 @@ const LocationDetails = () => {
                 <Description>{location.description}</Description>
               </div>
             )}
-            {location.slidesLink && (
-              <Link href={location.slidesLink} target="_blank">
-                <Button variant="white">
-                  <div className="flex w-full items-center justify-between">
-                    <span className="text-iron-600 font-semibold text-xs">
-                      Slides link
+            <div className="flex flex-col gap-4 mt-10">
+              {(location.slidesLink || true) && (
+                <Link href={location?.slidesLink ?? "#"} target="_blank">
+                  <LinkCard className="flex w-full items-center justify-between">
+                    <span className="text-white font-medium font-inter text-xs">
+                      Slides
                     </span>
-                    <Icons.ExternalLink className="text-gray-10" />
-                  </div>
-                </Button>
-              </Link>
-            )}
-            {location.speakerSocial && (
-              <Link href={location.speakerSocial} target="_blank">
-                <Button variant="white">
-                  <div className="flex w-full items-center justify-between">
-                    <span className="text-iron-600 font-semibold text-xs">
-                      Follow the speaker
-                    </span>
-                    <Icons.ExternalLink className="text-gray-10" />
-                  </div>
-                </Button>
-              </Link>
-            )}
-            <div className=""></div>
+                    <Icons.ExternalLink className="text-white" />
+                  </LinkCard>
+                </Link>
+              )}
+              {location?.speakerSocial ||
+                (true && (
+                  <Link href={location?.speakerSocial ?? "#"} target="_blank">
+                    <LinkCard className="flex w-full items-center justify-between">
+                      <span className="text-white font-medium font-inter text-xs">
+                        Follow the speaker
+                      </span>
+                      <Icons.ExternalLink className="text-white" />
+                    </LinkCard>
+                  </Link>
+                ))}
+            </div>
           </div>
         )}
       </LoadingWrapper>
