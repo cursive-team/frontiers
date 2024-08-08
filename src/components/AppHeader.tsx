@@ -290,20 +290,12 @@ const AppHeader = ({ isMenuOpen, setIsMenuOpen }: AppHeaderProps) => {
 
   return (
     <div
-      className={cn("flex w-full items-center p-3 py-5 xs:p-4 z-50", {
+      className={cn("flex w-full items-center p-3 py-5 xs:px-4 z-50", {
         "bg-main": isMenuOpen,
         "bg-transparent": !isMenuOpen,
       })}
     >
-      {!isMenuOpen && (
-        <Link href="/">
-          <button type="button" className="flex gap-2 items-center">
-            <Icons.Frontiers />
-            <Icons.X />
-            <Icons.Cursive />
-          </button>
-        </Link>
-      )}
+      {!isMenuOpen && <AppHeaderLogo />}
 
       <div className="flex gap-4 items-center ml-auto">
         <span className="text-white">{isMenuOpen && "Close"}</span>
