@@ -44,7 +44,7 @@ const LinkCard = ({ label, value, href }: LinkCardProps) => {
   return (
     <Link href={href} target="_blank">
       <div className="grid items-center grid-cols-[auto_1fr_auto] gap-1">
-        <span className="text-iron-950 font-normal">{label}</span>
+        <span className="text-iron-300 font-normal">{label}</span>
         <div className="h-[1px] bg-iron-200 w-full"></div>
         <span className="text-right">{handleUsername(value) ?? "N/A"}</span>
       </div>
@@ -118,6 +118,7 @@ const UserProfilePage = () => {
 
   const { data: githubSession } = useSession();
   const [userGithubInfo, setUserGithubInfo] = useState<UserGithubInfo>();
+  const [githubInfoLoading, setGithubInfoLoading] = useState<boolean>(false);
   const [userTalkInfo, setUserTalkInfo] = useState<
     { talkName: string; talkId: string }[]
   >([]);
@@ -500,25 +501,29 @@ const UserProfilePage = () => {
 
           // get github info
           if (
+            !userGithubInfo &&
             githubSession &&
             (githubSession as any).accessToken &&
             fetchedUser.ghUserId &&
             !isNaN(parseInt(fetchedUser.ghUserId, 10))
           ) {
+            setGithubInfoLoading(true);
             const userGithubId = parseInt(fetchedUser.ghUserId, 10);
             const githubToken = (githubSession as any).accessToken as string;
-            const foundryContribution = await getRepoContributionStats(
-              "paradigmxyz",
-              "foundry",
-              userGithubId,
-              githubToken
-            );
-            const rethContribution = await getRepoContributionStats(
-              "paradigmxyz",
-              "reth",
-              userGithubId,
-              githubToken
-            );
+            // const foundryContribution = await getRepoContributionStats(
+            //   "paradigmxyz",
+            //   "foundry",
+            //   userGithubId,
+            //   githubToken
+            // );
+            // const rethContribution = await getRepoContributionStats(
+            //   "paradigmxyz",
+            //   "reth",
+            //   userGithubId,
+            //   githubToken
+            // );
+            const foundryContribution = undefined;
+            const rethContribution = undefined;
             const zkSummitContribution = await getRepoContributionStats(
               "cursive-team",
               "zk-summit",
@@ -537,12 +542,13 @@ const UserProfilePage = () => {
               cursiveZkSummit: zkSummitContribution,
               cursiveDenver: denverContribution,
             });
+            setGithubInfoLoading(false);
           }
         }
       }
     };
     fetchUser();
-  }, [id, router, githubSession]);
+  }, [id, router, githubSession, userGithubInfo]);
 
   if (!user) {
     return <div>User not found</div>;
@@ -587,11 +593,11 @@ const UserProfilePage = () => {
           </div>
 
           <div className="flex flex-col gap-1">
-            <h2 className="text-xl font-iron-950 font-medium">{user.name}</h2>
+            <h2 className="text-xl text-white font-medium">{user.name}</h2>
             <div className="flex items-center gap-1">
               {user.bio && (
                 <span
-                  className="font-iron-950 text-[12px] font-normal mt-1 left-5"
+                  className="text-iron-300 text-[12px] font-normal mt-1 left-5"
                   style={{ whiteSpace: "pre-wrap" }}
                 >
                   {user.bio}
@@ -678,6 +684,8 @@ const UserProfilePage = () => {
           </Accordion>
         )}
 
+        {githubInfoLoading && !userGithubInfo && <Accordion label="Github" />}
+
         {userGithubInfo && (
           <Accordion label="Github">
             <div className="flex flex-col gap-1">
@@ -717,7 +725,7 @@ const UserProfilePage = () => {
 
         <Card.Base className="flex flex-col p-4 gap-6 !bg-white/20 mt-4 mb-8">
           <div className="flex flex-col gap-1">
-            <span className="font-bold text-iron-950 text-sm">
+            <span className="font-bold text-white text-sm">
               Which contacts and talks do you have in common?
             </span>
             <span className="text-iron-600 text-xs font-normal">
@@ -791,7 +799,7 @@ const UserProfilePage = () => {
               type="button"
               onClick={setupChannel}
               size="small"
-              variant="tertiary"
+              variant="secondary"
             >
               Discover
             </Button>

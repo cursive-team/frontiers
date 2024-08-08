@@ -95,11 +95,7 @@ const FeedContent = ({
     <div className="grid grid-cols-[1fr_80px] items-center justify-between py-1 gap-4">
       <div className="grid grid-cols-[24px_1fr] items-center gap-2 truncate">
         <IconCircle>{icon}</IconCircle>
-        {titleOverride === true ? (
-          <CardTitleOverride className="truncate">{title}</CardTitleOverride>
-        ) : (
-          <Card.Title className="truncate">{title}</Card.Title>
-        )}
+        <CardTitleOverride className="truncate">{title}</CardTitleOverride>
       </div>
       <Card.Description>{description}</Card.Description>
     </div>
@@ -113,7 +109,8 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
         <FeedContent
           title={
             <>
-              {"Sent socials to "} {name}
+              <span className="text-iron-600">{"Sent socials to "}</span>
+              <span className="text-white">{name}</span>
             </>
           }
           icon={<Icons.Person className="text-secondary" />}
