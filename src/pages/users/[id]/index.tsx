@@ -380,6 +380,7 @@ const UserProfilePage = () => {
     }
 
     handleOverlapRounds();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [psiState, selfEncPk, otherEncPk, channelName]);
 
   const getRepoContributionStats = async (
@@ -648,14 +649,14 @@ const UserProfilePage = () => {
           </Accordion>
         )}
 
-        {(user?.x || user?.tg || user?.fc) && (
+        {(user.x || user.tg || user.fc) && (
           <Accordion label="Socials">
             <div className="flex flex-col gap-1">
               {(user.x?.length ?? 0) > 1 && (
                 <LinkCard
                   label="Twitter"
                   href={`https://x.com/${removeLabelStartWith(user.x, "@")}`}
-                  value={labelStartWith(user?.x, "@")}
+                  value={labelStartWith(user.x, "@")}
                 />
               )}
               {(user.fc?.length ?? 0) > 1 && (
@@ -688,7 +689,7 @@ const UserProfilePage = () => {
                   className="text-white text-[14px] mt-1 left-5"
                 >
                   <Link href={"/talks/" + talkInfo.talkId}>
-                    {talkInfo?.talkName}
+                    {talkInfo.talkName}
                   </Link>
                 </span>
               ))}

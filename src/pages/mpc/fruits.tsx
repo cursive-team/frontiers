@@ -22,7 +22,7 @@ enum OutputState {
   ERROR,
 }
 
-const Title = classed.h3("block font-sans text-white
+const Title = classed.h3("block font-sans text-white", {
   variants: {
     size: {
       small: "text-base leading-1 font-semibold",
