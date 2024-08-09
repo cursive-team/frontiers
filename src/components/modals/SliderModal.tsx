@@ -11,10 +11,10 @@ import {
 } from "@/lib/client/flower";
 import { logClientEvent } from "@/lib/client/metrics";
 
-const Title = classed.span("text-center text-iron-950 text-[20px] font-bold");
+const Title = classed.span("text-center text-white text-[20px] font-bold");
 const Label = classed.span("text-iron-600 text-xs font-normal");
 const Description = classed.span(
-  "text-center text-iron-700 text-sm font-regular"
+  "text-center text-white/75 text-sm font-regular"
 );
 
 interface SliderModalProps extends ModalProps {

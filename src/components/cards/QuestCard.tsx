@@ -90,7 +90,7 @@ const QuestCard = ({
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-2">
-            <Card.Title className="text-iron-950 text-sm font-bold">
+            <Card.Title className="text-white text-sm font-bold">
               {title}
             </Card.Title>
             <span className="text-xs font-iron-600 font-sans">

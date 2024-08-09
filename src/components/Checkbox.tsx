@@ -30,16 +30,19 @@ const CheckboxComponent = classed.label(
   }
 );
 
-const CheckboxLabelBase = classed.span("font-normal font-normal", {
-  variants: {
-    disabled: {
-      true: "opacity-50 pointer-events-none",
+const CheckboxLabelBase = classed.span(
+  "font-normal font-normal text-white text-sm font-sans leading-5",
+  {
+    variants: {
+      disabled: {
+        true: "opacity-50 pointer-events-none",
+      },
     },
-  },
-  defaultVariants: {
-    disabled: false,
-  },
-});
+    defaultVariants: {
+      disabled: false,
+    },
+  }
+);
 const CheckboxTitle = classed.span(CheckboxLabelBase, "text-sm");
 const CheckboxDescription = classed.span(
   CheckboxLabelBase,
@@ -75,10 +78,10 @@ const CheckboxButton = ({ label, disabled, id, checked }: CheckboxProps) => {
         {checked ? (
           <Icons.checkedCircle />
         ) : (
-          <div className="rounded-full h-[14px] w-[14px] border border-gray-600"></div>
+          <div className="rounded-full h-[14px] w-[14px] border border-white"></div>
         )}
       </div>
-      <span>{label}</span>
+      <span className="text-white">{label}</span>
     </CheckboxComponent>
   );
 };

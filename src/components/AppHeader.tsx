@@ -26,7 +26,7 @@ const Title = classed.h3("block font-sans text-white", {
     size: "small",
   },
 });
-const Description = classed.span("text-sm text-iron-950 leading-5");
+const Description = classed.span("text-sm text-white leading-5");
 
 const ContentWrapper = classed.div("flex flex-col gap-3 mt-3 xs:gap-4 xs:mt-6");
 

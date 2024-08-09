@@ -16,7 +16,7 @@ const TableHeaderLabel = classed.div(
 const DisplayName = classed.span("text-iron-600 text-sm leading-5 font-bold");
 const Point = classed.span("text-gray-900 text-sm");
 const PositionCard = classed.div(
-  "duration-200 text-iron-950 font-bold w-6 h-6 text-xs flex items-center justify-center rounded-full",
+  "duration-200 text-white font-bold w-6 h-6 text-xs flex items-center justify-center rounded-full",
   {
     variants: {
       active: {
@@ -88,7 +88,7 @@ export default function LeaderBoard() {
               <div className="flex items-center font-bold gap-2">
                 <span>
                   {isCurrentUser ? (
-                    <span className="text-iron-950">{`${name} (you)`}</span>
+                    <span className="text-white">{`${name} (you)`}</span>
                   ) : (
                     name
                   )}
@@ -117,8 +117,8 @@ export default function LeaderBoard() {
           !loading &&
           currentUserRank && (
             <div className="flex gap-0.5 text-sm">
-              <span className="text-iron-950">Your rank:</span>
-              <span className="text-iron-950 font-bold">{profileRank}</span>
+              <span className="text-white">Your rank:</span>
+              <span className="text-white font-bold">{profileRank}</span>
             </div>
           )
         }
@@ -144,7 +144,7 @@ export default function LeaderBoard() {
                   <PositionCard active>{currentUserRank}</PositionCard>
                   <DisplayName>
                     {userLeaderboardItem?.name}{" "}
-                    <span className="text-iron-950">(you)</span>
+                    <span className="text-white">(you)</span>
                   </DisplayName>
                   <Point className="text-right">
                     {userLeaderboardItem?.connections ?? 0}

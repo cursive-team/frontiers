@@ -42,7 +42,7 @@ interface LinkCardProps {
 const LinkCard = ({ name, date, href, other }: LinkCardProps) => {
   return (
     <Link href={href}>
-      <div className="w-full border border-white/50 p-3">
+      <div className="w-full border border-white/20 p-3">
         <div className="grid grid-cols-[1fr_90px] w-full">
           {other ? (
             <div className="flex flex-row gap-2 truncate items-end">
@@ -382,16 +382,18 @@ export default function Social() {
                     )}
                     spacing="sm"
                   >
-                    {locations.map((location, index) => {
-                      return (
-                        <LinkCard
-                          key={index}
-                          name={location.name}
-                          date={formatDate(location.talkTime.toString())}
-                          href={`/talks/${location.id}`}
-                        />
-                      );
-                    })}
+                    <div className="flex flex-col gap-1">
+                      {locations.map((location, index) => {
+                        return (
+                          <LinkCard
+                            key={index}
+                            name={location.name}
+                            date={formatDate(location.talkTime.toString())}
+                            href={`/talks/${location.id}`}
+                          />
+                        );
+                      })}
+                    </div>
                   </ListLayout>
                 );
               })

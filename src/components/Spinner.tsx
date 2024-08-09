@@ -12,7 +12,7 @@ const Spinner = ({ label, size = 28, className }: SpinnerProps) => {
       <div className="mx-auto">
         <Icons.Loading
           size={size}
-          className={`animate-spin text-iron-950 ${className}`}
+          className={`animate-spin text-white ${className}`}
         />
       </div>
       {label && (

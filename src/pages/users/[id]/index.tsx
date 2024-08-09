@@ -8,7 +8,7 @@ import {
   getUsers,
   User,
 } from "@/lib/client/localStorage";
-import { AppBackHeader } from "@/components/AppHeader";
+import { AppBackHeader, AppHeaderLogo } from "@/components/AppHeader";
 import { Card } from "@/components/cards/Card";
 import Link from "next/link";
 import { classed } from "@tw-classed/react";
@@ -31,6 +31,7 @@ import { handleUsername } from "@/lib/client/utils";
 import { Icons } from "@/components/Icons";
 import { logClientEvent } from "@/lib/client/metrics";
 import { useSession } from "next-auth/react";
+import { Icon } from "@mui/material";
 
 const Label = classed.span("text-sm text-gray-12");
 
@@ -44,8 +45,10 @@ const LinkCard = ({ label, value, href }: LinkCardProps) => {
   return (
     <Link href={href} target="_blank">
       <div className="grid items-center grid-cols-[auto_1fr_auto] gap-1">
-        <span className="text-iron-300 font-normal">{label}</span>
-        <div className="h-[1px] bg-iron-200 w-full"></div>
+        <span className="text-sm text-white/50 font-inter font-normal leading-6">
+          {label}
+        </span>
+        <div className="h-[1px] bg-white/20 w-full"></div>
         <span className="text-right">{handleUsername(value) ?? "N/A"}</span>
       </div>
     </Link>
@@ -377,6 +380,7 @@ const UserProfilePage = () => {
     }
 
     handleOverlapRounds();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [psiState, selfEncPk, otherEncPk, channelName]);
 
   const getRepoContributionStats = async (
@@ -551,7 +555,14 @@ const UserProfilePage = () => {
   }, [id, router, githubSession, userGithubInfo]);
 
   if (!user) {
-    return <div>User not found</div>;
+    return (
+      <>
+        <AppHeaderLogo className="mx-auto py-4" />
+        <div className="text-white text-lg flex items-center justify-center h-full">
+          User not found
+        </div>
+      </>
+    );
   }
 
   const isOverlapComputed = psiState === PSIState.COMPLETE;
@@ -562,13 +573,13 @@ const UserProfilePage = () => {
         isOpen={showProfilePicModal}
         setIsOpen={setShowProfilePicModal}
         size={pageWidth - 60}
-        name={user.name}
-        pubKey={user.sigPk ?? ""}
+        name={user?.name!}
+        pubKey={user?.sigPk ?? ""}
       />
       <AppBackHeader redirectTo="/" />
       {alreadyConnected && (
         <div className="flex items-start justify-center py-28">
-          <span className="text-xl text-iron-950">
+          <span className="text-xl text-white">
             You have already connected with this user!
           </span>
         </div>
@@ -585,7 +596,7 @@ const UserProfilePage = () => {
             <ArtworkSnapshot
               width={128}
               height={128}
-              pubKey={user.sigPk ?? ""}
+              pubKey={user?.sigPk ?? ""}
             />
             <button type="button" className="absolute right-1 top-1 z-1">
               <Icons.Zoom />
@@ -593,28 +604,30 @@ const UserProfilePage = () => {
           </div>
 
           <div className="flex flex-col gap-1">
-            <h2 className="text-xl text-white font-medium">{user.name}</h2>
+            <h2 className="text-xl text-white font-semibold font-inter leading-6 tracking-[-0.1px]">
+              {user?.name}
+            </h2>
             <div className="flex items-center gap-1">
-              {user.bio && (
+              {user?.bio && (
                 <span
-                  className="text-iron-300 text-[12px] font-normal mt-1 left-5"
+                  className="text-white/50 text-xs font-inter font-medium mt-1 left-5"
                   style={{ whiteSpace: "pre-wrap" }}
                 >
-                  {user.bio}
+                  {user?.bio}
                 </span>
               )}
             </div>
           </div>
         </div>
-        {!user.inTs && (
-          <div className="p-3 bg-tertiary rounded flex-col justify-center items-start gap-1 inline-flex">
+        {!user?.inTs && (
+          <div className="p-3 border border-white/20 flex-col justify-center items-start gap-1 inline-flex">
             <InputWrapper
               className="flex flex-col gap-2"
               label="Details pending"
             >
-              <span className="text-iron-600 font-sans text-[14px] left-5 mt-1">
-                If {user.name} taps you back and shares their socials, they will
-                appear here.
+              <span className="text-white/50 font-inter text-[14px] left-5 mt-1">
+                If {user?.name} taps you back and shares their socials, they
+                will appear here.
               </span>
             </InputWrapper>
           </div>
@@ -630,7 +643,7 @@ const UserProfilePage = () => {
 
         {user?.note && (
           <Accordion label="Notes">
-            <span className="text-iron-600 text-[14px] mt-1 left-5">
+            <span className="text-white/50 text-[14px] mt-1 left-5">
               {user?.note}
             </span>
           </Accordion>
@@ -673,7 +686,7 @@ const UserProfilePage = () => {
               {userTalkInfo.map((talkInfo, index) => (
                 <span
                   key={index}
-                  className="text-iron-600 text-[14px] mt-1 left-5"
+                  className="text-white text-[14px] mt-1 left-5"
                 >
                   <Link href={"/talks/" + talkInfo.talkId}>
                     {talkInfo.talkName}
@@ -690,21 +703,21 @@ const UserProfilePage = () => {
           <Accordion label="Github">
             <div className="flex flex-col gap-1">
               {userGithubInfo.foundry && (
-                <span className="text-iron-600 text-[14px] mt-1 left-5">
+                <span className="text-white/50 text-[14px] mt-1 left-5">
                   Foundry: {userGithubInfo.foundry.total} commits, first commit
                   on {userGithubInfo.foundry.first.toDateString()}, rank{" "}
                   {userGithubInfo.foundry.rank}
                 </span>
               )}
               {userGithubInfo.reth && (
-                <span className="text-iron-600 text-[14px] mt-1 left-5">
+                <span className="text-white/50 text-[14px] mt-1 left-5">
                   Reth: {userGithubInfo.reth.total} commits, first commit on{" "}
                   {userGithubInfo.reth.first.toDateString()}, rank{" "}
                   {userGithubInfo.reth.rank}
                 </span>
               )}
               {userGithubInfo.cursiveZkSummit && (
-                <span className="text-iron-600 text-[14px] mt-1 left-5">
+                <span className="text-white/50 text-[14px] mt-1 left-5">
                   Cursive ZK Summit: {userGithubInfo.cursiveZkSummit.total}{" "}
                   commits, first commit on{" "}
                   {userGithubInfo.cursiveZkSummit.first.toDateString()}, rank{" "}
@@ -712,7 +725,7 @@ const UserProfilePage = () => {
                 </span>
               )}
               {userGithubInfo.cursiveDenver && (
-                <span className="text-iron-600 text-[14px] mt-1 left-5">
+                <span className="text-white/50 text-[14px] mt-1 left-5">
                   Cursive Denver: {userGithubInfo.cursiveDenver.total} commits,
                   first commit on{" "}
                   {userGithubInfo.cursiveDenver.first.toDateString()}, rank{" "}
@@ -723,12 +736,16 @@ const UserProfilePage = () => {
           </Accordion>
         )}
 
-        <Card.Base className="flex flex-col p-4 gap-6 !bg-white/20 mt-4 mb-8">
+        <Card.Base className="flex flex-col p-4 gap-6 !bg-gray/20 !rounded-none !border-white/20 mt-4 mb-8">
           <div className="flex flex-col gap-1">
-            <span className="font-bold text-white text-sm">
-              Which contacts and talks do you have in common?
-            </span>
-            <span className="text-iron-600 text-xs font-normal">
+            <div className="flex items-center gap-2">
+              <Icons.Cards className="text-secondary" />
+              <span className="font-medium text-white text-sm font-inter">
+                What do you both have in common?
+              </span>
+            </div>
+
+            <span className="text-white/50 font-inter text-xs font-normal">
               {isOverlapComputed ? (
                 "Overlap computed at the time you both opted into "
               ) : (
@@ -799,13 +816,13 @@ const UserProfilePage = () => {
               type="button"
               onClick={setupChannel}
               size="small"
-              variant="secondary"
+              variant="gray"
             >
               Discover
             </Button>
           ) : (
             <div className="flex flex-col gap-2">
-              <span className="text-iron-950 text-xs text-center">
+              <span className="text-white text-xs text-center">
                 {PSIStateMapping[psiState]}
               </span>
               <div className="relative">

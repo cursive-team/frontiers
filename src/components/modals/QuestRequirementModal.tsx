@@ -18,7 +18,7 @@ import { IconCircle } from "../IconCircle";
 
 const Label = classed.span("text-xs text-gray-10 font-normal");
 const Description = classed.span("text-gray-12 text-sm font-normal");
-const Title = classed.span("text-iron-950 font-sans text-lg font-normal");
+const Title = classed.span("text-white font-sans text-lg font-normal");
 
 type HeaderProps = {
   label?: string;
