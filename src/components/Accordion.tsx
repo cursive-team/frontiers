@@ -22,7 +22,7 @@ const Accordion = ({ label, children }: AccordionProps) => {
           setIsOpen(!isOpen);
         }}
       >
-        <span className="font-sans text-sm font-semibold leading-6 text-white">
+        <span className="font-inter text-sm font-semibold leading-6 text-white">
           {label}
         </span>
         <Icons.ArrowUp
@@ -42,7 +42,7 @@ const Accordion = ({ label, children }: AccordionProps) => {
               : "grid-rows-[0fr] opacity-0"
           )}
         >
-          <p className="block overflow-hidden pt-4 text-primary text-sm leading-5 font-sans font-normal">
+          <p className="block overflow-hidden pt-4 text-primary text-sm leading-5 font-inter font-normal">
             {children}
           </p>
         </div>

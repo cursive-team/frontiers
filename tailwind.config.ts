@@ -20,7 +20,6 @@ const config: Config = {
         8: "24px",
       },
       fontFamily: {
-        sans: "var(--font-dm-sans)",
         inter: "var(--font-inter)",
       },
       colors: {

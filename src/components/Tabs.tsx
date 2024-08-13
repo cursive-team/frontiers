@@ -34,11 +34,11 @@ const TabBadge = classed.div(
 const Tabs = ({ items }: TabsProps) => {
   return (
     <Tab.Group>
-      <Tab.List className="flex gap-8 relative">
-        <div className="">
+      <Tab.List className="flex relative">
+        <AppContent className="flex gap-8 relative">
           {items.map(({ label, badge }, index) => {
             return (
-              <Tab className="outline-none px-4" key={index}>
+              <Tab className="outline-none" key={index}>
                 {({ selected }) => (
                   <div className="relative">
                     <TabButton selected={selected}>
@@ -55,10 +55,10 @@ const Tabs = ({ items }: TabsProps) => {
               </Tab>
             );
           })}
-          <div className="absolute bg-white/50 bottom-0 h-[1px] w-full z-0"></div>
-        </div>
+        </AppContent>
+        <div className="absolute bg-white/50 bottom-0 h-[1px] w-full z-0"></div>
       </Tab.List>
-      <Tab.Panels className="pt-2 xs:pt-4">
+      <Tab.Panels>
         {items.map(({ children }, index) => {
           return <Tab.Panel key={index}>{children}</Tab.Panel>;
         })}

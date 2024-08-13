@@ -246,7 +246,7 @@ const CompleteQuestModal = ({
             <div className="flex flex-col gap-6 self-center">
               <div className="flex flex-col gap-1">
                 <span className="text-sm text-iron-600 font-bold">Proof:</span>
-                <span className="text-[21px] font-sans text-white font-medium">
+                <span className="text-[21px] font-inter text-white font-medium">
                   {quest.name}
                 </span>
               </div>

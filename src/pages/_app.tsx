@@ -72,7 +72,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <SessionProvider session={pageProps.session}>
           <OnlyMobileLayout>
             <main
-              className={`flex flex-col ${dmSans.variable} ${inter.variable} font-sans`}
+              className={`flex flex-col ${inter.variable} font-inter`}
               style={{
                 height: `${pageHeight}px`,
               }}
@@ -102,7 +102,7 @@ export default function App({ Component, pageProps }: AppProps) {
             position="top-center"
             toastOptions={{
               duration: 5000,
-              className: "font-sans text-white",
+              className: "font-inter text-white",
             }}
           />
         </SessionProvider>

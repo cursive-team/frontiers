@@ -15,7 +15,7 @@ import { cn } from "@/lib/client/utils";
 import { signOut } from "next-auth/react";
 import { AppLink } from "./AppLink";
 
-const Title = classed.h3("block font-sans text-white", {
+const Title = classed.h3("block font-inter text-white", {
   variants: {
     size: {
       small: "text-base leading-1 font-semibold",
@@ -160,7 +160,7 @@ const AppHeaderContent = ({
                 </div>
               </Link>
             </Description>
-            <span className="text-xs text-white/50 text-center mt-20 font-sans ">
+            <span className="text-xs text-white/50 text-center mt-20 font-inter ">
               App built by{" "}
               <AppLink
                 href="https://cursive.team/"

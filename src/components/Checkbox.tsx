@@ -4,14 +4,19 @@ import { useState } from "react";
 
 type CheckboxType = "checkbox" | "button";
 interface CheckboxProps
-  extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "onChange"> {
-  id: string;
+  extends Omit<
+    React.HTMLAttributes<HTMLInputElement>,
+    "type" | "onChange" | "value"
+  > {
+  id?: string;
+  name?: string;
   label: string;
   description?: string;
   disabled?: boolean;
   checked?: boolean;
   onChange?: (checked: boolean) => void;
   type?: CheckboxType; // show the checkbox as a button or a regular checkbox
+  value?: string;
 }
 
 const CheckboxBase = classed.label(
@@ -31,7 +36,7 @@ const CheckboxComponent = classed.label(
 );
 
 const CheckboxLabelBase = classed.span(
-  "font-normal font-normal text-white text-sm font-sans leading-5",
+  "font-normal font-normal text-white text-sm font-inter leading-5",
   {
     variants: {
       disabled: {

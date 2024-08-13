@@ -15,7 +15,7 @@ import { classed } from "@tw-classed/react";
 
 export type ProfileFormProps = InferType<typeof ProfileSchema>;
 
-const Title = classed.h3("block font-sans text-white", {
+const Title = classed.h3("block font-inter text-white", {
   variants: {
     size: {
       small: "text-base leading-1 font-semibold",

@@ -93,7 +93,7 @@ const QuestCard = ({
             <Card.Title className="text-white text-sm font-bold">
               {title}
             </Card.Title>
-            <span className="text-xs font-iron-600 font-sans">
+            <span className="text-xs font-iron-600 font-inter">
               {description}
             </span>
           </div>

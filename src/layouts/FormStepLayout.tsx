@@ -41,7 +41,7 @@ const FormStepLayout = ({
           <div className="flex flex-col gap-1 xs:mb-4">
             <div className="flex flex-col gap-3">
               {description && (
-                <span className="font-normal font-sans text-sm leading-5 text-white">
+                <span className="font-normal font-inter text-sm leading-5 text-white">
                   {description}
                 </span>
               )}

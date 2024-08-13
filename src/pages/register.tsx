@@ -463,7 +463,7 @@ export default function Register() {
     [DisplayState.GITHUB]: (
       <div className="grid grid-rows-[1fr_auto] h-full">
         <div className="flex flex-col  justify-center">
-          <span className="text-center text-base leading-6 text-white/75 font-sans px-10">
+          <span className="text-center text-base leading-6 text-white/75 font-inter px-10">
             This app will allow you to share and collect encrypted data with
             other event attendees.
           </span>
@@ -494,7 +494,7 @@ export default function Register() {
             </Button>
             <div className="text-center">
               <span
-                className="text-center font-sans text-sm text-white/50"
+                className="text-center font-inter text-sm text-white/50"
                 onClick={async () => {
                   await signOut();
                   window.location.reload();
@@ -686,7 +686,7 @@ export default function Register() {
       <AppHeaderLogo className="mx-auto py-5" />
       <div className="flex flex-col h-full">
         {StateContent?.[displayState]}
-        <span className="text-xs text-white/50 text-center mt-auto font-sans ">
+        <span className="text-xs text-white/50 text-center mt-auto font-inter ">
           App built by{" "}
           <AppLink
             href="https://cursive.team/"

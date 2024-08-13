@@ -19,7 +19,7 @@ export default function JobsNew() {
         //onSubmit={handleSubmitWithPassword}
         footer={
           <div className="flex flex-col gap-4 px-4">
-            <Link href="/jobs/opportunities">
+            <Link href="/jobs/new/opportunity">
               <Button variant="black" type="submit">
                 {`I'm hiring`}
               </Button>
@@ -31,7 +31,7 @@ export default function JobsNew() {
                 or
               </div>
             </span>
-            <Link href="/jobs/seekers">
+            <Link href="/jobs/new/seeker">
               <Button variant="black">{`I'm open to opportunities`}</Button>
             </Link>
           </div>

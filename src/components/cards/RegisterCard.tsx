@@ -2,7 +2,7 @@ import { classed } from "@tw-classed/react";
 import React, { ReactNode } from "react";
 
 const Description = classed.span(
-  "text-sm text-white/75 [&>strong]:text-white [&>strong]:font-bold leading-5 font-sans"
+  "text-sm text-white/75 [&>strong]:text-white [&>strong]:font-bold leading-5 font-inter"
 );
 
 export const RegisterCard = () => {
@@ -15,7 +15,7 @@ export const RegisterCard = () => {
         }}
       ></div>
       <div className="relative bg-secondary p-4 rounded-2xl">
-        <span className="text-white text-lg leading-6 font-sans">
+        <span className="text-white text-lg leading-6 font-inter">
           Hold NFC card against your phone until you receive a notification.
         </span>
       </div>

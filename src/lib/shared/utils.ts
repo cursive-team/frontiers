@@ -1,6 +1,18 @@
 import { MerkleProof, bigIntToHex, hexToBigInt } from "babyjubjub-ecdsa";
 import dayjs from "dayjs";
 
+export const toggleArrayElement = (array: any[], value: string): string[] => {
+  const index = array?.indexOf(value);
+
+  if (index === -1) {
+    array.push(value);
+  } else {
+    array.splice(index, 1);
+  }
+
+  return array as string[];
+};
+
 // This function check if nickname starts with @, if not, it adds it
 export const handleNickName = (nickname?: string): string => {
   if (!nickname) return "";

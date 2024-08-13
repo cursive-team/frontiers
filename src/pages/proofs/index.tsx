@@ -41,7 +41,7 @@ export default function QuestsPage() {
 
   return (
     <AppContent className="flex flex-col gap-4 pt-4">
-      <span className="text-iron-600 font-sans text-xs">
+      <span className="text-iron-600 font-inter text-xs">
         Post proofs about your Backpocket experience on Twitter, while
         preserving privacy over the people you met and talks you attended.
       </span>

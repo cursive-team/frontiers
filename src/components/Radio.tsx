@@ -10,7 +10,7 @@ interface RadioProps
   onChange?: (checked: boolean) => void;
 }
 
-const RadioLabelBase = classed.span("font-normal", {
+const RadioLabelBase = classed.span("font-normal text-white", {
   variants: {
     disabled: {
       true: "opacity-50 pointer-events-none",

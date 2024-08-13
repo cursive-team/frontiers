@@ -41,7 +41,7 @@ export default function MPCPage() {
 
   return (
     <div className="flex flex-col gap-4 pt-4">
-      <span className="text-iron-600 font-sans text-xs">
+      <span className="text-iron-600 font-inter text-xs">
         Discover connections with your social graph, using MPC for efficient
         results while maintaining your data privacy.
       </span>
@@ -54,7 +54,7 @@ export default function MPCPage() {
                 <Card.Title className="text-white text-sm font-bold">
                   🍎 Rate fruits
                 </Card.Title>
-                <span className="text-xs font-iron-600 font-sans">
+                <span className="text-xs font-iron-600 font-inter">
                   Rate some fruits with your friends, discover how aligned you
                   are without revealing any specific votes. Votes happen in
                   batches of 10.
@@ -73,7 +73,7 @@ export default function MPCPage() {
                 <Card.Title className="text-white text-sm font-bold">
                   Top 3 Talks
                 </Card.Title>
-                <span className="text-xs font-iron-600 font-sans">
+                <span className="text-xs font-iron-600 font-inter">
                   Rate some talks, only reveal the top 3 after everyone votes.
                   Learn about which ones were most successful without putting
                   down other speakers.

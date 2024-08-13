@@ -3,6 +3,7 @@ import { Icons } from "./Icons";
 import { Card } from "./cards/Card";
 import useSettings from "@/hooks/useSettings";
 import { DM_Sans } from "next/font/google";
+import { AppHeaderLogo } from "./AppHeader";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -22,22 +23,19 @@ const FullPageBanner = ({ description, title }: FullPageBannerProps) => {
       style={{
         minHeight: `${pageHeight}px`,
       }}
-      className={`flex text-center h-full ${dmSans.variable} font-sans`}
+      className={`flex text-center h-full ${dmSans.variable} font-inter`}
     >
-      <div className="flex flex-col gap-2 my-auto mx-auto px-10">
+      <div className="flex flex-col gap-6 my-auto mx-auto px-10">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-4 mx-auto">
-            <Icons.Cursive className="text-white" height={80} width={120} />
+            <AppHeaderLogo />
           </div>
-          <span className="text-[36px] font-bold font-sans text-center">
-            {APP_CONFIG.APP_NAME}
-          </span>
         </div>
         <div className="flex flex-col gap-2">
           {title && <Card.Title className="!text-lg">{title}</Card.Title>}
           <Card.Base className="p-2">
             <Card.Description>
-              <span className="font-sans text-sm text-white">
+              <span className="font-inter text-sm text-white">
                 {description}
               </span>
             </Card.Description>

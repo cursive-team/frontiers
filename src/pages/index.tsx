@@ -295,7 +295,7 @@ export default function Social() {
       {
         label: "Activity Feed",
         children: (
-          <div className="flex flex-col gap-4 mt-2">
+          <div className="flex flex-col gap-4 mt-2 pt-2 xs:pt-4">
             {activities.length === 1 && (
               <NoResultContent>Get started by tapping badges!</NoResultContent>
             )}
@@ -330,7 +330,7 @@ export default function Social() {
       {
         label: "Contacts",
         children: (
-          <div className="flex flex-col gap-5 mt-2">
+          <div className="flex flex-col gap-5 mt-2 pt-2 xs:pt-4">
             {contactUsersList.length === 0 && (
               <NoResultContent>
                 Tap rings to share socials and connect with others!
@@ -367,7 +367,7 @@ export default function Social() {
       {
         label: "Talks",
         children: (
-          <div className="flex flex-col gap-5 mt-2">
+          <div className="flex flex-col gap-5 mt-2 pt-2 xs:pt-4">
             {locations.length === 0 ? (
               <NoResultContent>{"No talks available."}</NoResultContent>
             ) : (

@@ -50,7 +50,7 @@ const Modal = ({
 
         <div
           data-component="modal"
-          className={`fixed inset-0 overflow-y-auto z-[100] ${dmSans.variable} font-sans`}
+          className={`fixed inset-0 overflow-y-auto z-[100] ${dmSans.variable} font-inter`}
         >
           <div className="flex min-h-full w-full items-center justify-center p-4 text-center">
             <Transition.Child
@@ -78,7 +78,7 @@ const Modal = ({
                       {withBackButton ? (
                         <div className="flex items-center gap-1 text-white">
                           <Icons.ArrowLeft className="text-white" />
-                          <span className="text-white font-sans text-sm">
+                          <span className="text-white font-inter text-sm">
                             Back
                           </span>
                         </div>
