@@ -261,9 +261,7 @@ export const AppHeaderLogo = ({ className = "" }: any) => {
   return (
     <Link className={cn(className)} href="/">
       <button type="button" className="flex gap-2 items-center">
-        <Icons.Frontiers />
-        <Icons.X />
-        <Icons.Cursive />
+        <Icons.Logo />
       </button>
     </Link>
   );

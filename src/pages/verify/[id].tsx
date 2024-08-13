@@ -10,6 +10,7 @@ import useRequireAdmin from "@/hooks/useRequireAdmin";
 import { Icons } from "@/components/Icons";
 import { ArtworkSnapshot } from "@/components/artwork/ArtworkSnapshot";
 import Link from "next/link";
+import { AppContent } from "@/components/AppContent";
 
 enum QRPageDisplayState {
   DISPLAY,
@@ -120,7 +121,7 @@ const QRPage = () => {
   }
 
   return (
-    <div className="mx-auto" style={{ maxWidth: "320px" }}>
+    <AppContent className="mx-auto" style={{ maxWidth: "320px" }}>
       <Link href="https://cursive.team">
         <div className="flex justify-center my-4 text-primary">
           <Icons.Cursive />
@@ -176,7 +177,7 @@ const QRPage = () => {
           </Link>
         </div>
       </div>
-    </div>
+    </AppContent>
   );
 };
 

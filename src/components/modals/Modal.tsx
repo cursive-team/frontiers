@@ -76,8 +76,8 @@ const Modal = ({
                       onClick={onCloseModal}
                     >
                       {withBackButton ? (
-                        <div className="flex items-center gap-1">
-                          <Icons.ArrowLeft />
+                        <div className="flex items-center gap-1 text-white">
+                          <Icons.ArrowLeft className="text-white" />
                           <span className="text-white font-sans text-sm">
                             Back
                           </span>

@@ -1,3 +1,4 @@
+import { AppContent } from "@/components/AppContent";
 import { AppBackHeader } from "@/components/AppHeader";
 import { Placeholder } from "@/components/placeholders/Placeholder";
 import { LoadingWrapper } from "@/components/wrappers/LoadingWrapper";
@@ -111,7 +112,7 @@ export default function LeaderBoard() {
   const loading = isLoading;
 
   return (
-    <div>
+    <AppContent>
       <AppBackHeader
         actions={
           !loading &&
@@ -155,7 +156,7 @@ export default function LeaderBoard() {
           </LoadingWrapper>
         </div>
       </div>
-    </div>
+    </AppContent>
   );
 }
 

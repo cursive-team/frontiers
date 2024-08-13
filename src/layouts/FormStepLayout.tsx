@@ -37,31 +37,33 @@ const FormStepLayout = ({
       onChange={onChange}
     >
       <div className="flex flex-col gap-3 xs:gap-8">
-        <div className="flex flex-col gap-1 xs:mb-4">
-          <div className="flex flex-col gap-3">
-            {description && (
-              <span className="font-normal font-sans text-sm leading-5 text-white">
-                {description}
-              </span>
-            )}
-            {title && (
-              <>
-                {typeof title === "string" ? (
-                  <h3 className="font-semibold text-white text-[21px] leading-6">
-                    {title}
-                  </h3>
-                ) : (
-                  title
-                )}
-              </>
-            )}
-            {subtitle && (
-              <span className="font-normal text-sm leading-5 text-white">
-                {subtitle}
-              </span>
-            )}
+        {(title || description) && (
+          <div className="flex flex-col gap-1 xs:mb-4">
+            <div className="flex flex-col gap-3">
+              {description && (
+                <span className="font-normal font-sans text-sm leading-5 text-white">
+                  {description}
+                </span>
+              )}
+              {title && (
+                <>
+                  {typeof title === "string" ? (
+                    <h3 className="font-semibold text-white text-[21px] leading-6">
+                      {title}
+                    </h3>
+                  ) : (
+                    title
+                  )}
+                </>
+              )}
+              {subtitle && (
+                <span className="font-normal text-sm leading-5 text-white">
+                  {subtitle}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
+        )}
         {header}
       </div>
       {(children || footer) && (

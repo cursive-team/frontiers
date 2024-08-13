@@ -31,6 +31,7 @@ import { NoResultContent } from "@/components/NoResultContent";
 import { classed } from "@tw-classed/react";
 import { logClientEvent } from "@/lib/client/metrics";
 import { Location } from "@prisma/client";
+import { AppContent } from "@/components/AppContent";
 
 interface LinkCardProps {
   name: string;
@@ -296,9 +297,7 @@ export default function Social() {
         children: (
           <div className="flex flex-col gap-4 mt-2">
             {activities.length === 1 && (
-              <NoResultContent>
-                Get started by tapping rings and NFC stickers!
-              </NoResultContent>
+              <NoResultContent>Get started by tapping badges!</NoResultContent>
             )}
             {activities.length > 1 &&
               groupedActivities.map((activities, index) => {
@@ -479,7 +478,7 @@ export default function Social() {
 
   if (!profile || !tabsItems) return null;
   return (
-    <>
+    <AppContent>
       <SliderModal
         isOpen={showSliderModal}
         setIsOpen={setShowSliderModal}
@@ -525,6 +524,6 @@ export default function Social() {
         </div>
       </div>
       <Tabs items={tabsItems} />
-    </>
+    </AppContent>
   );
 }

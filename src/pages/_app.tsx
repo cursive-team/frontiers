@@ -85,7 +85,7 @@ export default function App({ Component, pageProps }: AppProps) {
                   />
                 )}
                 <div
-                  className={`flex flex-col grow px-4 xs:px-4 ${
+                  className={`flex flex-col grow ${
                     footerVisible ? "mb-20" : ""
                   }`}
                 >

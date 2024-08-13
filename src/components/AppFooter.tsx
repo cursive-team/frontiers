@@ -53,7 +53,7 @@ const AppFooter = () => {
     {
       label: "Jobs",
       href: "/jobs",
-      icon: Icons.Social,
+      icon: Icons.Jobs,
       iconSize: 14,
     },
   ];

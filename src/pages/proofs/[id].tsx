@@ -31,6 +31,7 @@ import {
 import { Card } from "@/components/cards/Card";
 import { IconCircle } from "@/components/IconCircle";
 import { cn } from "@/lib/client/utils";
+import { AppContent } from "@/components/AppContent";
 
 interface QuestDetailProps {
   loading?: boolean;
@@ -56,7 +57,7 @@ export const UserDetail = ({
   numValidSigsCollected,
 }: UserDetailProps) => {
   return (
-    <div className="flex flex-col gap-8">
+    <AppContent className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
         <div>
           {users
@@ -107,7 +108,7 @@ export const UserDetail = ({
           )}
         </div>
       </div>
-    </div>
+    </AppContent>
   );
 };
 

@@ -11,6 +11,7 @@ import Link from "next/link";
 import { Button } from "@/components/Button";
 import { Icons } from "@/components/Icons";
 import { getUsers, User } from "@/lib/client/localStorage";
+import { AppContent } from "@/components/AppContent";
 
 const Title = classed.span("text-white text-xs font-normal font-inter");
 const Description = classed.h5("text-white/50 font-inter font-normal text-sm");
@@ -83,7 +84,7 @@ const LocationDetails = () => {
   };
 
   return (
-    <div>
+    <AppContent>
       <AppBackHeader redirectTo="/" />
       <LoadingWrapper
         isLoading={!location}
@@ -142,7 +143,7 @@ const LocationDetails = () => {
           </div>
         )}
       </LoadingWrapper>
-    </div>
+    </AppContent>
   );
 };
 
