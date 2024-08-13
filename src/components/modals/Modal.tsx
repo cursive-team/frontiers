@@ -2,11 +2,11 @@ import { Transition, Dialog } from "@headlessui/react";
 import React, { Fragment } from "react";
 import { Icons } from "../Icons";
 import { cn } from "@/lib/client/utils";
-import { DM_Sans } from "@next/font/google";
+import { Inter } from "@next/font/google";
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-inter",
 });
 
 export interface ModalProps
@@ -50,7 +50,7 @@ const Modal = ({
 
         <div
           data-component="modal"
-          className={`fixed inset-0 overflow-y-auto z-[100] ${dmSans.variable} font-inter`}
+          className={`fixed inset-0 overflow-y-auto z-[100] ${inter.variable} font-inter`}
         >
           <div className="flex min-h-full w-full items-center justify-center p-4 text-center">
             <Transition.Child

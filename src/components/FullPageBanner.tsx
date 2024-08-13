@@ -1,13 +1,11 @@
-import { APP_CONFIG } from "@/shared/constants";
-import { Icons } from "./Icons";
 import { Card } from "./cards/Card";
 import useSettings from "@/hooks/useSettings";
-import { DM_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 import { AppHeaderLogo } from "./AppHeader";
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-inter",
 });
 
 interface FullPageBannerProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -23,7 +21,7 @@ const FullPageBanner = ({ description, title }: FullPageBannerProps) => {
       style={{
         minHeight: `${pageHeight}px`,
       }}
-      className={`flex text-center h-full ${dmSans.variable} font-inter`}
+      className={`flex text-center h-full ${inter.variable} font-inter`}
     >
       <div className="flex flex-col gap-6 my-auto mx-auto px-10">
         <div className="flex flex-col gap-2">

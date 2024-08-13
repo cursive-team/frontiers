@@ -4,7 +4,7 @@ import { FullPageBanner } from "@/components/FullPageBanner";
 import { TransitionWrapper } from "@/components/Transition";
 import useSettings from "@/hooks/useSettings";
 import OnlyMobileLayout from "@/layouts/OnlyMobileLayout";
-import { DM_Sans, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 import {
   QueryCache,
@@ -22,11 +22,6 @@ const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error) => toast.error(`Something went wrong: ${error.message}`),
   }),
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
 });
 
 const inter = Inter({
