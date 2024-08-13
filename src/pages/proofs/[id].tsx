@@ -309,7 +309,7 @@ export default function QuestById() {
     !isQuestComplete;
 
   return (
-    <div>
+    <AppContent>
       <AppBackHeader />
       {quest && (
         <CompleteQuestModal
@@ -405,7 +405,7 @@ export default function QuestById() {
           )}
         </LoadingWrapper>
       }
-    </div>
+    </AppContent>
   );
 }
 
