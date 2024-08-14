@@ -414,15 +414,17 @@ export const Icons: Record<string, any> = {
   Home: (props: any) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width={props?.size || "14"}
-      height={props?.size || "16"}
-      viewBox="0 0 14 16"
+      width={props?.size || "18"}
+      height={props?.size || "18"}
+      viewBox="0 0 18 18"
       fill="none"
       {...props}
     >
       <path
-        d="M7.64 0.2325C7.269 -0.0775 6.731 -0.0775 6.36 0.2325L0.36 5.2325C0.132 5.4225 0 5.7035 0 6.0005V15.0005C0 15.5525 0.448 16.0005 1 16.0005H5V12.0005C5 11.4485 5.448 11.0005 6 11.0005H8C8.552 11.0005 9 11.4485 9 12.0005V16.0005H13C13.552 16.0005 14 15.5525 14 15.0005V6.0005C14 5.7035 13.868 5.4225 13.64 5.2325L7.64 0.2325Z"
-        fill="currentColor"
+        d="M6.75 16.5V8.99999H11.25V16.5M2.25 6.75L9 1.5L15.75 6.75V15C15.75 15.3978 15.592 15.7794 15.3107 16.0607C15.0294 16.342 14.6478 16.5 14.25 16.5H3.75C3.35218 16.5 2.97064 16.342 2.68934 16.0607C2.40804 15.7794 2.25 15.3978 2.25 15V6.75Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   ),
@@ -850,7 +852,7 @@ export const Icons: Record<string, any> = {
       />
     </svg>
   ),
-  store: (props: any) => (
+  Store: (props: any) => (
     <svg
       fill="none"
       height="16"

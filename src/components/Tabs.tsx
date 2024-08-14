@@ -9,6 +9,7 @@ interface TabProps {
 }
 
 export interface TabsProps {
+  defaultIndex?: number;
   items: TabProps[];
 }
 
@@ -31,9 +32,9 @@ const TabBadge = classed.div(
   "absolute -top-0.5 -right-2 bg-[#D40018] rounded-full text-white w-[6px] h-[6px] text-[8px]"
 );
 
-const Tabs = ({ items }: TabsProps) => {
+const Tabs = ({ items, defaultIndex = 0 }: TabsProps) => {
   return (
-    <Tab.Group>
+    <Tab.Group defaultIndex={defaultIndex}>
       <Tab.List className="flex relative">
         <AppContent className="flex gap-8 relative">
           {items.map(({ label, badge }, index) => {

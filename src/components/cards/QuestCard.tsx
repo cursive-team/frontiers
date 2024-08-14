@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Card } from "./Card";
 import { LocationRequirement, UserRequirement } from "@/types";
 import { Icons } from "../Icons";
@@ -7,7 +7,7 @@ import { PointCard } from "./PointCard";
 
 type QuestCardProps = {
   title: string;
-  description: string;
+  description: ReactNode;
   userTapReqCount: number; // 1 or 0
   userRequirements?: UserRequirement[];
   locationRequirements?: LocationRequirement[];
@@ -50,7 +50,6 @@ const QuestRequirementIcons = ({
                 key={index}
                 isMultiple={true}
                 icon={isPersonRequirement ? "person" : "location"}
-                color="secondary"
                 border
               />
             );
@@ -86,7 +85,7 @@ const QuestCard = ({
     : 0;
 
   return (
-    <Card.Base className="flex flex-col gap-4 p-3">
+    <Card.Base className="flex flex-col gap-4 p-3 !pb-4">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-2">
@@ -115,7 +114,7 @@ const QuestCard = ({
         ) : completedReqs === numRequirements ? (
           <Card.Description className="!text-primary">{`Generate proof of completion`}</Card.Description>
         ) : (
-          <Card.Description className="!text-primary">{`${
+          <Card.Description className="!text-secondary !font-medium">{`${
             completedReqs || 0
           }/${numRequirements}`}</Card.Description>
         )}

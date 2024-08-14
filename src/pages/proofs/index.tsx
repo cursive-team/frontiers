@@ -41,7 +41,7 @@ export default function QuestsPage() {
 
   return (
     <AppContent className="flex flex-col gap-4 pt-4">
-      <span className="text-iron-600 font-inter text-xs">
+      <span className="text-white/75 font-inter text-sm">
         Post proofs about your Backpocket experience on Twitter, while
         preserving privacy over the people you met and talks you attended.
       </span>
@@ -72,7 +72,9 @@ export default function QuestsPage() {
                 <Link href={`/proofs/${id}`} key={key}>
                   <QuestCard
                     title={name}
-                    description={description}
+                    description={
+                      <span className="text-white/50">{description}</span>
+                    }
                     userTapReqCount={userTapReq ? 1 : 0}
                     completedReqs={numRequirementsSatisfied[index]}
                     userRequirements={userRequirements}
