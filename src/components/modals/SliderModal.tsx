@@ -51,7 +51,7 @@ const SliderModal = ({ isOpen, setIsOpen, size = 320 }: SliderModalProps) => {
         <div className="flex flex-col gap-4">
           <div className="mx-auto">
             <div className="flex flex-col gap-4 h-full">
-              <Title>Your Backpocket Flower Garden</Title>
+              <Title>Your Frontiers Flower Garden</Title>
 
               <div className="flex flex-col gap-2 border border-white/20 rounded-[8px]">
                 <canvas

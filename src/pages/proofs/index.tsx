@@ -42,8 +42,8 @@ export default function QuestsPage() {
   return (
     <AppContent className="flex flex-col gap-4 pt-4">
       <span className="text-white/75 font-inter text-sm">
-        Post proofs about your Backpocket experience on Twitter, while
-        preserving privacy over the people you met and talks you attended.
+        Post proofs about your Frontiers experience on Twitter, while preserving
+        privacy over the people you met.
       </span>
 
       <LoadingWrapper

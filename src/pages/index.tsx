@@ -343,7 +343,7 @@ export default function Social() {
           <div className="flex flex-col gap-5 mt-2 pt-2 xs:pt-4">
             {contactUsersList.length === 0 && (
               <NoResultContent>
-                Tap rings to share socials and connect with others!
+                Tap badges to share socials and connect with others!
               </NoResultContent>
             )}
             {contactUsersList.length !== 0 &&

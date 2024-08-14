@@ -80,12 +80,14 @@ export type TapResponse = {
   code: TapResponseCode;
   person?: PersonTapResponse;
   location?: LocationTapResponse;
+  uid?: string;
 };
 
 export const tapResponseSchema = object({
   code: string().oneOf(Object.values(TapResponseCode)),
   person: personTapResponseSchema.optional().default(undefined),
   location: locationTapResponseSchema.optional().default(undefined),
+  uid: string().optional().default(undefined),
 });
 
 /**
@@ -140,7 +142,7 @@ export default async function handler(
   }
 
   // verify encryption
-  const chipId = verifyCmac(chipEnc);
+  const chipId = await verifyCmac(chipEnc);
   if (!chipId) {
     return res.status(400).json({ error: "Invalid chipEnc provided" });
   }
@@ -224,5 +226,7 @@ export default async function handler(
     });
   }
 
-  return res.status(200).json({ code: TapResponseCode.PERSON_NOT_REGISTERED });
+  return res
+    .status(200)
+    .json({ code: TapResponseCode.PERSON_NOT_REGISTERED, uid: chipId });
 }

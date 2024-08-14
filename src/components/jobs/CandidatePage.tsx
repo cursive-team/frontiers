@@ -327,3 +327,7 @@ export default function CandidatePage({
     </AppContent>
   );
 }
+
+CandidatePage.getInitialProps = () => {
+  return { showHeader: false, showFooter: false };
+};

@@ -15,7 +15,7 @@ export default function Info() {
       <div className="flex flex-col my-auto justify-center">
         <Title>
           <div className="flex items-center justify-center m-4 gap-2">
-            Tap your ring to get started!
+            Tap your badge to get started!
           </div>
         </Title>
         <div className="flex flex-col gap-2 m-4">

@@ -225,7 +225,7 @@ export default function Tap() {
 
     // ----- HANDLE CMAC TAP -----
 
-    if (!location.hash) {
+    if (!window.location.search) {
       toast.error("Invalid tap! Please try again.");
       router.push("/");
       return;
@@ -233,7 +233,7 @@ export default function Tap() {
 
     logClientEvent("tapProcessNewTap", {});
 
-    const urlParams = new URLSearchParams(location.hash.slice(1));
+    const urlParams = new URLSearchParams(window.location.search);
     const chipEnc = urlParams.get("e");
 
     if (!chipEnc) {

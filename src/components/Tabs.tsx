@@ -36,7 +36,7 @@ const Tabs = ({ items, defaultIndex = 0 }: TabsProps) => {
   return (
     <Tab.Group defaultIndex={defaultIndex}>
       <Tab.List className="flex relative">
-        <AppContent className="flex gap-8 relative">
+        <div className="flex gap-8 relative">
           {items.map(({ label, badge }, index) => {
             return (
               <Tab className="outline-none" key={index}>
@@ -56,7 +56,7 @@ const Tabs = ({ items, defaultIndex = 0 }: TabsProps) => {
               </Tab>
             );
           })}
-        </AppContent>
+        </div>
         <div className="absolute bg-white/50 bottom-0 h-[1px] w-full z-0"></div>
       </Tab.List>
       <Tab.Panels>

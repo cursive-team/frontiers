@@ -20,6 +20,7 @@ import { startAuthentication } from "@simplewebauthn/browser";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { AppHeaderLogo } from "@/components/AppHeader";
 import { AppLink } from "@/components/AppLink";
+import { AppContent } from "@/components/AppContent";
 
 enum DisplayState {
   GITHUB,
@@ -342,19 +343,21 @@ export default function Login() {
   return (
     <div className="flex flex-col grow pb-4">
       <AppHeaderLogo className="mx-auto py-5" />
-      <div className="flex flex-col h-full">
-        {LoginStateContentMapping?.[displayState]}
-        <span className="text-xs text-white/50 text-center mt-auto font-inter ">
-          App built by{" "}
-          <AppLink
-            href="https://cursive.team/"
-            className="text-primary underline"
-          >
-            Cursive
-          </AppLink>{" "}
-          for Paradigm Frontiers.
-        </span>
-      </div>
+      <AppContent>
+        <div className="flex flex-col h-full">
+          {LoginStateContentMapping?.[displayState]}
+          <span className="text-xs text-white/50 text-center mt-auto font-inter ">
+            App built by{" "}
+            <AppLink
+              href="https://cursive.team/"
+              className="text-primary underline"
+            >
+              Cursive
+            </AppLink>{" "}
+            for Paradigm Frontiers.
+          </span>
+        </div>
+      </AppContent>
     </div>
   );
 }
