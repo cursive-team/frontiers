@@ -577,7 +577,7 @@ const UserProfilePage = () => {
         name={user?.name!}
         pubKey={user?.sigPk ?? ""}
       />
-      <AppBackHeader redirectTo="/" />
+      <AppBackHeader redirectTo="/?defaultTabIndex=1" />
       {alreadyConnected && (
         <div className="flex items-start justify-center py-28">
           <span className="text-xl text-white">
@@ -681,7 +681,7 @@ const UserProfilePage = () => {
           </Accordion>
         )}
 
-        {userTalkInfo && (
+        {userTalkInfo?.length > 0 && (
           <Accordion label="Speaker">
             <div className="flex flex-col gap-1">
               {userTalkInfo.map((talkInfo, index) => (

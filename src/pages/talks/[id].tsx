@@ -85,7 +85,7 @@ const LocationDetails = () => {
 
   return (
     <AppContent>
-      <AppBackHeader redirectTo="/" />
+      <AppBackHeader redirectTo="/?defaultTabIndex=2" />
       <LoadingWrapper
         isLoading={!location}
         fallback={<LocationDetailPlaceholder />}

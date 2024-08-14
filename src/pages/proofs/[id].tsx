@@ -145,7 +145,7 @@ export const LocationDetail = ({
                 >
                   <div className="flex items-center gap-2">
                     <IconCircle>
-                      <Icons.Location size={12} />
+                      <Icons.Location  size={12} />
                     </IconCircle>
                     <Card.Title
                       className={"text-sm font-inter text-white font-bold"}
@@ -393,7 +393,7 @@ export default function QuestById() {
                       setCompleteQuestModal(true);
                     }}
                   >
-                    Generate proof
+                    Begin proof generation
                   </Button>
                 )}
               </ListWrapper>

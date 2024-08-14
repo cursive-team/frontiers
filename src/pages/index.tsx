@@ -50,7 +50,7 @@ const LinkCard = ({ name, date, href, other }: LinkCardProps) => {
               <span className="text-white font-medium text-sm  text-left">
                 {name}
               </span>
-              <span className="text-white/50 font-medium text-xs text-left truncate">
+              <span className="text-white/50 font-medium font-inter font-medium text-xs text-left truncate">
                 {other}
               </span>
             </div>
@@ -60,7 +60,7 @@ const LinkCard = ({ name, date, href, other }: LinkCardProps) => {
             </span>
           )}
 
-          <span className="text-white/50 font-inter font-medium text-xs">
+          <span className="text-white/50 font-medium font-inter font-inter font-medium text-xs">
             {date}
           </span>
         </div>
@@ -98,7 +98,9 @@ const FeedContent = ({
         <IconCircle>{icon}</IconCircle>
         <CardTitleOverride className="truncate">{title}</CardTitleOverride>
       </div>
-      <Card.Description>{description}</Card.Description>
+      <Card.Description className="!text-white/25 !text-xs !font-medium">
+        {description}
+      </Card.Description>
     </div>
   );
 };
@@ -110,8 +112,10 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
         <FeedContent
           title={
             <>
-              <span className="text-iron-600">{"Sent socials to "}</span>
-              <span className="text-white">{name}</span>
+              <span className="text-white/50 font-medium font-inter">
+                {"Sent socials to "}
+              </span>
+              <span className="text-white font-medium">{name}</span>
             </>
           }
           icon={<Icons.Person className="text-secondary" />}
@@ -124,8 +128,10 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
           <FeedContent
             title={
               <>
-                <span className="text-iron-600">{"Overlapped with "}</span>
-                <span className="text-white">{name}</span>
+                <span className="text-white/50 font-medium font-inter">
+                  {"Overlapped with "}
+                </span>
+                <span className="text-white font-medium">{name}</span>
               </>
             }
             titleOverride={true}
@@ -140,10 +146,10 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
           <FeedContent
             title={
               <>
-                <span className="text-iron-600">
+                <span className="text-white/50 font-medium font-inter">
                   {"Received socials from "}
                 </span>
-                <span className="text-white">{name}</span>
+                <span className="text-white font-medium">{name}</span>
               </>
             }
             titleOverride={true}
@@ -158,8 +164,10 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
           <FeedContent
             title={
               <>
-                <span className="text-iron-600">{"Attended talk "}</span>
-                <span className="text-white">{name}</span>
+                <span className="text-white/50 font-medium font-inter">
+                  {"Attended talk "}
+                </span>
+                <span className="text-white font-medium">{name}</span>
               </>
             }
             titleOverride={true}
@@ -175,8 +183,10 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
             icon={<CircleCard icon="proof" />}
             title={
               <>
-                <span className="text-iron-600">{"Made a proof "}</span>
-                <span className="text-white">{name}</span>
+                <span className="text-white/50 font-medium font-inter">
+                  {"Made a proof "}
+                </span>
+                <span className="text-white font-medium">{name}</span>
               </>
             }
             titleOverride={true}
@@ -317,7 +327,7 @@ export default function Social() {
                           type={activity.type}
                           name={activity.name}
                           id={activity.id}
-                          date={formatDate(activity.ts)}
+                          date={formatDate(activity?.ts)}
                         />
                       );
                     })}
@@ -468,6 +478,8 @@ export default function Social() {
     updateSocialInfo();
   }, [router]);
 
+  const defaultTabIndex = router?.query?.defaultTabIndex ?? 0;
+
   if (isLoading) {
     return (
       <div className="my-auto mx-auto">
@@ -509,7 +521,7 @@ export default function Social() {
               <h2 className="text-xl leading-6 font-inter tracking-[-0.1px] text-white font-semibold">
                 {profile?.displayName}
               </h2>
-              <span className="text-xs font-inter font-normal text-white/50">
+              <span className="text-xs font-inter text-white/50 font-medium ">
                 {numConnections === 1
                   ? `1 contact`
                   : `${numConnections} contacts`}
@@ -523,7 +535,7 @@ export default function Social() {
           </div>
         </div>
       </div>
-      <Tabs items={tabsItems} />
+      <Tabs items={tabsItems} defaultIndex={Number(defaultTabIndex ?? 0)} />
     </AppContent>
   );
 }
