@@ -14,6 +14,7 @@ export interface ModalProps
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   children?: React.ReactNode;
+  actions?: React.ReactNode;
   closable?: boolean;
   onClose?: () => void;
   withBackButton?: boolean;
@@ -26,6 +27,7 @@ const Modal = ({
   closable = true, // show close button when active
   onClose, // run when modal close
   withBackButton = false, // show back button when active
+  actions = null,
 }: ModalProps) => {
   const onCloseModal = () => {
     onClose?.();
@@ -88,6 +90,7 @@ const Modal = ({
                     </button>
                   </div>
                 )}
+                {actions}
                 <div className="flex flex-col grow h-full overflow-y-auto mt-8 z-100">
                   <div className="pt-4 pb-6 grow">{children}</div>
                 </div>

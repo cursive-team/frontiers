@@ -578,6 +578,41 @@ export const Icons: Record<string, any> = {
       />
     </svg>
   ),
+  Bookmark: (...props: any) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      {...props}
+    >
+      <path
+        d="M12.6666 14L7.99992 11.3333L3.33325 14V3.33333C3.33325 2.97971 3.47373 2.64057 3.72378 2.39052C3.97382 2.14048 4.31296 2 4.66659 2H11.3333C11.6869 2 12.026 2.14048 12.2761 2.39052C12.5261 2.64057 12.6666 2.97971 12.6666 3.33333V14Z"
+        stroke="white"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  BookmarkActive: (...props: any) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      {...props}
+    >
+      <path
+        d="M12.6668 14L8.00016 11.3333L3.3335 14V3.33333C3.3335 2.97971 3.47397 2.64057 3.72402 2.39052C3.97407 2.14048 4.31321 2 4.66683 2H11.3335C11.6871 2 12.0263 2.14048 12.2763 2.39052C12.5264 2.64057 12.6668 2.97971 12.6668 3.33333V14Z"
+        fill="#00E100"
+        stroke="#00E100"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
   Pin: (...props: any) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"

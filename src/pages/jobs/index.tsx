@@ -3,6 +3,7 @@ import CandidatePage, {
   JobCandidateInput,
 } from "@/components/jobs/CandidatePage";
 import JobsEntryPage from "@/components/jobs/JobsEntryPage";
+import RecruiterMatchView from "@/components/jobs/RecruiterMatchView";
 import RecruiterPage, {
   JobRecruiterInput,
 } from "@/components/jobs/RecruiterPage";
@@ -60,7 +61,7 @@ const Jobs: React.FC = () => {
     case JobsDisplayState.CANDIDATE_MATCHES:
       return <CandidateJobsView />;
     case JobsDisplayState.RECRUITER_MATCHES:
-      return <CandidateJobsView />;
+      return <RecruiterMatchView />;
   }
 };
 

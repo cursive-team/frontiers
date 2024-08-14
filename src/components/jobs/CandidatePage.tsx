@@ -76,7 +76,7 @@ export default function CandidatePage({
   const { setValue, watch, register, handleSubmit } =
     useForm<JobCandidateInput>({
       defaultValues: {
-        education: "bachelor",
+        education: "high-school",
         experience: 0,
         interestZk: false,
         interestDefi: false,
