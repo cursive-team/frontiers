@@ -60,7 +60,7 @@ const LinkCard = ({ name, date, href, other }: LinkCardProps) => {
             </span>
           )}
 
-          <span className="text-white/50 font-medium font-inter font-inter font-medium text-xs">
+          <span className="text-white/50 font-medium font-inter  text-right text-xs">
             {date}
           </span>
         </div>
@@ -397,7 +397,10 @@ export default function Social() {
                           <LinkCard
                             key={index}
                             name={location.name}
-                            date={formatDate(location.talkTime.toString())}
+                            date={formatDate(
+                              location.talkTime.toString(),
+                              "hh:mm"
+                            )}
                             href={`/talks/${location.id}`}
                           />
                         );

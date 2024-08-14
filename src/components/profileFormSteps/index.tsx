@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useStateMachine } from "little-state-machine";
 import updateStateFromAction from "@/lib/shared/updateAction";
 import { classed } from "@tw-classed/react";
+import { Icons } from "../Icons";
 
 export type ProfileFormProps = InferType<typeof ProfileSchema>;
 
@@ -112,7 +113,7 @@ const ProfileForm = ({
     resolver: yupResolver(ProfileSchema),
   });
 
-  const { errors } = formState;
+  const { errors, isDirty } = formState;
 
   // make sure the username is always prefixed with @
   const handleUsername = (
@@ -140,21 +141,23 @@ const ProfileForm = ({
     <FormStepLayout
       onSubmit={handleSubmit(updateProfile)}
       actions={
-        <div className="flex flex-col gap-2">
-          <Button
-            variant="black"
-            disabled={!formState.isDirty || loading}
-            onClick={async () => {
-              const isValid = await trigger();
-              if (isValid) {
-                handleSubmit(updateProfile)();
-              }
-            }}
-            loading={loading}
-          >
-            Save Changes
-          </Button>
-          <Button variant="black" type="button" onClick={onHandleSignout}>
+        <div className="flex flex-col gap-2 bg-[#000] pt-2">
+          {isDirty && (
+            <Button
+              variant="black"
+              disabled={!formState.isDirty || loading}
+              onClick={async () => {
+                const isValid = await trigger();
+                if (isValid) {
+                  handleSubmit(updateProfile)();
+                }
+              }}
+              loading={loading}
+            >
+              Save Changes
+            </Button>
+          )}
+          <Button variant="link" type="button" onClick={onHandleSignout}>
             Logout
           </Button>
         </div>
@@ -177,7 +180,11 @@ const ProfileForm = ({
         </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1 ">
-            <Title>Social settings</Title>
+            <div className="flex gap-1 items-center">
+              <Title>Social settings</Title>
+              <Icons.Pencil />
+            </div>
+
             <Description>
               Updates are not shared with previous connections
             </Description>

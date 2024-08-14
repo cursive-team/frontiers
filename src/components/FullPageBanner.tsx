@@ -25,11 +25,6 @@ const FullPageBanner = ({ description, title }: FullPageBannerProps) => {
     >
       <div className="flex flex-col gap-6 my-auto mx-auto px-10">
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-4 mx-auto">
-            <AppHeaderLogo />
-          </div>
-        </div>
-        <div className="flex flex-col gap-2">
           {title && <Card.Title className="!text-lg">{title}</Card.Title>}
           <Card.Base className="p-2">
             <Card.Description>

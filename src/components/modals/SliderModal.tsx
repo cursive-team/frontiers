@@ -53,7 +53,7 @@ const SliderModal = ({ isOpen, setIsOpen, size = 320 }: SliderModalProps) => {
             <div className="flex flex-col gap-4 h-full">
               <Title>Your Backpocket Flower Garden</Title>
 
-              <div className="flex flex-col gap-2 bg-white/40 rounded-[8px]">
+              <div className="flex flex-col gap-2 border border-white/20 rounded-[8px]">
                 <canvas
                   className="artwork-webgl flex p-0 m-0 rounded-[8px]"
                   id="slider"
