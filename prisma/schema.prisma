@@ -46,7 +46,9 @@ model User {
   Room                      Room[]
   RoomMember                RoomMember[]
 
-  talks Location[]
+  talks                    Location[]
+  TestingJobCandidateInput TestingJobCandidateInput[]
+  TestingJobRecruiterInput TestingJobRecruiterInput[]
 }
 
 model Admin {
@@ -238,5 +240,21 @@ model RoomMember {
   userId    Int
   createdAt DateTime @default(now())
   room      Room     @relation(fields: [roomId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model TestingJobCandidateInput {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  inputData String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model TestingJobRecruiterInput {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  inputData String
+  createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
 }

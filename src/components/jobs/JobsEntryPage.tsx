@@ -1,11 +1,17 @@
 import { AppContent } from "@/components/AppContent";
 import { Button } from "@/components/Button";
-import { Checkbox } from "@/components/Checkbox";
 import { FormStepLayout } from "@/layouts/FormStepLayout";
-import Link from "next/link";
 import React from "react";
 
-export default function JobsNew() {
+type JobsEntryPageProps = {
+  handleIsCandidate: () => void;
+  handleIsRecruiter: () => void;
+};
+
+export default function JobsEntryPage({
+  handleIsCandidate,
+  handleIsRecruiter,
+}: JobsEntryPageProps) {
   return (
     <AppContent className="h-full">
       <FormStepLayout
@@ -19,11 +25,9 @@ export default function JobsNew() {
         //onSubmit={handleSubmitWithPassword}
         footer={
           <div className="flex flex-col gap-4 px-4">
-            <Link href="/jobs/new/opportunity">
-              <Button variant="black" type="submit">
-                {`I'm hiring`}
-              </Button>
-            </Link>
+            <Button variant="black" onClick={handleIsRecruiter}>
+              {`I'm hiring`}
+            </Button>
 
             <span className="h-6 relative font-normal text-sm text-white font-inter text-center">
               <div className="after:content-[''] after:top-[12px] after:absolute after:h-[1px] after:bg-white/40 after:w-full after:left-0"></div>
@@ -31,9 +35,10 @@ export default function JobsNew() {
                 or
               </div>
             </span>
-            <Link href="/jobs/new/seeker">
-              <Button variant="black">{`I'm open to opportunities`}</Button>
-            </Link>
+            <Button
+              variant="black"
+              onClick={handleIsCandidate}
+            >{`I'm open to opportunities`}</Button>
           </div>
         }
       />

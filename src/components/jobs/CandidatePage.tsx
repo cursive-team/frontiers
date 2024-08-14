@@ -6,11 +6,29 @@ import { Input } from "@/components/Input";
 import { InputRange } from "@/components/InputRange";
 import { Radio } from "@/components/Radio";
 import { FormStepLayout } from "@/layouts/FormStepLayout";
+import { getAuthToken } from "@/lib/client/localStorage";
 import { cn } from "@/lib/client/utils";
 import { toggleArrayElement } from "@/lib/shared/utils";
 import { register } from "module";
 import React, { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+export type JobCandidateInput = {
+  education: "high-school" | "bachelor" | "master" | "phd";
+  experience: number;
+  interestZk: boolean;
+  interestDefi: boolean;
+  interestConsumer: boolean;
+  interestInfra: boolean;
+  salary: number;
+  stageParadigm: boolean;
+  stageGrant: boolean;
+  stageSeed: boolean;
+  stageSeriesA: boolean;
+  partTime: boolean;
+  email: string;
+};
 
 interface SectionProps {
   title?: string;
@@ -48,28 +66,76 @@ const Section = ({
   </div>
 );
 
-export default function JobSeekerPage() {
-  const { setValue, watch, register, handleSubmit } = useForm({
-    defaultValues: {
-      experience: 0,
-      salary: 0,
-      email: "",
-      education: "",
-      field: [],
-      companyStage: [],
-      socials: [],
-    },
-  });
+interface CandidatePageProps {
+  handleSubmitCandidateInput: (formValues: JobCandidateInput) => void;
+}
 
-  const education = watch("education", "");
+export default function CandidatePage({
+  handleSubmitCandidateInput,
+}: CandidatePageProps) {
+  const { setValue, watch, register, handleSubmit } =
+    useForm<JobCandidateInput>({
+      defaultValues: {
+        education: "bachelor",
+        experience: 0,
+        interestZk: false,
+        interestDefi: false,
+        interestConsumer: false,
+        interestInfra: false,
+        salary: 0,
+        stageParadigm: false,
+        stageGrant: false,
+        stageSeed: false,
+        stageSeriesA: false,
+        partTime: false,
+        email: "",
+      },
+    });
+
+  const education = watch("education", "high-school");
   const experience = watch("experience", 0);
+  const interestZk = watch("interestZk", false);
+  const interestDefi = watch("interestDefi", false);
+  const interestConsumer = watch("interestConsumer", false);
+  const interestInfra = watch("interestInfra", false);
   const salary = watch("salary", 0);
-  const field: string[] = watch("field", []) ?? [];
-  const companyStage: string[] = watch("companyStage", []);
-  const socials: string[] = watch("socials", []);
+  const stageParadigm = watch("stageParadigm", false);
+  const stageGrant = watch("stageGrant", false);
+  const stageSeed = watch("stageSeed", false);
+  const stageSeriesA = watch("stageSeriesA", false);
+  const partTime = watch("partTime", false);
 
-  const onSubmitForm = (formValues: any) => {
-    console.log("formValues => ", formValues);
+  const onSubmitForm = async (formValues: JobCandidateInput) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formValues.email || !emailRegex.test(formValues.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    const authToken = getAuthToken();
+    if (!authToken || authToken.expiresAt < new Date()) {
+      toast.error("Please try logging in again.");
+      return;
+    }
+
+    const response = await fetch("/api/jobs/new_candidate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputData: JSON.stringify(formValues),
+        authToken: authToken.value,
+      }),
+    });
+
+    if (!response.ok) {
+      toast.error("Failed to submit your candidate profile.");
+      return;
+    }
+
+    toast.success("Your candidate profile has been submitted.");
+    handleSubmitCandidateInput(formValues);
   };
 
   return (
@@ -107,18 +173,18 @@ export default function JobSeekerPage() {
             />
             <Radio
               id="education-2"
-              label="Master's"
-              checked={education === "master"}
-              onChange={() => {
-                setValue("education", "master");
-              }}
-            />
-            <Radio
-              id="education-3"
               label="Bachelor's"
               checked={education === "bachelor"}
               onChange={() => {
                 setValue("education", "bachelor");
+              }}
+            />
+            <Radio
+              id="education-3"
+              label="Master's"
+              checked={education === "master"}
+              onChange={() => {
+                setValue("education", "master");
               }}
             />
             <Radio
@@ -127,45 +193,6 @@ export default function JobSeekerPage() {
               checked={education === "phd"}
               onChange={() => {
                 setValue("education", "phd");
-              }}
-            />
-          </div>
-        </Section>
-        <Section title="Fields">
-          <div className="grid grid-cols-2 gap-2">
-            <Checkbox
-              id="field-1"
-              checked={field.includes("computer-science")}
-              onChange={(checked) => {
-                setValue(
-                  "field",
-                  toggleArrayElement(field, "computer-science") as any
-                );
-              }}
-              label="Computer Science"
-            />
-            <Checkbox
-              id="field-2"
-              label="Math"
-              checked={field.includes("math")}
-              onChange={(checked) => {
-                setValue("field", toggleArrayElement(field, "math") as any);
-              }}
-            />
-            <Checkbox
-              id="field-3"
-              label="Physics"
-              checked={field.includes("physics")}
-              onChange={(checked) => {
-                setValue("field", toggleArrayElement(field, "physics") as any);
-              }}
-            />
-            <Checkbox
-              id="field-4"
-              label="Other"
-              checked={field.includes("other")}
-              onChange={(checked) => {
-                setValue("field", toggleArrayElement(field, "other") as any);
               }}
             />
           </div>
@@ -185,52 +212,49 @@ export default function JobSeekerPage() {
             }}
           />
         </Section>
+
+        <Section title="What opportunities are you seeking?" active />
+
         <Section title="Interests">
           <div className="grid grid-cols-2 gap-2">
             <Checkbox
               id="interests-1"
-              checked={field.includes("zl-mpc")}
+              checked={interestZk}
               onChange={(checked) => {
-                setValue("field", toggleArrayElement(field, "zl-mpc") as any);
+                setValue("interestZk", checked);
               }}
-              label="ZL/MPC"
+              label="ZK/MPC"
             />
             <Checkbox
               id="interests-2"
-              label="Defi"
-              checked={field.includes("defi")}
+              label="DeFi"
+              checked={interestDefi}
               onChange={(checked) => {
-                setValue("field", toggleArrayElement(field, "defi") as any);
+                setValue("interestDefi", checked);
               }}
             />
             <Checkbox
               id="interests-3"
               label="Consumer"
-              checked={field.includes("consumer")}
+              checked={interestConsumer}
               onChange={(checked) => {
-                setValue("field", toggleArrayElement(field, "consumer") as any);
+                setValue("interestConsumer", checked);
               }}
             />
             <Checkbox
               id="interests-4"
               label="Infrastructure"
-              checked={field.includes("infrastructure")}
+              checked={interestInfra}
               onChange={(checked) => {
-                setValue(
-                  "field",
-                  toggleArrayElement(field, "infrastructure") as any
-                );
+                setValue("interestInfra", checked);
               }}
             />
           </div>
         </Section>
-
-        <Section title="What opportunities are you seeking?" active />
-
         <Section title="Salary (in thousands)">
           <InputRange
             id="salary"
-            min={10}
+            min={0}
             max={600}
             // @ts-ignore
             value={salary}
@@ -243,61 +267,51 @@ export default function JobSeekerPage() {
           <div className="grid grid-cols-2 gap-2">
             <Checkbox
               id="companyStage-1"
-              checked={companyStage?.includes("open-source")}
-              value="open-source"
-              onChange={() => {
-                setValue(
-                  "companyStage",
-                  toggleArrayElement(companyStage, "open-source") as any
-                );
+              checked={stageParadigm}
+              onChange={(checked) => {
+                setValue("stageParadigm", checked);
               }}
-              label="Open source"
+              label="Paradigm project"
             />
             <Checkbox
               id="companyStage-2"
-              label="Seed"
-              checked={companyStage?.includes("seed")}
-              value="seed"
-              onChange={() => {
-                setValue(
-                  "companyStage",
-                  toggleArrayElement(companyStage, "seed") as any
-                );
+              label="Grant"
+              checked={stageGrant}
+              onChange={(checked) => {
+                setValue("stageGrant", checked);
               }}
             />
             <Checkbox
               id="companyStage-3"
-              label="Series A"
-              value="series-a"
-              checked={companyStage?.includes("series-a")}
-              onChange={() => {
-                setValue(
-                  "companyStage",
-                  toggleArrayElement(companyStage, "series-a") as any
-                );
+              label="Seed"
+              checked={stageSeed}
+              onChange={(checked) => {
+                setValue("stageSeed", checked);
               }}
             />
             <Checkbox
               id="companyStage-4"
               name="companyStage"
-              value="series-c"
-              label="Series C+"
-              checked={companyStage?.includes("series-c")}
-              onChange={() => {
-                setValue(
-                  "companyStage",
-                  toggleArrayElement(companyStage, "series-c") as any
-                );
+              label="Series A+"
+              checked={stageSeriesA}
+              onChange={(checked) => {
+                setValue("stageSeriesA", checked);
               }}
             />
           </div>
         </Section>
 
-        <Section
-          title="Github data"
-          description="We'll use public data from your connected account to identify recruiting opportunities"
-          active
-        />
+        <Section title="Commitment" active>
+          <Checkbox
+            id="commitment"
+            name="commitment"
+            label="I'm open to part-time roles"
+            checked={partTime}
+            onChange={(checked) => {
+              setValue("partTime", checked);
+            }}
+          />
+        </Section>
 
         <Section
           title="Contact info"
@@ -307,44 +321,6 @@ export default function JobSeekerPage() {
 
         <Section title="Email">
           <Input {...register("email")} border="full" />
-        </Section>
-
-        <Section title="Your Socials">
-          <div className="grid grid-cols-2 gap-2">
-            <Checkbox
-              id="social-1"
-              checked={socials?.includes("telegram")}
-              value="telegram"
-              onChange={() => {
-                setValue(
-                  "socials",
-                  toggleArrayElement(socials, "telegram") as any
-                );
-              }}
-              label="Telegram"
-            />
-            <Checkbox
-              id="social-2"
-              checked={socials?.includes("x")}
-              value="x"
-              onChange={() => {
-                setValue("socials", toggleArrayElement(socials, "x") as any);
-              }}
-              label="X"
-            />
-            <Checkbox
-              id="social-3"
-              checked={socials?.includes("farcaster")}
-              value="farcaster"
-              onChange={() => {
-                setValue(
-                  "socials",
-                  toggleArrayElement(socials, "farcaster") as any
-                );
-              }}
-              label="Farcaster"
-            />
-          </div>
         </Section>
       </FormStepLayout>
     </AppContent>

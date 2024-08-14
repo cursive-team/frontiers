@@ -15,7 +15,28 @@ const Section = ({ title, children }: any) => (
   </div>
 );
 
-export default function JobOpportunities() {
+export type JobRecruiterInput = {
+  title: string;
+  project: string;
+  link: string;
+  education: "high-school" | "bachelor" | "master" | "phd";
+  experience: number;
+  tagZk: boolean;
+  tagDefi: boolean;
+  tagConsumer: boolean;
+  tagInfra: boolean;
+  salary: number;
+  stage: "paradigm" | "grant" | "seed" | "seriesA";
+  partTime: boolean;
+};
+
+interface RecruiterPageProps {
+  handleSubmitRecruiterInput: (formValues: JobRecruiterInput) => void;
+}
+
+export default function RecruiterPage({
+  handleSubmitRecruiterInput,
+}: RecruiterPageProps) {
   return (
     <AppContent>
       <FormStepLayout
