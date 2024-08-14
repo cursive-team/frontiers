@@ -5,6 +5,7 @@ import { Icons } from "@/components/Icons";
 import { Modal } from "@/components/modals/Modal";
 import { Tabs } from "@/components/Tabs";
 import { FormStepLayout } from "@/layouts/FormStepLayout";
+import { CandidateJobMatch } from "@/pages/api/jobs/get_candidate_matches";
 import { classed } from "@tw-classed/react";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -47,10 +48,18 @@ const OpportunityCard = ({
     </div>
   );
 };
-export default function CandidateJobsView() {
+
+type CandidateJobsViewProps = {
+  pendingMatches: CandidateJobMatch[];
+};
+export default function CandidateJobsView({
+  pendingMatches,
+}: CandidateJobsViewProps) {
   const [showJobDetailModal, setShowJobDetailModal] = useState(false);
   const hasOpportunities = true;
   const hasOptedIn = true;
+
+  console.log(pendingMatches);
 
   return (
     <>
@@ -110,16 +119,26 @@ export default function CandidateJobsView() {
                   </span>
                 ) : (
                   <div className="flex flex-col w-full">
+                    {pendingMatches.map((match, index) => (
+                      <OpportunityCard
+                        key={index}
+                        label={match.recruiterData.title}
+                        description={match.recruiterData.project}
+                        onClick={() => {
+                          setShowJobDetailModal(true);
+                        }}
+                      />
+                    ))}
                     <OpportunityCard
-                      label="opportunity 1"
-                      description="example"
+                      label="Software Engineer"
+                      description="Reth"
                       onClick={() => {
                         setShowJobDetailModal(true);
                       }}
                     />
                     <OpportunityCard
-                      label="opportunity 2"
-                      description="example"
+                      label="ZK Circuits Engineer"
+                      description="Axiom"
                       onClick={() => {
                         setShowJobDetailModal(true);
                       }}

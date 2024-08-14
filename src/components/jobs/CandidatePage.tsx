@@ -135,6 +135,7 @@ export default function CandidatePage({
     }
 
     toast.success("Your candidate profile has been submitted.");
+    console.log("submitted candidate profile", formValues);
     handleSubmitCandidateInput(formValues);
   };
 
