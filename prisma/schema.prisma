@@ -49,6 +49,8 @@ model User {
   talks                    Location[]
   TestingJobCandidateInput TestingJobCandidateInput[]
   TestingJobRecruiterInput TestingJobRecruiterInput[]
+  JobMatchProposer         JobMatchQueue[]            @relation(name: "JobMatchProposer")
+  JobMatchAccepter         JobMatchQueue[]            @relation(name: "JobMatchAccepter")
 }
 
 model Admin {
@@ -257,4 +259,27 @@ model TestingJobRecruiterInput {
   inputData String
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model JobMatchQueue {
+  id              Int               @id @default(autoincrement())
+  proposerId      Int
+  accepterId      Int
+  isCompleted     Boolean           @default(false)
+  isInvalid       Boolean           @default(false)
+  lastCheckedTime DateTime          @default(now())
+  createdAt       DateTime          @default(now())
+  proposer        User              @relation(name: "JobMatchProposer", fields: [proposerId], references: [id])
+  accepter        User              @relation(name: "JobMatchAccepter", fields: [accepterId], references: [id])
+  TestingJobMatch TestingJobMatch[]
+}
+
+model TestingJobMatch {
+  id                Int           @id @default(autoincrement())
+  jobMatchId        Int
+  candidateData     String
+  recruiterData     String
+  candidateAccepted Boolean       @default(false)
+  createdAt         DateTime      @default(now())
+  jobMatch          JobMatchQueue @relation(fields: [jobMatchId], references: [id])
 }

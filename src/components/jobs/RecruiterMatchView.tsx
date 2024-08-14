@@ -11,6 +11,7 @@ import React, { useState } from "react";
 import { Banner } from "../Banner";
 import { ArtworkSnapshot } from "../artwork/ArtworkSnapshot";
 import { Accordion } from "../Accordion";
+import { CandidateJobMatch } from "@/pages/api/jobs/get_candidate_matches";
 
 const Title = classed.span("text-white text-xs font-normal font-inter");
 const Description = classed.h5("text-white/50 font-inter font-normal text-sm");
@@ -64,11 +65,20 @@ const OpportunityCard = ({
     </div>
   );
 };
-export default function RecruiterMatchView() {
+
+type RecruiterMatchViewProps = {
+  matches: CandidateJobMatch[];
+};
+
+export default function RecruiterMatchView({
+  matches,
+}: RecruiterMatchViewProps) {
   const [showMatch, setShowMatch] = useState(false);
   const hasOpportunities = true;
   const hasOptedIn = true;
   const isBookmarked = false;
+
+  console.log(matches);
 
   return (
     <>
@@ -158,16 +168,26 @@ export default function RecruiterMatchView() {
                       title="These candidates shared their contact info with you."
                       closable
                     />
+                    {matches.map((match, index) => (
+                      <OpportunityCard
+                        key={index}
+                        label={match.candidateData.email}
+                        description={match.candidateData.email}
+                        onClick={() => {
+                          setShowMatch(true);
+                        }}
+                      />
+                    ))}
                     <OpportunityCard
-                      label="match 1"
-                      description="example"
+                      label="Tom Smith"
+                      description="tomsmith@gmail.com"
                       onClick={() => {
                         setShowMatch(true);
                       }}
                     />
                     <OpportunityCard
-                      label="match 2"
-                      description="example"
+                      label="Bob Johnson"
+                      description="bobjohnson@gmail.com"
                       onClick={() => {
                         setShowMatch(true);
                       }}

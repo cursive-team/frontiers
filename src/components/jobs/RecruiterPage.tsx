@@ -8,6 +8,8 @@ import { cn } from "@/lib/client/utils";
 import React, { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { Radio } from "../Radio";
+import { getAuthToken, getProfile, getUsers } from "@/lib/client/localStorage";
+import { toast } from "sonner";
 
 interface SectionProps {
   title?: string;
@@ -57,7 +59,6 @@ export type JobRecruiterInput = {
   tagConsumer: boolean;
   tagInfra: boolean;
   salary: number;
-  stage: "paradigm" | "grant" | "seed" | "seriesA";
   partTime: boolean;
   stageParadigm: boolean;
   stageGrant: boolean;
@@ -103,14 +104,50 @@ export default function RecruiterPage({
   const stageSeriesA = watch("stageSeriesA", false);
   const partTime = watch("partTime", false);
 
-  const onSubmit = (formValues: any) => {
-    // todo: BE implementation
+  const onSubmitForm = async (formValues: JobRecruiterInput) => {
+    const authToken = getAuthToken();
+    if (!authToken || authToken.expiresAt < new Date()) {
+      toast.error("Please try logging in again.");
+      return;
+    }
+
+    const profile = getProfile();
+    if (!profile) {
+      toast.error("Please try logging in again.");
+      return;
+    }
+
+    const users = getUsers();
+    const userEncPubKeys = Object.values(users)
+      .filter((user) => user.encPk !== profile.encryptionPublicKey)
+      .map((user) => user.encPk);
+
+    const response = await fetch("/api/jobs/new_recruiter", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputData: JSON.stringify(formValues),
+        authToken: authToken.value,
+        userEncPubKeys,
+      }),
+    });
+
+    if (!response.ok) {
+      toast.error("Failed to submit your recruiter profile.");
+      return;
+    }
+
+    toast.success("Your recruiter profile has been submitted.");
+    console.log("submitted recruiter profile", formValues);
     handleSubmitRecruiterInput(formValues);
   };
+
   return (
     <AppContent>
       <FormStepLayout
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmitForm)}
         title="What kind of opportunities are you hiring for?"
         childrenClassName="overflow-hidden"
         subtitle={

@@ -10,7 +10,7 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { inputData, authToken } = req.body;
+  const { inputData, authToken, userEncPubKeys } = req.body;
 
   if (!inputData || typeof inputData !== "string") {
     return res.status(400).json({ error: "Invalid input data" });
@@ -47,6 +47,31 @@ export default async function handler(
         userId,
         inputData,
       },
+    });
+
+    let matchUserPublicKeys = userEncPubKeys as string[];
+    const matchUsers = await prisma.user.findMany({
+      where: {
+        encryptionPublicKey: {
+          in: matchUserPublicKeys,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    const matchUserIds = matchUsers.map((user) => user.id);
+
+    await prisma.jobMatchQueue.createMany({
+      data: matchUserIds.map((matchUserId) => ({
+        proposerId: userId,
+        accepterId: matchUserId,
+        isCompleted: false,
+        isInvalid: false,
+        lastCheckedTime: new Date(),
+        createdAt: new Date(),
+      })),
     });
 
     return res.status(201).json({});
