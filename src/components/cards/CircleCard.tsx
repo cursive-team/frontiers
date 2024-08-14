@@ -17,6 +17,7 @@ const CardIconMapping: Record<CardIconType, string> = {
 interface CircleCardProps extends CardIconVariants {
   icon: CardIconType;
   isMultiple?: boolean; // have multiple icons
+  className?: string;
 }
 
 const IconSizeMapping: Record<"xs" | "sm" | "md", number> = {
@@ -31,12 +32,12 @@ const IconSizeClass: Record<"xs" | "sm" | "md", string> = {
   md: "h-[32px]",
 };
 
-const CircleCard = ({ icon, color, border }: CircleCardProps) => {
+const CircleCard = ({ icon, color, border, ...props }: CircleCardProps) => {
   const iconSize = IconSizeMapping["xs"];
   const iconSizeClass = IconSizeClass["xs"];
 
   return (
-    <IconCircle color={color} border={border}>
+    <IconCircle color={color} border={border} {...props}>
       <Image
         src={CardIconMapping[icon]}
         height={iconSize}
