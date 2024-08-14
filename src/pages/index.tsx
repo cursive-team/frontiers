@@ -95,7 +95,7 @@ const FeedContent = ({
   return (
     <div className="grid grid-cols-[1fr_80px] items-center justify-between py-1 gap-4">
       <div className="grid grid-cols-[24px_1fr] items-center gap-2 truncate">
-        <IconCircle>{icon}</IconCircle>
+        <IconCircle className="!bg-[#1C1C1C]">{icon}</IconCircle>
         <CardTitleOverride className="truncate">{title}</CardTitleOverride>
       </div>
       <Card.Description className="!text-white/25 !text-xs !font-medium">
@@ -135,7 +135,7 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
               </>
             }
             titleOverride={true}
-            icon={<CircleCard icon="overlap" />}
+            icon={<CircleCard className="!bg-[#1C1C1C]" icon="overlap" />}
             description={date}
           />
         </Link>
@@ -171,7 +171,7 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
               </>
             }
             titleOverride={true}
-            icon={<CircleCard icon="location" />}
+            icon={<CircleCard className="!bg-[#1C1C1C]" icon="location" />}
             description={date}
           />
         </Link>
@@ -180,7 +180,7 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
       return (
         <Link href={`/proofs/${id}`}>
           <FeedContent
-            icon={<CircleCard icon="proof" />}
+            icon={<CircleCard className="!bg-[#1C1C1C]" icon="proof" />}
             title={
               <>
                 <span className="text-white/50 font-medium font-inter">
@@ -203,7 +203,7 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
             </>
           }
           description={date}
-          icon={<Icons.Store />}
+          icon={<Icons.Store className="!bg-[#1C1C1C]" />}
         />
       );
     default:
