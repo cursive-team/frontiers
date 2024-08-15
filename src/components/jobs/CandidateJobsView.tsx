@@ -174,6 +174,7 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
             <div className="flex flex-col gap-2 text-center">
               <Button
                 className="mt-20"
+                // TODO: no-op if already accepted
                 onClick={async () => await handleAccept(match!)}
               >
                 Share your contact
