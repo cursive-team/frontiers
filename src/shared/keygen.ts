@@ -293,7 +293,7 @@ export const initialLocationData: Record<string, KeygenData> = {
     talkSpeaker: "gakonst",
     talkStartTime: "9:10AM",
     talkEndTime: "9:30AM",
-    talkTime: new Date("2024-08-16T09:00:00"),
+    talkTime: new Date("2024-08-16T09:10:00"),
   },
   TALK02: {
     box: "brown",

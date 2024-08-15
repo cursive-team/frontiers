@@ -52,11 +52,12 @@ export default async function handler(
     // Check user github is authenticated
     const session = await getServerSession(req, res, authOptions);
     if (!session || !session.user) {
-      return res.status(401).json({ error: "Unauthorized" });
+      return res.status(401).json({ error: "Unauthorized, no session" });
     }
     const githubEmail = session.user.email;
     if (user.githubEmail !== githubEmail) {
-      return res.status(401).json({ error: "Unauthorized" });
+      console.log(user.githubEmail, githubEmail);
+      return res.status(401).json({ error: "Unauthorized, wrong email" });
     }
 
     // Generate auth token

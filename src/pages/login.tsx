@@ -224,8 +224,8 @@ export default function Login() {
       <div className="grid grid-rows-[1fr_auto] h-full">
         <div className="flex flex-col  justify-center">
           <span className="text-center text-base leading-6 text-white/75 font-inter px-10">
-            This app will allow you to share and collect encrypted data with
-            other event attendees.
+            Tap NFC badges to share socials, make ZK proofs about your Frontiers
+            experience, and privately match on job opportunities using MPC.
           </span>
         </div>
         <div className="mt-auto mb-4">
@@ -237,18 +237,13 @@ export default function Login() {
     ),
     [DisplayState.PASSKEY]: (
       <FormStepLayout
-        subtitle={
-          <span className="pb-4 block">
-            Login to view your social graph and make queries.
-          </span>
-        }
         className="pt-4"
         onSubmit={handleSubmitWithPasskey}
         footer={
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-4">
               <Button variant="black" type="submit">
-                {loading ? "Logging in..." : "Login with passkey"}
+                {loading ? "Logging in..." : "Restore backup with passkey"}
               </Button>
               <span className="h-6 relative font-normal text-sm text-white font-inter text-center">
                 <div className="after:content-[''] after:top-[12px] after:absolute after:h-[1px] after:bg-white/40 after:w-full after:left-0"></div>
@@ -263,7 +258,7 @@ export default function Login() {
                   handlePasswordLogin();
                 }}
               >
-                Login with password instead
+                Restore backup with password
               </Button>
             </div>
 
@@ -284,7 +279,7 @@ export default function Login() {
         <Input
           type="text"
           id="displayName"
-          label="Github account"
+          label="Display name"
           placeholder="Name you registered with"
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
@@ -305,7 +300,7 @@ export default function Login() {
         footer={
           <div className="flex flex-col gap-4">
             <Button variant="black" type="submit">
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "Restoring backup..." : "Restore backup"}
             </Button>
             <span className="h-6 relative font-normal text-sm text-white font-inter text-center">
               <div className="after:content-[''] after:top-[12px] after:absolute after:h-[1px] after:bg-white/40 after:w-full after:left-0"></div>
@@ -314,7 +309,7 @@ export default function Login() {
               </div>
             </span>
             <Button variant="black" onClick={handlePasskeyLogin}>
-              Login with passkey instead
+              Restore backup with passkey instead
             </Button>
           </div>
         }
@@ -322,7 +317,7 @@ export default function Login() {
         <Input
           type="text"
           id="displayName"
-          label="Github account"
+          label="Display name"
           placeholder="Name you registered with"
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}

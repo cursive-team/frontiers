@@ -42,19 +42,19 @@ const AppFooter = () => {
       label: "Home",
       href: "/",
       icon: Icons.Home,
-      iconSize: 14,
+      iconSize: 18,
     },
     {
       label: "Proofs",
       href: "/proofs",
       icon: Icons.Proof,
-      iconSize: 14,
+      iconSize: 18,
     },
     {
       label: "Jobs",
       href: "/jobs",
       icon: Icons.Jobs,
-      iconSize: 14,
+      iconSize: 18,
     },
   ];
 
