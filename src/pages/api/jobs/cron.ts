@@ -16,7 +16,7 @@ export default async function handler(
     // Fetch the next job match queue entry that is not completed or invalid
     const nextJobMatch = await prisma.jobMatchQueue.findFirst({
       where: {
-        isCompleted: false,
+        matchResults: { not: null },
         isInvalid: false,
       },
       orderBy: {
@@ -33,41 +33,15 @@ export default async function handler(
         id: nextJobMatch.proposerId,
       },
     });
-    if (!proposer) {
-      return res.status(404).json({ error: "Proposer not found" });
-    }
 
     const accepter = await prisma.user.findUnique({
       where: {
         id: nextJobMatch.accepterId,
       },
     });
-    if (!accepter) {
-      return res.status(404).json({ error: "Accepter not found" });
-    }
 
-    // get proposer input
-    const proposerRecruiterInput =
-      await prisma.testingJobRecruiterInput.findFirst({
-        where: {
-          userId: proposer.id,
-        },
-      });
-    if (!proposerRecruiterInput) {
-      return res
-        .status(400)
-        .json({ error: "Proposer has not submitted recruiter input" });
-    }
-
-    // if accepter is recruiter, mark job invalid
-    const accepterIsRecruiter = await prisma.testingJobRecruiterInput.findFirst(
-      {
-        where: {
-          userId: accepter.id,
-        },
-      }
-    );
-    if (accepterIsRecruiter) {
+    // mark job invalid if proposer or accepter not found
+    if (!proposer || !accepter) {
       await prisma.jobMatchQueue.update({
         where: {
           id: nextJobMatch.id,
@@ -77,22 +51,38 @@ export default async function handler(
           lastCheckedTime: new Date(),
         },
       });
-
-      return res.status(200).json({
-        message: "Job match marked as invalid",
-        jobMatch: nextJobMatch,
-      });
+      return res.status(400).json({ error: "Proposer or accepter not found" });
     }
 
-    // if accepter is not candidate, update last checked time and return
-    const accepterIsCandidate = await prisma.testingJobCandidateInput.findFirst(
-      {
+    // mark job invalid if proposer is candidate or accepter is recruiter
+    if (proposer.isCandidate || accepter.isRecruiter) {
+      await prisma.jobMatchQueue.update({
         where: {
-          userId: accepter.id,
+          id: nextJobMatch.id,
         },
-      }
-    );
-    if (!accepterIsCandidate) {
+        data: {
+          isInvalid: true,
+          lastCheckedTime: new Date(),
+        },
+      });
+      return res
+        .status(200)
+        .json({ message: "Proposer is candidate or accepter is recruiter" });
+    }
+
+    // update job checked time if proposer is not recruiter or accepter is not candidate or if either party has not submitted encrypted data or keys
+    const proposerPublicKeyLink = proposer.jobsPublicKeyLink;
+    const accepterPublicKeyLink = accepter.jobsPublicKeyLink;
+    const proposerInputLink = proposer.jobsEncryptedDataLink;
+    const accepterInputLink = accepter.jobsEncryptedDataLink;
+    if (
+      !proposer.isRecruiter ||
+      !accepter.isCandidate ||
+      !proposerPublicKeyLink ||
+      !accepterPublicKeyLink ||
+      !proposerInputLink ||
+      !accepterInputLink
+    ) {
       await prisma.jobMatchQueue.update({
         where: {
           id: nextJobMatch.id,
@@ -101,44 +91,33 @@ export default async function handler(
           lastCheckedTime: new Date(),
         },
       });
-
       return res.status(200).json({
-        message: "Job match accepter has not submitted candidate input",
-        jobMatch: nextJobMatch,
+        message: "Proposer is not recruiter or accepter is not candidate",
       });
     }
 
-    // compute match output
-    const recruiterInput = JSON.parse(
-      proposerRecruiterInput.inputData
+    // TODO: compute shared public key
+    const sharedPublicKey = "shared";
+    // TODO: fetch proposer and accepter encrypted data
+    const proposerEncryptedData = JSON.parse(
+      proposerInputLink
     ) as JobRecruiterInput;
-    const candidateInput = JSON.parse(
-      accepterIsCandidate.inputData
+    const accepterEncryptedData = JSON.parse(
+      accepterInputLink
     ) as JobCandidateInput;
+    // TODO: compute computation result
     const isSuccessfulMatch = await computeJobMatchOutput(
-      recruiterInput,
-      candidateInput
+      proposerEncryptedData,
+      accepterEncryptedData
     );
 
-    // send match output to recruiter
-
-    // send match output to client
-    if (isSuccessfulMatch) {
-      await prisma.testingJobMatch.create({
-        data: {
-          jobMatchId: nextJobMatch.id,
-          candidateData: accepterIsCandidate.inputData,
-          recruiterData: proposerRecruiterInput.inputData,
-        },
-      });
-    }
-
+    // log match result
     await prisma.jobMatchQueue.update({
       where: {
         id: nextJobMatch.id,
       },
       data: {
-        isCompleted: true,
+        matchResults: isSuccessfulMatch.toString(),
         lastCheckedTime: new Date(),
       },
     });
