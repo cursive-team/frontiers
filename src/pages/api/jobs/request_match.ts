@@ -20,6 +20,20 @@ export default async function handler(
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
+  const user = await prisma.user.findFirst({
+    where: {
+      id: userId,
+    },
+  });
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  if (!user.isRecruiter) {
+    return res
+      .status(400)
+      .json({ error: "Only recruiters can request matches" });
+  }
 
   const otherUser = await prisma.user.findFirst({
     where: {

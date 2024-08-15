@@ -47,8 +47,13 @@ const Jobs: React.FC = () => {
   );
 
   useEffect(() => {
-    const loadRecruiterMatches = async () => {
-      // If page is reloaded, load recruiter job matches
+    const loadMatches = async () => {
+      const jobs = getJobs();
+      if (!jobs) {
+        return;
+      }
+
+      // If page is reloaded, load job matches
       const navigationEntries = window.performance.getEntriesByType(
         "navigation"
       ) as PerformanceNavigationTiming[];
@@ -57,14 +62,18 @@ const Jobs: React.FC = () => {
         if (navigationEntry.type && navigationEntry.type === "reload") {
           try {
             logClientEvent("refreshJobsPage", {});
-            await recruiterProcessNewMatches();
+            if (jobs.candidateInput) {
+              await loadMessages({ forceRefresh: false });
+            } else if (jobs.recruiterInput) {
+              await recruiterProcessNewMatches();
+            }
           } catch (error) {
             console.error("Failed to refresh jobs page:", error);
           }
         }
       }
     };
-    loadRecruiterMatches();
+    loadMatches();
   }, []);
 
   useEffect(() => {

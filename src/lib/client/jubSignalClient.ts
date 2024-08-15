@@ -557,6 +557,7 @@ const processEncryptedMessages = async (args: {
             jobs.jobsPrivateKey = privateKey;
           }
 
+          // TODO: display activity when user provides candidate or recruiter input
           const activity = {
             type: JUB_SIGNAL_MESSAGE_TYPE.JOB_INPUT,
             name: isCandidate ? "Candidate" : "Recruiter",
@@ -603,6 +604,7 @@ const processEncryptedMessages = async (args: {
             jobs.candidateProcessedMatches = { [matchId]: match };
           }
 
+          // TODO: display activity when recruiter shares match
           const activity = {
             type: JUB_SIGNAL_MESSAGE_TYPE.RECRUITER_SHARED,
             name,
@@ -656,6 +658,7 @@ const processEncryptedMessages = async (args: {
             jobs.recruiterAcceptedMatches = { [matchId]: match };
           }
 
+          // TODO: display activity when candidate accepts match
           const activity = {
             type: JUB_SIGNAL_MESSAGE_TYPE.CANDIDATE_SHARED,
             name,
