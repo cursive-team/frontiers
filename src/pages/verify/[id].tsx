@@ -152,15 +152,17 @@ const QRPage = () => {
             <span className="text-[14px] font-bold">Valid proof</span>
           </div>
         </div>
-        <Button
-          onClick={() => {
-            navigator.clipboard.writeText(qrCodeData.serializedProof);
-            toast.success("Proof copied to clipboard");
-          }}
-          variant="primary"
-        >
-          Copy proof
-        </Button>
+        <div className="mt-4 mb-4">
+          <Button
+            onClick={() => {
+              navigator.clipboard.writeText(qrCodeData.serializedProof);
+              toast.success("Proof copied to clipboard");
+            }}
+            variant="primary"
+          >
+            Copy proof
+          </Button>
+        </div>
         <Link
           href="https://github.com/cursive-team/zk-summit/blob/5a97066c0c09ee7d2d388def1bec7b5547382c48/src/pages/api/quest/submit_proof.tsx#L50"
           target="_blank"
