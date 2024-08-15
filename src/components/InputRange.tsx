@@ -46,7 +46,7 @@ const InputRange = forwardRef<HTMLInputElement, InputRangeProps>(
     };
 
     const percentage = ((value - min) / (max - min)) * 100;
-    const showLabel = percentage > 10 && percentage < 90;
+    const showLabel = percentage > 5 && percentage < 90;
 
     return (
       <>
@@ -79,7 +79,10 @@ const InputRange = forwardRef<HTMLInputElement, InputRangeProps>(
           {showLabel && (
             <RangeLabel
               className="absolute top-[28px] transition-all duration-200"
-              style={{ left: `${percentage}%`, transform: "translateX(-50%)" }}
+              style={{
+                left: `calc(${percentage}%)`,
+                transform: "translateX(-50%)",
+              }}
             >
               {value}
             </RangeLabel>

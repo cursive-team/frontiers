@@ -207,6 +207,59 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
           icon={<Icons.Store className="!bg-[#1C1C1C]" />}
         />
       );
+    case JUB_SIGNAL_MESSAGE_TYPE.JOB_INPUT:
+      return (
+        <Link href="/jobs">
+          <FeedContent
+            title={
+              <>
+                <span className="text-white/50 font-medium font-inter">
+                  {"Started "}
+                </span>
+                <span className="text-white font-medium">
+                  private job matching
+                </span>
+              </>
+            }
+            description={date}
+            icon={<Icons.Jobs className="!bg-[#1C1C1C]" />}
+          />
+        </Link>
+      );
+    case JUB_SIGNAL_MESSAGE_TYPE.RECRUITER_SHARED:
+      return (
+        <Link href="/jobs">
+          <FeedContent
+            title={
+              <>
+                <span className="text-white/50 font-medium font-inter">
+                  {"Matched with "}
+                </span>
+                <span className="text-white font-medium">{name}</span>
+              </>
+            }
+            description={date}
+            icon={<Icons.Jobs className="!bg-[#1C1C1C]" />}
+          />
+        </Link>
+      );
+    case JUB_SIGNAL_MESSAGE_TYPE.CANDIDATE_SHARED:
+      return (
+        <Link href="/jobs">
+          <FeedContent
+            title={
+              <>
+                <span className="text-white/50 font-medium font-inter">
+                  {"Job interest from "}
+                </span>
+                <span className="text-white font-medium">{name}</span>
+              </>
+            }
+            description={date}
+            icon={<Icons.Jobs className="!bg-[#1C1C1C]" />}
+          />
+        </Link>
+      );
     default:
       return null;
   }

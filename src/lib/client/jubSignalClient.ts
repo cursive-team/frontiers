@@ -42,6 +42,12 @@ import { recruiterSharedMessageSchema } from "./jubSignal/recruiterShared";
 import { CandidateJobMatch } from "@/components/jobs/CandidateJobsView";
 import { candidateSharedMessageSchema } from "./jubSignal/candidateShared";
 import { RecruiterJobMatch } from "@/components/jobs/RecruiterMatchView";
+import { deserializeMPCData } from "./mpc";
+import init, {
+  ni_hiring_client_dec_share_web,
+  ni_hiring_client_full_dec_web,
+  ni_hiring_init_web,
+} from "@/lib/ni_hiring_web";
 
 export type LoadMessagesRequest = {
   forceRefresh: boolean;
@@ -557,7 +563,6 @@ const processEncryptedMessages = async (args: {
             jobs.jobsPrivateKey = privateKey;
           }
 
-          // TODO: display activity when user provides candidate or recruiter input
           const activity = {
             type: JUB_SIGNAL_MESSAGE_TYPE.JOB_INPUT,
             name: isCandidate ? "Candidate" : "Recruiter",
@@ -584,10 +589,37 @@ const processEncryptedMessages = async (args: {
             decryptionShareLink,
             matchId,
             matchResultsLink,
+            jobTags,
+            jobStage,
+            jobExperience,
+            jobPartTime,
           } = await recruiterSharedMessageSchema.validate(data);
 
-          // TODO: finish decrypting data to determine if there is a match
-          const isMatch = true;
+          if (!jobs.jobsPrivateKey) {
+            break;
+          }
+
+          const jobsPrivateKey = deserializeMPCData(jobs.jobsPrivateKey);
+          const fheResResponse = await fetch(matchResultsLink);
+          const fheRes = deserializeMPCData(await fheResResponse.text());
+
+          await init();
+          try {
+            ni_hiring_init_web(BigInt(1));
+          } catch (e) {
+            console.log(e);
+          }
+
+          const decryptionShare = ni_hiring_client_dec_share_web(
+            jobsPrivateKey,
+            fheRes
+          );
+          const isMatch = ni_hiring_client_full_dec_web(
+            jobsPrivateKey,
+            fheRes,
+            deserializeMPCData(decryptionShareLink),
+            decryptionShare
+          );
 
           const match: CandidateJobMatch = {
             recruiterDisplayName: name,
@@ -597,17 +629,22 @@ const processEncryptedMessages = async (args: {
             jobLink,
             matchId,
             isMatch,
+            jobTags,
+            jobStage,
+            jobExperience,
+            jobPartTime,
           };
+          console.log(match);
+
           if (jobs.candidateProcessedMatches) {
             jobs.candidateProcessedMatches[matchId] = match;
           } else {
             jobs.candidateProcessedMatches = { [matchId]: match };
           }
 
-          // TODO: display activity when recruiter shares match
           const activity = {
             type: JUB_SIGNAL_MESSAGE_TYPE.RECRUITER_SHARED,
-            name,
+            name: role,
             id: matchId.toString(),
             ts: metadata.timestamp.toISOString(),
           };
@@ -658,7 +695,6 @@ const processEncryptedMessages = async (args: {
             jobs.recruiterAcceptedMatches = { [matchId]: match };
           }
 
-          // TODO: display activity when candidate accepts match
           const activity = {
             type: JUB_SIGNAL_MESSAGE_TYPE.CANDIDATE_SHARED,
             name,

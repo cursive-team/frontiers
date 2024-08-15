@@ -71,7 +71,7 @@ export type RecruiterJobMatch = {
   candidateEmail: string;
   candidateGithubUserId: string;
   candidateGithubLogin: string;
-  candidateEducation: string;
+  candidateEducation: number;
   candidateInterests: string[];
   candidateExperience: number;
   candidateStage: string[];
@@ -91,124 +91,128 @@ export default function RecruiterMatchView({
   const hasOptedIn = true;
   const isBookmarked = false;
 
-  // console.log(matches);
+  const jobsMap = [`High school`, `Bachelor`, `Master`, `PhD`];
 
   return (
     <>
-      <Modal
-        isOpen={showMatch && match !== undefined}
-        setIsOpen={setShowMatch}
-        withBackButton
-        // actions={
-        //   <button className=" absolute right-6 cursor-pointer">
-        //     {isBookmarked ? <Icons.BookmarkActive /> : <Icons.Bookmark />}
-        //   </button>
-        // }
-      >
-        <FormStepLayout className="h-full">
-          <div className="flex flex-col gap-4">
-            <div className="flex gap-4 xs:gap-5 items-center">
-              <div className="w-32 h-32 rounded-[4px] relative flex-shrink-0">
-                <ArtworkSnapshot
-                  width={128}
-                  height={128}
-                  pubKey={match!.candidateEncryptionPublicKey}
-                />
-                <button type="button" className="absolute right-1 top-1 z-1">
-                  <Icons.Zoom />
-                </button>
-              </div>
+      {match && (
+        <Modal
+          isOpen={showMatch && match !== undefined}
+          setIsOpen={setShowMatch}
+          withBackButton
+          // actions={
+          //   <button className=" absolute right-6 cursor-pointer">
+          //     {isBookmarked ? <Icons.BookmarkActive /> : <Icons.Bookmark />}
+          //   </button>
+          // }
+        >
+          <FormStepLayout className="h-full">
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-4 xs:gap-5 items-center">
+                <div className="w-32 h-32 rounded-[4px] relative flex-shrink-0">
+                  <ArtworkSnapshot
+                    width={128}
+                    height={128}
+                    pubKey={match!.candidateEncryptionPublicKey}
+                  />
+                  <button type="button" className="absolute right-1 top-1 z-1">
+                    <Icons.Zoom />
+                  </button>
+                </div>
 
-              <div className="flex flex-col gap-1">
-                <h2 className="text-xl text-white font-semibold font-inter leading-6 tracking-[-0.1px]">
-                  {match!.candidateDisplayName}
-                </h2>
-                <div className="flex items-center gap-1">
-                  <span
-                    className="text-white/50 text-xs font-inter font-medium mt-1 left-5"
-                    style={{ whiteSpace: "pre-wrap" }}
-                  >
-                    {match!.candidateBio}
-                  </span>
+                <div className="flex flex-col gap-1">
+                  <h2 className="text-xl text-white font-semibold font-inter leading-6 tracking-[-0.1px]">
+                    {match!.candidateDisplayName}
+                  </h2>
+                  <div className="flex items-center gap-1">
+                    <span
+                      className="text-white/50 text-xs font-inter font-medium mt-1 left-5"
+                      style={{ whiteSpace: "pre-wrap" }}
+                    >
+                      {match!.candidateBio}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <Accordion label="Contact">
-              <LinkCardBox
-                label="Email"
-                value={match!.candidateEmail}
-              ></LinkCardBox>
-            </Accordion>
-            {/* <Accordion label="Dev stats">
+              <Accordion label="Contact">
+                <LinkCardBox
+                  label="Email"
+                  value={match!.candidateEmail}
+                ></LinkCardBox>
+              </Accordion>
+              {/* <Accordion label="Dev stats">
               <LinkCardBox
                 label="Github"
                 value="example@gmail.com"
               ></LinkCardBox>
             </Accordion> */}
 
-            <Accordion label="Qualifications">
-              <div className="flex flex-col gap-2">
-                <LinkCardBox
-                  label="Education"
-                  value={
-                    <span className="text-white">
-                      {match!.candidateEducation}
-                    </span>
-                  }
-                />
-                <LinkCardBox
-                  label="Interests"
-                  value={
-                    <span className="text-white">
-                      {match!.candidateInterests.join(",")}
-                    </span>
-                  }
-                />
-                {/* <LinkCardBox
+              <Accordion label="Qualifications">
+                <div className="flex flex-col gap-2">
+                  <LinkCardBox
+                    label="Education"
+                    value={
+                      <span className="text-white">
+                        {jobsMap[match!.candidateEducation] || "N/A"}
+                      </span>
+                    }
+                  />
+                  <LinkCardBox
+                    label="Interests"
+                    value={
+                      <span className="text-white">
+                        {match!.candidateInterests.join(", ")}
+                      </span>
+                    }
+                  />
+                  {/* <LinkCardBox
                   label="Desired title "
                   value={<span className="text-white">value</span>}
                 /> */}
-                <LinkCardBox
-                  label="Preferred stage "
-                  value={
-                    <span className="text-white">
-                      {match!.candidateStage.join(",")}
+                  <LinkCardBox
+                    label="Preferred stage "
+                    value={
+                      <span className="text-white">
+                        {match!.candidateStage.join(", ")}
+                      </span>
+                    }
+                  />
+                </div>
+              </Accordion>
+            </div>
+          </FormStepLayout>
+        </Modal>
+      )}
+
+      <AppContent>
+        <Tabs
+          items={[
+            {
+              label: "Respondents",
+              children: (
+                <div className="flex flex-col h-full">
+                  {matches.length === 0 ? (
+                    <span className="mt-20 text-white/50 text-xs text-center">
+                      No respondents yet.{" "}
                     </span>
-                  }
-                />
-              </div>
-            </Accordion>
-          </div>
-        </FormStepLayout>
-      </Modal>
-      <Tabs
-        items={[
-          {
-            label: "Respondents",
-            children: (
-              <div className="flex flex-col h-full">
-                {matches.length === 0 ? (
-                  <span className="mt-20 text-white/50 text-xs text-center">
-                    No opportunities yet.{" "}
-                  </span>
-                ) : (
-                  <div className="flex flex-col w-full">
-                    <Banner
-                      title="These candidates shared their contact info with you."
-                      closable
-                    />
-                    {matches.map((match, index) => (
-                      <OpportunityCard
-                        key={index}
-                        label={match.candidateDisplayName}
-                        description={match.candidateEmail}
-                        onClick={() => {
-                          setShowMatch(true);
-                          setMatch(match);
-                        }}
+                  ) : (
+                    <div className="flex flex-col w-full">
+                      <Banner
+                        title="These candidates shared their contact info with you."
+                        closable
                       />
-                    ))}
-                    {/* <OpportunityCard
+                      {matches.map((match, index) => (
+                        <OpportunityCard
+                          key={index}
+                          label={match.candidateDisplayName}
+                          description={match.candidateEmail}
+                          onClick={() => {
+                            setShowMatch(true);
+                            setMatch(match);
+                          }}
+                        />
+                      ))}
+                      {/* <OpportunityCard
                       label="Tom Smith"
                       description="tomsmith@gmail.com"
                       onClick={() => {
@@ -222,35 +226,36 @@ export default function RecruiterMatchView({
                         setShowMatch(true);
                       }}
                     /> */}
-                  </div>
-                )}
-              </div>
-            ),
-          },
-          // {
-          //   label: "Bookmarked",
-          //   children: (
-          //     <div className="flex flex-col h-full">
-          //       {!hasOptedIn ? (
-          //         <span className="mt-20 text-white/50 text-xs text-center">
-          //           No bookmarked yet.{" "}
-          //         </span>
-          //       ) : (
-          //         <div className="flex flex-col w-full">
-          //           <OpportunityCard
-          //             label="bookmark 1"
-          //             description="example"
-          //             onClick={() => {
-          //               setShowMatch(true);
-          //             }}
-          //           />
-          //         </div>
-          //       )}
-          //     </div>
-          //   ),
-          // },
-        ]}
-      ></Tabs>
+                    </div>
+                  )}
+                </div>
+              ),
+            },
+            // {
+            //   label: "Bookmarked",
+            //   children: (
+            //     <div className="flex flex-col h-full">
+            //       {!hasOptedIn ? (
+            //         <span className="mt-20 text-white/50 text-xs text-center">
+            //           No bookmarked yet.{" "}
+            //         </span>
+            //       ) : (
+            //         <div className="flex flex-col w-full">
+            //           <OpportunityCard
+            //             label="bookmark 1"
+            //             description="example"
+            //             onClick={() => {
+            //               setShowMatch(true);
+            //             }}
+            //           />
+            //         </div>
+            //       )}
+            //     </div>
+            //   ),
+            // },
+          ]}
+        ></Tabs>
+      </AppContent>
     </>
   );
 }

@@ -8,13 +8,13 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { Radio } from "../Radio";
 import { Section } from "./Section";
-import { Banner } from "../Banner";
+import { toast } from "sonner";
 
 export type JobRecruiterInput = {
   title: string;
   project: string;
   link: string;
-  education: "high-school" | "bachelor" | "master" | "phd";
+  education: 0 | 1 | 2 | 3;
   experience: number;
   tagZk: boolean;
   tagDefi: boolean;
@@ -30,10 +30,12 @@ export type JobRecruiterInput = {
 
 interface RecruiterPageProps {
   handleSubmitRecruiterInput: (formValues: JobRecruiterInput) => Promise<void>;
+  submitLoading: boolean;
 }
 
 export default function RecruiterPage({
   handleSubmitRecruiterInput,
+  submitLoading,
 }: RecruiterPageProps) {
   const { setValue, watch, register, handleSubmit } =
     useForm<JobRecruiterInput>({
@@ -50,11 +52,14 @@ export default function RecruiterPage({
         stageSeed: false,
         stageSeriesA: false,
         partTime: false,
+        education: 0,
+        experience: 1,
+        salary: 0,
       },
     });
 
-  const education = watch("education", "high-school");
-  const experience = watch("experience", 0);
+  const education = watch("education", 0);
+  const experience = watch("experience", 1);
   const interestZk = watch("tagZk", false);
   const interestDefi = watch("tagDefi", false);
   const interestConsumer = watch("tagConsumer", false);
@@ -67,6 +72,11 @@ export default function RecruiterPage({
   const partTime = watch("partTime", false);
 
   const onSubmitForm = async (formValues: JobRecruiterInput) => {
+    if (!formValues.title || !formValues.project) {
+      toast.error("Please fill in the title and project name");
+      return;
+    }
+
     await handleSubmitRecruiterInput(formValues);
   };
 
@@ -87,7 +97,9 @@ export default function RecruiterPage({
       }
       footer={
         <div className="flex flex-col gap-4 bg-black px-4">
-          <Button type="submit">Save and continue</Button>
+          <Button type="submit" loading={submitLoading}>
+            Save and continue
+          </Button>
           <span className="text-center text-secondary text-[12px] font-inter">
             Review your answers. They cannot be edited later.
           </span>
@@ -115,33 +127,33 @@ export default function RecruiterPage({
               id="education-1"
               label="High school"
               value="high-school"
-              checked={education === "high-school"}
+              checked={education === 0}
               onChange={() => {
-                setValue("education", "high-school");
+                setValue("education", 0);
               }}
             />
             <Radio
               id="education-2"
               label="Bachelor's"
-              checked={education === "bachelor"}
+              checked={education === 1}
               onChange={() => {
-                setValue("education", "bachelor");
+                setValue("education", 1);
               }}
             />
             <Radio
               id="education-3"
               label="Master's"
-              checked={education === "master"}
+              checked={education === 2}
               onChange={() => {
-                setValue("education", "master");
+                setValue("education", 2);
               }}
             />
             <Radio
               id="education-4"
               label="PhD"
-              checked={education === "phd"}
+              checked={education === 3}
               onChange={() => {
-                setValue("education", "phd");
+                setValue("education", 3);
               }}
             />
           </div>
@@ -156,8 +168,8 @@ export default function RecruiterPage({
             value={experience}
             max={8}
             moreMax
-            onChange={(e: any) => {
-              setValue("experience", e?.target?.value);
+            onChange={(value: number) => {
+              setValue("experience", value);
             }}
           />
         </Section>
@@ -271,8 +283,8 @@ export default function RecruiterPage({
             moreMax={true}
             // @ts-ignore
             value={salary}
-            onChange={(e: any) => {
-              setValue("salary", e?.target?.value);
+            onChange={(value: number) => {
+              setValue("salary", value);
             }}
           />
         </Section>

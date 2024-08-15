@@ -25,7 +25,7 @@ ADD COLUMN     "matchResults" TEXT;
 -- AlterTable
 ALTER TABLE "User" ADD COLUMN     "isCandidate" BOOLEAN NOT NULL DEFAULT false,
 ADD COLUMN     "isRecruiter" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "jobsEncryptedDataLink" TEXT;
+ADD COLUMN     "jobsEncryptedDataLink" TEXT,
 ADD COLUMN     "jobsPublicKeyLink" TEXT;
 
 -- DropTable

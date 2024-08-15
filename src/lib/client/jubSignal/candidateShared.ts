@@ -8,7 +8,7 @@ export type CandidateSharedMessage = {
   email: string; // Email
   githubUserId: string; // GitHub user ID
   githubLogin: string; // GitHub username
-  education: string; // Education
+  education: number; // Education
   interests: string[]; // Interests
   experience: number; // Experience
   stage: string[]; // Stage
@@ -22,7 +22,7 @@ export const candidateSharedMessageSchema = object({
   email: string().required(),
   githubUserId: string().required(),
   githubLogin: string().required(),
-  education: string().required(),
+  education: number().required(),
   interests: array().of(string().required()).required(),
   experience: number().required(),
   stage: array().of(string().required()).required(),
@@ -36,7 +36,7 @@ export type EncryptCandidateSharedMessageArgs = {
   email: string;
   githubUserId: string;
   githubLogin: string;
-  education: string;
+  education: number;
   interests: string[];
   experience: number;
   stage: string[];

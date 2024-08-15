@@ -1,4 +1,4 @@
-import { number, object, string } from "yup";
+import { bool, number, object, string } from "yup";
 import { JUB_SIGNAL_MESSAGE_TYPE, encryptMessage } from ".";
 
 export type RecruiterSharedMessage = {
@@ -6,10 +6,14 @@ export type RecruiterSharedMessage = {
   encPk: string; // Encryption public key
   role: string; // Role
   project: string; // Project
-  jobLink: string; // Link to job
+  jobLink?: string; // Link to job
   decryptionShareLink: string; // Link to decryption share
   matchId: number; // Match ID
   matchResultsLink: string; // Link to match results
+  jobTags?: string; // Job tags
+  jobStage?: string; // Job stage
+  jobExperience?: number; // Job experience
+  jobPartTime?: boolean; // Job part time
 };
 
 export const recruiterSharedMessageSchema = object({
@@ -17,10 +21,14 @@ export const recruiterSharedMessageSchema = object({
   encPk: string().required(),
   role: string().required(),
   project: string().required(),
-  jobLink: string().required(),
+  jobLink: string().optional(),
   decryptionShareLink: string().required(),
   matchId: number().required(),
   matchResultsLink: string().required(),
+  jobTags: string().optional(),
+  jobStage: string().optional(),
+  jobExperience: number().optional(),
+  jobPartTime: bool().optional(),
 });
 
 export type EncryptRecruiterSharedMessageArgs = {
@@ -28,12 +36,16 @@ export type EncryptRecruiterSharedMessageArgs = {
   encryptionPublicKey: string;
   role: string;
   project: string;
-  jobLink: string;
+  jobLink?: string;
   decryptionShareLink: string;
   matchId: number;
   matchResultsLink: string;
   senderPrivateKey: string;
   recipientPublicKey: string;
+  jobTags?: string;
+  jobStage?: string;
+  jobExperience?: number;
+  jobPartTime?: boolean;
 };
 
 export async function encryptRecruiterSharedMessage({
@@ -47,6 +59,10 @@ export async function encryptRecruiterSharedMessage({
   matchResultsLink,
   senderPrivateKey,
   recipientPublicKey,
+  jobTags,
+  jobStage,
+  jobExperience,
+  jobPartTime,
 }: EncryptRecruiterSharedMessageArgs): Promise<string> {
   const messageData: RecruiterSharedMessage = {
     name: displayName,
@@ -57,6 +73,10 @@ export async function encryptRecruiterSharedMessage({
     decryptionShareLink,
     matchId,
     matchResultsLink,
+    jobTags,
+    jobStage,
+    jobExperience,
+    jobPartTime,
   };
 
   const encryptedMessage = await encryptMessage(

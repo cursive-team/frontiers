@@ -6,11 +6,15 @@ import React from "react";
 type JobsEntryPageProps = {
   handleIsCandidate: () => void;
   handleIsRecruiter: () => void;
+  candidateLoading: boolean;
+  recruiterLoading: boolean;
 };
 
 export default function JobsEntryPage({
   handleIsCandidate,
   handleIsRecruiter,
+  candidateLoading,
+  recruiterLoading,
 }: JobsEntryPageProps) {
   return (
     <AppContent className="h-full">
@@ -50,8 +54,12 @@ export default function JobsEntryPage({
         //onSubmit={handleSubmitWithPassword}
         footer={
           <div className="flex flex-col gap-4">
-            <Button variant="black" onClick={handleIsRecruiter}>
-              {`I'm recruiting for a role`}
+            <Button
+              variant="black"
+              onClick={handleIsRecruiter}
+              loading={recruiterLoading}
+            >
+              {`Recruiter / hiring for a role`}
             </Button>
 
             <span className="h-6 relative font-normal text-sm text-white font-inter text-center">
@@ -63,7 +71,8 @@ export default function JobsEntryPage({
             <Button
               variant="black"
               onClick={handleIsCandidate}
-            >{`I'm a candidate for new roles`}</Button>
+              loading={candidateLoading}
+            >{`Candidate / exploring new roles`}</Button>
           </div>
         }
       />

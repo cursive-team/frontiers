@@ -34,6 +34,8 @@ export default async function handler(
       },
     });
 
+    console.log(matches, userId);
+
     if (!matches || matches.length === 0) {
       return res.status(200).json({ matches: [] });
     }

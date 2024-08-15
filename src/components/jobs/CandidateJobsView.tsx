@@ -58,9 +58,13 @@ export type CandidateJobMatch = {
   recruiterEncPubKey: string;
   role: string;
   project: string;
-  jobLink: string;
+  jobLink?: string;
   matchId: number;
   isMatch: boolean;
+  jobTags?: string;
+  jobStage?: string;
+  jobExperience?: number;
+  jobPartTime?: boolean;
 };
 
 type CandidateJobsViewProps = {
@@ -93,30 +97,30 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
 
     const interests = [];
     if (jobs.candidateInput.interestZk) {
-      interests.push("zk");
+      interests.push("ZK");
     }
     if (jobs.candidateInput.interestDefi) {
-      interests.push("defi");
+      interests.push("DeFi");
     }
     if (jobs.candidateInput.interestConsumer) {
-      interests.push("consumer");
+      interests.push("Consumer");
     }
     if (jobs.candidateInput.interestInfra) {
-      interests.push("infra");
+      interests.push("Infra");
     }
 
     const stage = [];
     if (jobs.candidateInput.stageParadigm) {
-      stage.push("paradigm");
+      stage.push("Paradigm");
     }
     if (jobs.candidateInput.stageGrant) {
-      stage.push("grant");
+      stage.push("Grant");
     }
     if (jobs.candidateInput.stageSeed) {
-      stage.push("seed");
+      stage.push("Seed");
     }
     if (jobs.candidateInput.stageSeriesA) {
-      stage.push("seriesA");
+      stage.push("Series A+");
     }
 
     const jubSignalMessage = await encryptCandidateSharedMessage({
@@ -183,68 +187,99 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
 
   return (
     <>
-      <Modal
-        isOpen={showJobDetailModal && match !== undefined}
-        setIsOpen={setShowJobDetailModal}
-        withBackButton
-      >
-        <FormStepLayout className="h-full" actions={getActions()}>
-          <div className="flex flex-col gap-4">
-            <Card.Base
-              className="!border-white/20 !rounded-none bg-cover bg-center bg-no-repeat"
-              style={{
-                backgroundImage: "url('/shapes/card-shape-2.svg')",
-              }}
-            >
-              <div className="flex flex-col py-4 px-3 min-h-[180px]">
-                <h5 className="mt-auto text-white font-inter font-semibold text-xl leading-6">
-                  {match!.role}
-                </h5>
+      {match && (
+        <Modal
+          isOpen={showJobDetailModal && match !== undefined}
+          setIsOpen={setShowJobDetailModal}
+          withBackButton
+        >
+          <FormStepLayout className="h-full" actions={getActions()}>
+            <div className="flex flex-col gap-4">
+              <Card.Base
+                className="!border-white/20 !rounded-none bg-cover bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: "url('/shapes/card-shape-2.svg')",
+                }}
+              >
+                <div className="flex flex-col py-4 px-3 min-h-[180px]">
+                  <h5 className="mt-auto text-white font-inter font-semibold text-xl leading-6">
+                    {match!.role}
+                  </h5>
+                </div>
+              </Card.Base>
+              <div className="flex flex-col gap-1">
+                <Title>Project</Title>
+                <Description>{match!.project}</Description>
               </div>
-            </Card.Base>
-            {/* <div className="flex flex-col gap-1">
-              <Title>Level</Title>
-              <Description>level</Description>
-            </div> */}
-            <div className="flex flex-col gap-1">
-              <Title>Recruiter</Title>
-              <Description>{match!.recruiterDisplayName}</Description>
+              <div className="flex flex-col gap-1">
+                <Title>Recruiter</Title>
+                <Description>{match!.recruiterDisplayName}</Description>
+              </div>
+              {match!.jobTags && match!.jobTags !== "None" && (
+                <div className="flex flex-col gap-1">
+                  <Title>Tags</Title>
+                  <Description>{match!.jobTags}</Description>
+                </div>
+              )}
+              {match!.jobStage && match!.jobStage !== "None" && (
+                <div className="flex flex-col gap-1">
+                  <Title>Project stage</Title>
+                  <Description>{match!.jobStage}</Description>
+                </div>
+              )}
+              {match!.jobExperience && (
+                <div className="flex flex-col gap-1">
+                  <Title>Required experience</Title>
+                  <Description>{`${
+                    match!.jobExperience
+                  } years of development`}</Description>
+                </div>
+              )}
+              {match!.jobPartTime && match!.jobPartTime === true && (
+                <div className="flex flex-col gap-1">
+                  <Title>Part-time</Title>
+                  <Description>{"Yes"}</Description>
+                </div>
+              )}
+              {match!.jobLink && (
+                <Link href={match!.jobLink} target="_blank">
+                  <LinkCard className="flex w-full items-center justify-between">
+                    <span className="text-white font-medium font-inter text-xs">
+                      Job description
+                    </span>
+                    <Icons.ExternalLink className="text-white" />
+                  </LinkCard>
+                </Link>
+              )}
             </div>
-            <Link href={match!.jobLink} target="_blank">
-              <LinkCard className="flex w-full items-center justify-between">
-                <span className="text-white font-medium font-inter text-xs">
-                  Job description
-                </span>
-                <Icons.ExternalLink className="text-white" />
-              </LinkCard>
-            </Link>
-          </div>
-        </FormStepLayout>
-      </Modal>
-      <Tabs
-        items={[
-          {
-            label: "Opportunities",
-            children: (
-              <div className="flex flex-col h-full">
-                {pendingMatches.length === 0 ? (
-                  <span className="mt-20 text-white/50 text-xs text-center">
-                    No opportunities yet.{" "}
-                  </span>
-                ) : (
-                  <div className="flex flex-col w-full">
-                    {pendingMatches.map((match, index) => (
-                      <OpportunityCard
-                        key={index}
-                        label={match.role}
-                        description={match.project}
-                        onClick={() => {
-                          setShowJobDetailModal(true);
-                          setMatch(match);
-                        }}
-                      />
-                    ))}
-                    {/* <OpportunityCard
+          </FormStepLayout>
+        </Modal>
+      )}
+      <AppContent>
+        <Tabs
+          items={[
+            {
+              label: "Opportunities",
+              children: (
+                <div className="flex flex-col h-full">
+                  {pendingMatches.length === 0 ? (
+                    <span className="mt-20 text-white/50 text-xs text-center">
+                      No opportunities yet.{" "}
+                    </span>
+                  ) : (
+                    <div className="flex flex-col w-full">
+                      {pendingMatches.map((match, index) => (
+                        <OpportunityCard
+                          key={index}
+                          label={match.role}
+                          description={match.project}
+                          onClick={() => {
+                            setShowJobDetailModal(true);
+                            setMatch(match);
+                          }}
+                        />
+                      ))}
+                      {/* <OpportunityCard
                       label="Software Engineer"
                       description="Reth"
                       onClick={() => {
@@ -258,39 +293,40 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
                         setShowJobDetailModal(true);
                       }}
                     /> */}
-                  </div>
-                )}
-              </div>
-            ),
-          },
-          {
-            label: "You opted-in",
-            children: (
-              <div className="flex flex-col h-full">
-                {acceptedMatches.length === 0 ? (
-                  <span className="mt-20 text-white/50 text-xs text-center">
-                    No opted-in yet.{" "}
-                  </span>
-                ) : (
-                  <div className="flex flex-col w-full">
-                    {acceptedMatches.map((match, index) => (
-                      <OpportunityCard
-                        key={index}
-                        label={match.role}
-                        description={match.project}
-                        onClick={() => {
-                          setShowJobDetailModal(true);
-                          setMatch(match);
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            ),
-          },
-        ]}
-      ></Tabs>
+                    </div>
+                  )}
+                </div>
+              ),
+            },
+            {
+              label: "You opted-in",
+              children: (
+                <div className="flex flex-col h-full">
+                  {acceptedMatches.length === 0 ? (
+                    <span className="mt-20 text-white/50 text-xs text-center">
+                      No opted-in yet.{" "}
+                    </span>
+                  ) : (
+                    <div className="flex flex-col w-full">
+                      {acceptedMatches.map((match, index) => (
+                        <OpportunityCard
+                          key={index}
+                          label={match.role}
+                          description={match.project}
+                          onClick={() => {
+                            setShowJobDetailModal(true);
+                            setMatch(match);
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ),
+            },
+          ]}
+        ></Tabs>
+      </AppContent>
     </>
   );
 }

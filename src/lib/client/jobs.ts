@@ -3,6 +3,11 @@ import { encryptRecruiterSharedMessage } from "./jubSignal/recruiterShared";
 import { getAuthToken, getKeys, getProfile } from "./localStorage";
 import { getJobs, saveJobs } from "./localStorage/jobs";
 import { loadMessages } from "./jubSignalClient";
+import { deserializeMPCData, serializeMPCData } from "./mpc";
+import init, {
+  ni_hiring_client_dec_share_web,
+  ni_hiring_init_web,
+} from "@/lib/ni_hiring_web";
 
 export const recruiterProcessNewMatches = async () => {
   console.log("recruiter processing new matches...");
@@ -42,7 +47,9 @@ export const recruiterProcessNewMatches = async () => {
   const newMessages: MessageRequest[] = [];
   const newProcessedMatchIds: number[] = [];
   console.log(
-    "recruiter processing new matches, old match ids: ",
+    "recruiter processing new matches",
+    matches,
+    "old match ids",
     processedMatchIds
   );
 
@@ -50,10 +57,55 @@ export const recruiterProcessNewMatches = async () => {
     if (!processedMatchIds.includes(match.id)) {
       console.log("recruiter processing new match", match.id);
 
-      // TODO: compute decryption share from match results and upload it
-      const jobsPrivateKey = jobs.jobsPrivateKey;
-      const decryptionShare = match.matchResultsLink;
-      const decryptionShareLink = decryptionShare;
+      const jobsPrivateKey = deserializeMPCData(jobs.jobsPrivateKey);
+      const fheResResponse = await fetch(match.matchResultsLink);
+      const fheRes = deserializeMPCData(await fheResResponse.text());
+
+      console.log(fheRes, jobsPrivateKey);
+
+      await init();
+      try {
+        ni_hiring_init_web(BigInt(1));
+      } catch (e) {}
+
+      const decryptionShare = ni_hiring_client_dec_share_web(
+        jobsPrivateKey,
+        fheRes
+      );
+
+      const decryptionShareLink = serializeMPCData(decryptionShare);
+      console.log("decryption share link: ", decryptionShareLink);
+      console.log("match", match);
+
+      // add other information
+      const tags = [];
+      if (jobs.recruiterInput.tagZk) {
+        tags.push("ZK");
+      }
+      if (jobs.recruiterInput.tagDefi) {
+        tags.push("DeFi");
+      }
+      if (jobs.recruiterInput.tagConsumer) {
+        tags.push("Consumer");
+      }
+      if (jobs.recruiterInput.tagInfra) {
+        tags.push("Infra");
+      }
+      const allTags = tags.join(", ");
+
+      let stage = "";
+      if (jobs.recruiterInput.stageParadigm) {
+        stage = "Paradigm";
+      }
+      if (jobs.recruiterInput.stageGrant) {
+        stage = "Grant";
+      }
+      if (jobs.recruiterInput.stageSeed) {
+        stage = "Seed";
+      }
+      if (jobs.recruiterInput.stageSeriesA) {
+        stage = "Series A+";
+      }
 
       // create a new jubSignal message
       const jubSignalMessage = await encryptRecruiterSharedMessage({
@@ -67,6 +119,10 @@ export const recruiterProcessNewMatches = async () => {
         matchResultsLink: match.matchResultsLink,
         senderPrivateKey,
         recipientPublicKey: match.accepterEncPubKey,
+        jobTags: allTags === "" ? "None" : allTags,
+        jobStage: stage === "" ? "None" : stage,
+        jobExperience: jobs.recruiterInput.experience || 1,
+        jobPartTime: jobs.recruiterInput.partTime || false,
       });
 
       // Add the message to the list

@@ -11,7 +11,7 @@ export default async function handler(
   }
 
   const { authToken, jobsPublicKeyLink, jobsEncryptedDataLink, isCandidate } =
-    JSON.parse(req.body);
+    req.body;
 
   const userId = await verifyAuthToken(authToken);
   if (!userId) {

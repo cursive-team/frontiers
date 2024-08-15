@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { Section } from "./Section";
 
 export type JobCandidateInput = {
-  education: "high-school" | "bachelor" | "master" | "phd";
+  education: 0 | 1 | 2 | 3;
   experience: number;
   interestZk: boolean;
   interestDefi: boolean;
@@ -29,21 +29,23 @@ export type JobCandidateInput = {
 
 interface CandidatePageProps {
   handleSubmitCandidateInput: (formValues: JobCandidateInput) => Promise<void>;
+  submitLoading: boolean;
 }
 
 export default function CandidatePage({
   handleSubmitCandidateInput,
+  submitLoading,
 }: CandidatePageProps) {
   const { setValue, watch, register, handleSubmit } =
     useForm<JobCandidateInput>({
       defaultValues: {
-        education: "high-school",
-        experience: 0,
+        education: 0,
+        experience: 1,
+        salary: 0,
         interestZk: false,
         interestDefi: false,
         interestConsumer: false,
         interestInfra: false,
-        salary: 0,
         stageParadigm: false,
         stageGrant: false,
         stageSeed: false,
@@ -53,8 +55,8 @@ export default function CandidatePage({
       },
     });
 
-  const education = watch("education", "high-school");
-  const experience = watch("experience", 0);
+  const education = watch("education", 0);
+  const experience = watch("experience", 1);
   const interestZk = watch("interestZk", false);
   const interestDefi = watch("interestDefi", false);
   const interestConsumer = watch("interestConsumer", false);
@@ -93,7 +95,9 @@ export default function CandidatePage({
       }
       footer={
         <div className="flex flex-col gap-4 bg-black px-4">
-          <Button type="submit">Save and continue</Button>
+          <Button type="submit" loading={submitLoading}>
+            Save and continue
+          </Button>
           <span className="text-center text-secondary text-[12px] font-inter">
             Review your answers. They cannot be edited later.
           </span>
@@ -109,33 +113,33 @@ export default function CandidatePage({
               id="education-1"
               label="High school"
               value="high-school"
-              checked={education === "high-school"}
+              checked={education === 0}
               onChange={() => {
-                setValue("education", "high-school");
+                setValue("education", 0);
               }}
             />
             <Radio
               id="education-2"
               label="Bachelor's"
-              checked={education === "bachelor"}
+              checked={education === 1}
               onChange={() => {
-                setValue("education", "bachelor");
+                setValue("education", 1);
               }}
             />
             <Radio
               id="education-3"
               label="Master's"
-              checked={education === "master"}
+              checked={education === 2}
               onChange={() => {
-                setValue("education", "master");
+                setValue("education", 2);
               }}
             />
             <Radio
               id="education-4"
               label="PhD"
-              checked={education === "phd"}
+              checked={education === 3}
               onChange={() => {
-                setValue("education", "phd");
+                setValue("education", 3);
               }}
             />
           </div>
@@ -150,8 +154,8 @@ export default function CandidatePage({
             value={experience}
             max={8}
             moreMax
-            onChange={(e: any) => {
-              setValue("experience", e?.target?.value);
+            onChange={(value: number) => {
+              setValue("experience", value);
             }}
           />
         </Section>
@@ -252,8 +256,8 @@ export default function CandidatePage({
             moreMax={true}
             // @ts-ignore
             value={salary}
-            onChange={(e: any) => {
-              setValue("salary", e?.target?.value);
+            onChange={(value: number) => {
+              setValue("salary", value);
             }}
           />
         </Section>

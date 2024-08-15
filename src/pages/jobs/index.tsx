@@ -24,6 +24,15 @@ import { logClientEvent } from "@/lib/client/metrics";
 import { recruiterProcessNewMatches } from "@/lib/client/jobs";
 import { encryptJobInputMessage } from "@/lib/client/jubSignal/jobInput";
 import { loadMessages } from "@/lib/client/jubSignalClient";
+import {
+  deserializeMPCData,
+  generateMPCCandidateEncryption,
+  generateMPCKeys,
+  generateMPCRecruiterEncryption,
+  mpcBlobUploadClient,
+  serializeMPCData,
+} from "@/lib/client/mpc";
+import { gzip } from "pako";
 
 enum JobsDisplayState {
   SELECT_ROLE = "SELECT_ROLE",
@@ -45,6 +54,10 @@ export default function Jobs() {
   const [recruiterMatches, setRecruiterMatches] = useState<RecruiterJobMatch[]>(
     []
   );
+  const [candidateSetupLoading, setCandidateSetupLoading] = useState(false);
+  const [recruiterSetupLoading, setRecruiterSetupLoading] = useState(false);
+  const [candidateSubmitLoading, setCandidateSubmitLoading] = useState(false);
+  const [recruiterSubmitLoading, setRecruiterSubmitLoading] = useState(false);
 
   useEffect(() => {
     const loadMatches = async () => {
@@ -91,38 +104,47 @@ export default function Jobs() {
     }
   }, []);
 
-  const generateJobsKeys = async (): Promise<{
+  const generateJobsKeys = async (
+    id: number
+  ): Promise<{
     publicKeyLink: string;
     privateKey: string;
   }> => {
-    // TODO: generate a public and private key pair
-    const publicKey = "pub";
-    const privateKey = "priv";
-    // TODO: upload the public key to the server
-    const publicKeyLink = "pubLink";
+    const keys = await generateMPCKeys(id);
+
+    const publicKeyLink = await mpcBlobUploadClient(
+      "mpcPublicKey",
+      gzip(serializeMPCData(keys.mpcPublicKey))
+    );
+
     return {
       publicKeyLink,
-      privateKey,
+      privateKey: serializeMPCData(keys.mpcPrivateKey),
     };
   };
 
   const handleIsCandidate = async () => {
-    setDisplayState(JobsDisplayState.CANDIDATE_FORM);
-    const { publicKeyLink, privateKey } = await generateJobsKeys();
+    setCandidateSetupLoading(true);
+    const { publicKeyLink, privateKey } = await generateJobsKeys(1);
     setPublicKeyLink(publicKeyLink);
     setPrivateKey(privateKey);
+    setCandidateSetupLoading(false);
+    setDisplayState(JobsDisplayState.CANDIDATE_FORM);
   };
 
   const handleIsRecruiter = async () => {
-    setDisplayState(JobsDisplayState.RECRUITER_FORM);
-    const { publicKeyLink, privateKey } = await generateJobsKeys();
+    setRecruiterSetupLoading(true);
+    const { publicKeyLink, privateKey } = await generateJobsKeys(0);
     setPublicKeyLink(publicKeyLink);
     setPrivateKey(privateKey);
+    setRecruiterSetupLoading(false);
+    setDisplayState(JobsDisplayState.RECRUITER_FORM);
   };
 
   const handleSubmitCandidateInput = async (
     candidateInput: JobCandidateInput
   ) => {
+    setCandidateSubmitLoading(true);
     if (!publicKeyLink || !privateKey) {
       toast.error("Error generating keys");
       return;
@@ -141,9 +163,15 @@ export default function Jobs() {
       return;
     }
 
-    // TODO: upload encrypted candidate input to the server
-    const encryptedCandidateInput = candidateInput;
-    const encryptedCandidateInputLink = candidateInput;
+    const encryptedCandidateInput = generateMPCCandidateEncryption(
+      deserializeMPCData(privateKey),
+      candidateInput
+    );
+
+    const encryptedCandidateInputLink = await mpcBlobUploadClient(
+      "encryptedCandidateInput",
+      serializeMPCData(encryptedCandidateInput)
+    );
 
     const response = await fetch("/api/jobs/new_candidate", {
       method: "POST",
@@ -155,6 +183,7 @@ export default function Jobs() {
         jobsPublicKeyLink: publicKeyLink,
         jobsEncryptedDataLink: encryptedCandidateInputLink,
         isCandidate: true,
+        isRecruiter: false,
       }),
     });
 
@@ -185,6 +214,7 @@ export default function Jobs() {
 
     // update local storage with user jobs profile
     saveJobs({ jobsPrivateKey: privateKey, candidateInput });
+    setCandidateSubmitLoading(false);
     setDisplayState(JobsDisplayState.CANDIDATE_MATCHES);
     toast.success("Your candidate profile has been added.");
     console.log("submitted candidate profile", candidateInput);
@@ -193,6 +223,7 @@ export default function Jobs() {
   const handleSubmitRecruiterInput = async (
     recruiterInput: JobRecruiterInput
   ) => {
+    setRecruiterSubmitLoading(true);
     if (!publicKeyLink || !privateKey) {
       toast.error("Error generating keys");
       return;
@@ -211,9 +242,15 @@ export default function Jobs() {
       return;
     }
 
-    // TODO: upload encrypted recruiter input to the server
-    const encryptedRecruiterInput = recruiterInput;
-    const encryptedRecruiterInputLink = recruiterInput;
+    const encryptedRecruiterInput = generateMPCRecruiterEncryption(
+      deserializeMPCData(privateKey),
+      recruiterInput
+    );
+
+    const encryptedRecruiterInputLink = await mpcBlobUploadClient(
+      "encryptedRecruiterInput",
+      serializeMPCData(encryptedRecruiterInput)
+    );
 
     // send initial list of users to match with
     const users = getUsers();
@@ -231,6 +268,7 @@ export default function Jobs() {
         jobsPublicKeyLink: publicKeyLink,
         jobsEncryptedDataLink: encryptedRecruiterInputLink,
         isCandidate: false,
+        isRecruiter: true,
         userEncPubKeys,
       }),
     });
@@ -262,6 +300,7 @@ export default function Jobs() {
 
     // update local storage with user jobs profile
     saveJobs({ jobsPrivateKey: privateKey, recruiterInput });
+    setRecruiterSubmitLoading(false);
     setDisplayState(JobsDisplayState.RECRUITER_MATCHES);
     toast.success("Your recruiter profile has been submitted.");
     console.log("submitted recruiter profile", recruiterInput);
@@ -273,18 +312,22 @@ export default function Jobs() {
         <JobsEntryPage
           handleIsCandidate={handleIsCandidate}
           handleIsRecruiter={handleIsRecruiter}
+          candidateLoading={candidateSetupLoading}
+          recruiterLoading={recruiterSetupLoading}
         />
       );
     case JobsDisplayState.CANDIDATE_FORM:
       return (
         <CandidatePage
           handleSubmitCandidateInput={handleSubmitCandidateInput}
+          loading={candidateSubmitLoading}
         />
       );
     case JobsDisplayState.RECRUITER_FORM:
       return (
         <RecruiterPage
           handleSubmitRecruiterInput={handleSubmitRecruiterInput}
+          loading={recruiterSubmitLoading}
         />
       );
     case JobsDisplayState.CANDIDATE_MATCHES:
