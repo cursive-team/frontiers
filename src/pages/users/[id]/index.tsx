@@ -162,6 +162,8 @@ const UserProfilePage = () => {
         }
       })
       .on("broadcast", { event: "initiatePSI" }, async (event) => {
+        // only respond to initiatePSI if it's for this user
+        if (event.payload.to !== selfEncPk) return;
         console.log(
           "Received initiate PSI from ",
           otherEncPk,
@@ -550,7 +552,7 @@ const UserProfilePage = () => {
   }, [id, router, githubSession, userGithubInfo]);
 
   const handleInitiatePSI = () => {
-    if (!user || !channelName) return;
+    if (!user || !channelName || !otherEncPk) return;
 
     console.log(
       "Initiating psi...",
@@ -563,7 +565,9 @@ const UserProfilePage = () => {
     supabase.channel(channelName).send({
       type: "broadcast",
       event: "initiatePSI",
-      payload: {},
+      payload: {
+        to: otherEncPk,
+      },
     });
 
     // start psi if other user is already interested
@@ -576,7 +580,7 @@ const UserProfilePage = () => {
   };
 
   const handleUpdatePSI = () => {
-    if (!user || !channelName) return;
+    if (!user || !channelName || !otherEncPk) return;
 
     console.log(
       "Updating psi...",
@@ -593,7 +597,9 @@ const UserProfilePage = () => {
     supabase.channel(channelName).send({
       type: "broadcast",
       event: "initiatePSI",
-      payload: {},
+      payload: {
+        to: otherEncPk,
+      },
     });
 
     // start psi if other user is already interested
