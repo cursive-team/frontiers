@@ -60,7 +60,6 @@ const LinkCard = ({ label, value, href }: LinkCardProps) => {
 
 enum PSIState {
   NOT_STARTED,
-  WAITING,
   ROUND1,
   ROUND2,
   ROUND3,
@@ -70,7 +69,6 @@ enum PSIState {
 
 const PSIStateMapping: Record<PSIState, string> = {
   [PSIState.NOT_STARTED]: "Not started",
-  [PSIState.WAITING]: "Waiting for other user to connect...",
   [PSIState.ROUND1]: "Creating collective encryption pubkey with 2PC...",
   [PSIState.ROUND2]: "Performing PSI with FHE...",
   [PSIState.ROUND3]: "Decrypting encrypted results with 2PC...",
@@ -109,6 +107,14 @@ const UserProfilePage = () => {
     useState<string>();
   const [selfRound3Output, setSelfRound3Output] = useState<any>();
 
+  const [wantsToInitiatePSI, setWantsToInitiatePSI] = useState(false);
+  const [otherUserWantsToInitiatePSI, setOtherUserWantsToInitiatePSI] =
+    useState(false);
+  const [currentUserInChannel, setCurrentUserInChannel] = useState(false);
+  const [otherUserInChannel, setOtherUserInChannel] = useState(false);
+  const [otherUserTemporarilyLeft, setOtherUserTemporarilyLeft] =
+    useState(false);
+
   const [userOverlap, setUserOverlap] = useState<
     { userId: string; name: string }[]
   >([]);
@@ -127,10 +133,7 @@ const UserProfilePage = () => {
   // set up channel for PSI
   const setupChannel = () => {
     if (!selfEncPk || !otherEncPk || !channelName) return;
-
     logClientEvent("psiSetupChannel", {});
-
-    setPsiState(PSIState.WAITING);
 
     const channel = supabase.channel(channelName, {
       config: {
@@ -140,21 +143,40 @@ const UserProfilePage = () => {
 
     channel
       .on("presence", { event: "sync" }, () => {
+        setCurrentUserInChannel(true);
         const newState = channel.presenceState();
         if (Object.keys(newState).includes(otherEncPk)) {
-          setPsiState((prevState) => {
-            if (prevState === PSIState.WAITING) {
-              return PSIState.ROUND1;
-            }
-            return prevState;
-          });
+          console.log("Other user in channel ", otherEncPk);
+          setOtherUserInChannel(true);
+          setOtherUserTemporarilyLeft(false);
         }
       })
       .on("presence", { event: "leave" }, async ({ key }) => {
         if (key === otherEncPk) {
-          setPsiState(PSIState.NOT_STARTED);
-          await closeChannel();
+          console.log("Other user left channel ", otherEncPk);
+          setOtherUserTemporarilyLeft(true);
+          setOtherUserInChannel(false);
+        } else {
+          setCurrentUserInChannel(false);
         }
+      })
+      .on("broadcast", { event: "initiatePSI" }, async (event) => {
+        console.log("Received initiate PSI from ", otherEncPk, psiState);
+        setPsiState((prevState) => {
+          if (wantsToInitiatePSI) {
+            console.log(
+              "Starting psi after other user responded with initiatePSI",
+              otherEncPk
+            );
+            // reset psi initation and start psi
+            setWantsToInitiatePSI(false);
+            setOtherUserWantsToInitiatePSI(false);
+            return PSIState.ROUND1;
+          } else {
+            setOtherUserWantsToInitiatePSI(true);
+            return prevState;
+          }
+        });
       })
       .on("broadcast", { event: "message" }, (event) => {
         setBroadcastEvent(event);
@@ -382,6 +404,33 @@ const UserProfilePage = () => {
   }, [psiState, selfEncPk, otherEncPk, channelName]);
 
   useEffect(() => {
+    if (otherUserTemporarilyLeft) {
+      const currentState = psiState;
+      const timer = setTimeout(() => {
+        if (psiState === currentState) {
+          console.log(
+            "Resetting PSI due to other user temporarily leaving",
+            currentState,
+            psiState
+          );
+          setPsiState(PSIState.NOT_STARTED);
+          setSelfRound1Output(undefined);
+          setOtherRound2MessageLink(undefined);
+          setSelfRound2Output(undefined);
+          setOtherRound3MessageLink(undefined);
+          setSelfRound3Output(undefined);
+          setOtherUserInChannel(false);
+          setOtherUserTemporarilyLeft(false);
+          setWantsToInitiatePSI(false);
+          setOtherUserWantsToInitiatePSI(false);
+        }
+      }, 10000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [otherUserTemporarilyLeft, psiState]);
+
+  useEffect(() => {
     const fetchUser = async () => {
       if (typeof id === "string") {
         const profile = getProfile();
@@ -402,6 +451,8 @@ const UserProfilePage = () => {
           setChannelName(
             [fetchedUser.encPk, profile.encryptionPublicKey].sort().join("")
           );
+          // always set up channel
+          setupChannel();
           if (fetchedUser.oI) {
             processOverlap(JSON.parse(fetchedUser.oI));
             setPsiState(PSIState.COMPLETE);
@@ -483,6 +534,53 @@ const UserProfilePage = () => {
     };
     fetchUser();
   }, [id, router, githubSession, userGithubInfo]);
+
+  const handleInitiatePSI = () => {
+    if (!user || !channelName) return;
+
+    logClientEvent("psiInitiatePSI", {});
+    setWantsToInitiatePSI(true);
+    supabase.channel(channelName).send({
+      type: "broadcast",
+      event: "initiatePSI",
+      payload: {},
+    });
+
+    // start psi if other user is already interested
+    if (otherUserWantsToInitiatePSI) {
+      console.log("Starting psi after other user initiating PSI", otherEncPk);
+      setWantsToInitiatePSI(false);
+      setOtherUserWantsToInitiatePSI(false);
+      setPsiState(PSIState.ROUND1);
+    }
+  };
+
+  const handleUpdatePSI = () => {
+    if (!user || !channelName) return;
+
+    logClientEvent("psiUpdatePSI", {});
+    setSelfRound1Output(undefined);
+    setOtherRound2MessageLink(undefined);
+    setSelfRound2Output(undefined);
+    setOtherRound3MessageLink(undefined);
+    setSelfRound3Output(undefined);
+    supabase.channel(channelName).send({
+      type: "broadcast",
+      event: "initiatePSI",
+      payload: {},
+    });
+
+    // start psi if other user is already interested
+    if (otherUserWantsToInitiatePSI) {
+      console.log("Starting psi after other user initiating PSI", otherEncPk);
+      setWantsToInitiatePSI(false);
+      setOtherUserWantsToInitiatePSI(false);
+      setPsiState(PSIState.ROUND1);
+    } else {
+      setWantsToInitiatePSI(true);
+      setPsiState(PSIState.NOT_STARTED);
+    }
+  };
 
   if (!user) {
     return (
@@ -706,7 +804,7 @@ const UserProfilePage = () => {
               })}
               <Button
                 type="button"
-                onClick={setupChannel}
+                onClick={handleUpdatePSI}
                 size="small"
                 variant="tertiary"
                 style={{
@@ -719,11 +817,16 @@ const UserProfilePage = () => {
           ) : psiState === PSIState.NOT_STARTED ? (
             <Button
               type="button"
-              onClick={setupChannel}
+              onClick={handleInitiatePSI}
               size="small"
               variant="gray"
+              disabled={!otherUserInChannel}
             >
-              Discover
+              {wantsToInitiatePSI
+                ? "Waiting for other user to accept..."
+                : otherUserInChannel
+                ? "Discover"
+                : "Waiting for other user to connect..."}
             </Button>
           ) : (
             <div className="flex flex-col gap-2">
