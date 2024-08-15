@@ -11,12 +11,19 @@ import RecruiterMatchView, {
 import RecruiterPage, {
   JobRecruiterInput,
 } from "@/components/jobs/RecruiterPage";
-import { getAuthToken, getProfile, getUsers } from "@/lib/client/localStorage";
+import {
+  getAuthToken,
+  getKeys,
+  getProfile,
+  getUsers,
+} from "@/lib/client/localStorage";
 import { getJobs, saveJobs } from "@/lib/client/localStorage/jobs";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { logClientEvent } from "@/lib/client/metrics";
 import { recruiterProcessNewMatches } from "@/lib/client/jobs";
+import { encryptJobInputMessage } from "@/lib/client/jubSignal/jobInput";
+import { loadMessages } from "@/lib/client/jubSignalClient";
 
 enum JobsDisplayState {
   SELECT_ROLE = "SELECT_ROLE",
@@ -118,6 +125,13 @@ const Jobs: React.FC = () => {
       return;
     }
 
+    const keys = getKeys();
+    const profile = getProfile();
+    if (!keys || !profile) {
+      toast.error("Please try logging in again.");
+      return;
+    }
+
     // TODO: upload encrypted candidate input to the server
     const encryptedCandidateInput = candidateInput;
     const encryptedCandidateInputLink = candidateInput;
@@ -140,8 +154,27 @@ const Jobs: React.FC = () => {
       return;
     }
 
+    // send jubsignal message to self
+    const jubSignalMessage = await encryptJobInputMessage({
+      isCandidate: true,
+      privateKey: privateKey,
+      serializedInput: JSON.stringify(candidateInput),
+      senderPrivateKey: keys.encryptionPrivateKey,
+      recipientPublicKey: profile.encryptionPublicKey,
+    });
+    const newMessages = [
+      {
+        encryptedMessage: jubSignalMessage,
+        recipientPublicKey: profile.encryptionPublicKey,
+      },
+    ];
+    // send jubSignal messages
+    await loadMessages({
+      forceRefresh: false,
+      messageRequests: newMessages,
+    });
+
     // update local storage with user jobs profile
-    // TODO: send jubsignal message to self
     saveJobs({ jobsPrivateKey: privateKey, candidateInput });
     setDisplayState(JobsDisplayState.CANDIDATE_MATCHES);
     toast.success("Your candidate profile has been added.");
@@ -162,8 +195,9 @@ const Jobs: React.FC = () => {
       return;
     }
 
+    const keys = getKeys();
     const profile = getProfile();
-    if (!profile) {
+    if (!keys || !profile) {
       toast.error("Please try logging in again.");
       return;
     }
@@ -197,8 +231,27 @@ const Jobs: React.FC = () => {
       return;
     }
 
+    // send jubsignal message to self
+    const jubSignalMessage = await encryptJobInputMessage({
+      isCandidate: false,
+      privateKey: privateKey,
+      serializedInput: JSON.stringify(recruiterInput),
+      senderPrivateKey: keys.encryptionPrivateKey,
+      recipientPublicKey: profile.encryptionPublicKey,
+    });
+    const newMessages = [
+      {
+        encryptedMessage: jubSignalMessage,
+        recipientPublicKey: profile.encryptionPublicKey,
+      },
+    ];
+    // send jubSignal messages
+    await loadMessages({
+      forceRefresh: false,
+      messageRequests: newMessages,
+    });
+
     // update local storage with user jobs profile
-    // TODO: send jubsignal message to self
     saveJobs({ jobsPrivateKey: privateKey, recruiterInput });
     setDisplayState(JobsDisplayState.RECRUITER_MATCHES);
     toast.success("Your recruiter profile has been submitted.");

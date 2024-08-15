@@ -153,6 +153,14 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
     saveJobs(jobs);
   };
 
+  const validMatches = matches.filter((match) => match.isMatch);
+  const pendingMatches = validMatches.filter(
+    (match) => !acceptedIds.includes(match.matchId)
+  );
+  const acceptedMatches = validMatches.filter((match) =>
+    acceptedIds.includes(match.matchId)
+  );
+
   return (
     <>
       <Modal
@@ -214,26 +222,23 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
             label: "Opportunities",
             children: (
               <div className="flex flex-col h-full">
-                {matches.filter((match) => !acceptedIds.includes(match.matchId))
-                  .length === 0 ? (
+                {pendingMatches.length === 0 ? (
                   <span className="mt-20 text-white/50 text-xs text-center">
                     No opportunities yet.{" "}
                   </span>
                 ) : (
                   <div className="flex flex-col w-full">
-                    {matches
-                      .filter((match) => !acceptedIds.includes(match.matchId))
-                      .map((match, index) => (
-                        <OpportunityCard
-                          key={index}
-                          label={match.role}
-                          description={match.project}
-                          onClick={() => {
-                            setShowJobDetailModal(true);
-                            setMatch(match);
-                          }}
-                        />
-                      ))}
+                    {pendingMatches.map((match, index) => (
+                      <OpportunityCard
+                        key={index}
+                        label={match.role}
+                        description={match.project}
+                        onClick={() => {
+                          setShowJobDetailModal(true);
+                          setMatch(match);
+                        }}
+                      />
+                    ))}
                     {/* <OpportunityCard
                       label="Software Engineer"
                       description="Reth"
@@ -257,26 +262,23 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
             label: "You opted-in",
             children: (
               <div className="flex flex-col h-full">
-                {matches.filter((match) => acceptedIds.includes(match.matchId))
-                  .length === 0 ? (
+                {acceptedMatches.length === 0 ? (
                   <span className="mt-20 text-white/50 text-xs text-center">
                     No opted-in yet.{" "}
                   </span>
                 ) : (
                   <div className="flex flex-col w-full">
-                    {matches
-                      .filter((match) => acceptedIds.includes(match.matchId))
-                      .map((match, index) => (
-                        <OpportunityCard
-                          key={index}
-                          label={match.role}
-                          description={match.project}
-                          onClick={() => {
-                            setShowJobDetailModal(true);
-                            setMatch(match);
-                          }}
-                        />
-                      ))}
+                    {acceptedMatches.map((match, index) => (
+                      <OpportunityCard
+                        key={index}
+                        label={match.role}
+                        description={match.project}
+                        onClick={() => {
+                          setShowJobDetailModal(true);
+                          setMatch(match);
+                        }}
+                      />
+                    ))}
                   </div>
                 )}
               </div>

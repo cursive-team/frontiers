@@ -23,9 +23,9 @@ export const candidateSharedMessageSchema = object({
   githubUserId: string().required(),
   githubLogin: string().required(),
   education: string().required(),
-  interests: array().of(string()).required(),
+  interests: array().of(string().required()).required(),
   experience: number().required(),
-  stage: array().of(string()).required(),
+  stage: array().of(string().required()).required(),
   matchId: number().required(),
 });
 
