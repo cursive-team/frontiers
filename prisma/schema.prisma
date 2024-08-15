@@ -249,13 +249,13 @@ model RoomMember {
 }
 
 model JobMatchQueue {
-  id              Int      @id @default(autoincrement())
-  proposerId      Int
-  accepterId      Int
-  matchResults    String?
-  isInvalid       Boolean  @default(false)
-  lastCheckedTime DateTime @default(now())
-  createdAt       DateTime @default(now())
-  proposer        User     @relation(name: "JobMatchProposer", fields: [proposerId], references: [id])
-  accepter        User     @relation(name: "JobMatchAccepter", fields: [accepterId], references: [id])
+  id               Int      @id @default(autoincrement())
+  proposerId       Int
+  accepterId       Int
+  matchResultsLink String?
+  isInvalid        Boolean  @default(false)
+  lastCheckedTime  DateTime @default(now())
+  createdAt        DateTime @default(now())
+  proposer         User     @relation(name: "JobMatchProposer", fields: [proposerId], references: [id])
+  accepter         User     @relation(name: "JobMatchAccepter", fields: [accepterId], references: [id])
 }

@@ -1,17 +1,22 @@
-import CandidateJobsView from "@/components/jobs/CandidateJobsView";
+import CandidateJobsView, {
+  CandidateJobMatch,
+} from "@/components/jobs/CandidateJobsView";
 import CandidatePage, {
   JobCandidateInput,
 } from "@/components/jobs/CandidatePage";
 import JobsEntryPage from "@/components/jobs/JobsEntryPage";
-import RecruiterMatchView from "@/components/jobs/RecruiterMatchView";
+import RecruiterMatchView, {
+  RecruiterJobMatch,
+} from "@/components/jobs/RecruiterMatchView";
 import RecruiterPage, {
   JobRecruiterInput,
 } from "@/components/jobs/RecruiterPage";
 import { getAuthToken, getProfile, getUsers } from "@/lib/client/localStorage";
 import { getJobs, saveJobs } from "@/lib/client/localStorage/jobs";
 import React, { useEffect, useState } from "react";
-import { CandidateJobMatch } from "../api/jobs/get_candidate_matches";
 import { toast } from "sonner";
+import { logClientEvent } from "@/lib/client/metrics";
+import { recruiterProcessNewMatches } from "@/lib/client/jobs";
 
 enum JobsDisplayState {
   SELECT_ROLE = "SELECT_ROLE",
@@ -27,47 +32,47 @@ const Jobs: React.FC = () => {
   );
   const [publicKeyLink, setPublicKeyLink] = useState<string>();
   const [privateKey, setPrivateKey] = useState<string>();
-  const [pendingMatches, setPendingMatches] = useState<CandidateJobMatch[]>([]);
-  const [matches, setMatches] = useState<CandidateJobMatch[]>([]);
+  const [candidateMatches, setCandidateMatches] = useState<CandidateJobMatch[]>(
+    []
+  );
+  const [recruiterMatches, setRecruiterMatches] = useState<RecruiterJobMatch[]>(
+    []
+  );
 
   useEffect(() => {
-    const authToken = getAuthToken();
-    if (!authToken || authToken.expiresAt < new Date()) {
-      return;
-    }
-
-    const fetchMatches = async () => {
-      const jobs = getJobs();
-      if (jobs) {
-        if (jobs.candidateInput) {
-          const response = await fetch(
-            `/api/jobs/get_candidate_matches?authToken=${authToken.value}`
-          );
-          if (!response.ok) {
-            throw new Error("Failed to fetch candidate matches");
+    const loadRecruiterMatches = async () => {
+      // If page is reloaded, load recruiter job matches
+      const navigationEntries = window.performance.getEntriesByType(
+        "navigation"
+      ) as PerformanceNavigationTiming[];
+      if (navigationEntries.length > 0) {
+        const navigationEntry = navigationEntries[0];
+        if (navigationEntry.type && navigationEntry.type === "reload") {
+          try {
+            logClientEvent("refreshJobsPage", {});
+            await recruiterProcessNewMatches();
+          } catch (error) {
+            console.error("Failed to refresh jobs page:", error);
           }
-          const data = await response.json();
-          if (data.matches) {
-            setPendingMatches(data.matches);
-          }
-          setDisplayState(JobsDisplayState.CANDIDATE_MATCHES);
-        } else if (jobs.recruiterInput) {
-          const response = await fetch(
-            `/api/jobs/get_recruiter_matches?authToken=${authToken.value}`
-          );
-          if (!response.ok) {
-            throw new Error("Failed to fetch recruiter matches");
-          }
-          const data = await response.json();
-          if (data.matches) {
-            setMatches(data.matches);
-          }
-          setDisplayState(JobsDisplayState.RECRUITER_MATCHES);
         }
       }
     };
+    loadRecruiterMatches();
+  }, []);
 
-    fetchMatches();
+  useEffect(() => {
+    const jobs = getJobs();
+    if (jobs) {
+      if (jobs.candidateInput) {
+        setCandidateMatches(
+          Object.values(jobs.candidateProcessedMatches ?? {})
+        );
+        setDisplayState(JobsDisplayState.CANDIDATE_MATCHES);
+      } else if (jobs.recruiterInput) {
+        setRecruiterMatches(Object.values(jobs.recruiterAcceptedMatches ?? {}));
+        setDisplayState(JobsDisplayState.RECRUITER_MATCHES);
+      }
+    }
   }, []);
 
   const generateJobsKeys = async (): Promise<{
@@ -221,9 +226,9 @@ const Jobs: React.FC = () => {
         />
       );
     case JobsDisplayState.CANDIDATE_MATCHES:
-      return <CandidateJobsView pendingMatches={pendingMatches} />;
+      return <CandidateJobsView matches={candidateMatches} />;
     case JobsDisplayState.RECRUITER_MATCHES:
-      return <RecruiterMatchView matches={matches} />;
+      return <RecruiterMatchView matches={recruiterMatches} />;
   }
 };
 

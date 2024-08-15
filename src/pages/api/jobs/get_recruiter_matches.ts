@@ -1,7 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/server/prisma";
-import { JobRecruiterInput } from "@/components/jobs/RecruiterPage";
-import { JobCandidateInput } from "@/components/jobs/CandidatePage";
 import { verifyAuthToken } from "@/lib/server/auth";
 
 export default async function handler(
@@ -20,15 +18,19 @@ export default async function handler(
 
   try {
     // Fetch matches for the given recruiter ID
-    const matches = await prisma.testingJobMatch.findMany({
+    const matches = await prisma.jobMatchQueue.findMany({
       where: {
-        jobMatch: {
-          proposerId: userId,
-        },
-        candidateAccepted: true,
+        proposerId: userId,
+        matchResultsLink: { not: null },
       },
-      include: {
-        jobMatch: true,
+      select: {
+        id: true,
+        matchResultsLink: true,
+        accepter: {
+          select: {
+            encryptionPublicKey: true,
+          },
+        },
       },
     });
 
@@ -39,8 +41,8 @@ export default async function handler(
     // Format the matches to include candidate and recruiter data
     const formattedMatches = matches.map((match) => ({
       id: match.id,
-      candidateData: JSON.parse(match.candidateData) as JobCandidateInput,
-      recruiterData: JSON.parse(match.recruiterData) as JobRecruiterInput,
+      matchResultsLink: match.matchResultsLink,
+      accepterEncPubKey: match.accepter.encryptionPublicKey,
     }));
 
     return res.status(200).json({ matches: formattedMatches });

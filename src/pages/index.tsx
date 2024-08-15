@@ -32,6 +32,7 @@ import { classed } from "@tw-classed/react";
 import { logClientEvent } from "@/lib/client/metrics";
 import { Location } from "@prisma/client";
 import { AppContent } from "@/components/AppContent";
+import { recruiterProcessNewMatches } from "@/lib/client/jobs";
 
 interface LinkCardProps {
   name: string;
@@ -446,6 +447,7 @@ export default function Social() {
         if (navigationEntry.type && navigationEntry.type === "reload") {
           try {
             logClientEvent("loadMessagesPageRefresh", {});
+            await recruiterProcessNewMatches();
             await loadMessages({ forceRefresh: false });
           } catch (error) {
             console.error("Failed to load messages upon page reload:", error);

@@ -15,6 +15,8 @@ export enum JUB_SIGNAL_MESSAGE_TYPE {
   QUEST_COMPLETED = "QC", // A message you send to yourself indicating you completed a quest
   ITEM_REDEEMED = "IR", // A message sent to you indicating you redeemed an item
   OVERLAP_COMPUTED = "OC", // A message you send to yourself indicating PSI completion
+  RECRUITER_SHARED = "RS", // A message sent to you indicating a recruiter shared their profile
+  CANDIDATE_SHARED = "CS", // A message sent to you indicating a candidate shared their profile
 }
 
 export type MessageContents = {

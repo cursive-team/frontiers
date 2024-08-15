@@ -5,7 +5,6 @@ import { Icons } from "@/components/Icons";
 import { Modal } from "@/components/modals/Modal";
 import { Tabs } from "@/components/Tabs";
 import { FormStepLayout } from "@/layouts/FormStepLayout";
-import { CandidateJobMatch } from "@/pages/api/jobs/get_candidate_matches";
 import { classed } from "@tw-classed/react";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -49,17 +48,25 @@ const OpportunityCard = ({
   );
 };
 
-type CandidateJobsViewProps = {
-  pendingMatches: CandidateJobMatch[];
+export type CandidateJobMatch = {
+  recruiterDisplayName: string;
+  recruiterEncPubKey: string;
+  role: string;
+  project: string;
+  jobLink: string;
+  matchId: number;
+  isMatch: boolean;
 };
-export default function CandidateJobsView({
-  pendingMatches,
-}: CandidateJobsViewProps) {
+
+type CandidateJobsViewProps = {
+  matches: CandidateJobMatch[];
+};
+export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
   const [showJobDetailModal, setShowJobDetailModal] = useState(false);
   const hasOpportunities = true;
   const hasOptedIn = true;
 
-  console.log(pendingMatches);
+  console.log(matches);
 
   return (
     <>
@@ -119,11 +126,11 @@ export default function CandidateJobsView({
                   </span>
                 ) : (
                   <div className="flex flex-col w-full">
-                    {pendingMatches.map((match, index) => (
+                    {matches.map((match, index) => (
                       <OpportunityCard
                         key={index}
-                        label={match.recruiterData.title}
-                        description={match.recruiterData.project}
+                        label={match.role}
+                        description={match.project}
                         onClick={() => {
                           setShowJobDetailModal(true);
                         }}

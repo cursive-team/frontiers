@@ -16,7 +16,7 @@ export default async function handler(
     // Fetch the next job match queue entry that is not completed or invalid
     const nextJobMatch = await prisma.jobMatchQueue.findFirst({
       where: {
-        matchResults: { not: null },
+        matchResultsLink: { not: null },
         isInvalid: false,
       },
       orderBy: {
@@ -105,11 +105,12 @@ export default async function handler(
     const accepterEncryptedData = JSON.parse(
       accepterInputLink
     ) as JobCandidateInput;
-    // TODO: compute computation result
+    // TODO: compute computation result and upload it
     const isSuccessfulMatch = await computeJobMatchOutput(
       proposerEncryptedData,
       accepterEncryptedData
     );
+    const matchResultsLink = isSuccessfulMatch.toString();
 
     // log match result
     await prisma.jobMatchQueue.update({
@@ -117,7 +118,7 @@ export default async function handler(
         id: nextJobMatch.id,
       },
       data: {
-        matchResults: isSuccessfulMatch.toString(),
+        matchResultsLink,
         lastCheckedTime: new Date(),
       },
     });

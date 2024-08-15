@@ -11,7 +11,6 @@ import React, { useState } from "react";
 import { Banner } from "../Banner";
 import { ArtworkSnapshot } from "../artwork/ArtworkSnapshot";
 import { Accordion } from "../Accordion";
-import { CandidateJobMatch } from "@/pages/api/jobs/get_candidate_matches";
 
 const Title = classed.span("text-white text-xs font-normal font-inter");
 const Description = classed.h5("text-white/50 font-inter font-normal text-sm");
@@ -66,8 +65,20 @@ const OpportunityCard = ({
   );
 };
 
+export type RecruiterJobMatch = {
+  candidateDisplayName: string;
+  candidateBio?: string;
+  candidateEmail: string;
+  candidateGithubUserId: string;
+  candidateGithubLogin: string;
+  candidateEducation: string;
+  candidateInterests: string[];
+  candidateExperience: number;
+  candidateStage: string[];
+};
+
 type RecruiterMatchViewProps = {
-  matches: CandidateJobMatch[];
+  matches: RecruiterJobMatch[];
 };
 
 export default function RecruiterMatchView({
@@ -171,8 +182,8 @@ export default function RecruiterMatchView({
                     {matches.map((match, index) => (
                       <OpportunityCard
                         key={index}
-                        label={match.candidateData.email}
-                        description={match.candidateData.email}
+                        label={match.candidateEmail}
+                        description={match.candidateEmail}
                         onClick={() => {
                           setShowMatch(true);
                         }}

@@ -47,7 +47,7 @@ export const loadMessages = async ({
   forceRefresh,
   messageRequests,
 }: LoadMessagesRequest): Promise<void> => {
-  const session = getSession() as any; // TODO: Fix this any
+  const session = getSession();
   if (!session || session.authToken.expiresAt < new Date()) {
     console.error("Invalid session while trying to load messages");
     throw new Error("Invalid session while trying to load messages");
