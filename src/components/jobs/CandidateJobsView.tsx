@@ -5,10 +5,14 @@ import { Icons } from "@/components/Icons";
 import { Modal } from "@/components/modals/Modal";
 import { Tabs } from "@/components/Tabs";
 import { FormStepLayout } from "@/layouts/FormStepLayout";
-import { getJobs } from "@/lib/client/localStorage/jobs";
+import { encryptCandidateSharedMessage } from "@/lib/client/jubSignal/candidateShared";
+import { loadMessages } from "@/lib/client/jubSignalClient";
+import { getKeys, getProfile } from "@/lib/client/localStorage";
+import { getJobs, saveJobs } from "@/lib/client/localStorage/jobs";
 import { classed } from "@tw-classed/react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const Title = classed.span("text-white text-xs font-normal font-inter");
 const Description = classed.h5("text-white/50 font-inter font-normal text-sm");
@@ -73,9 +77,81 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
   useEffect(() => {
     const jobs = getJobs();
     const acceptedIds = jobs?.candidateAcceptedMatchIds ?? [];
+    setAcceptedIds(acceptedIds);
   }, []);
 
-  const handleAccept = async (match: CandidateJobMatch) => {};
+  const handleAccept = async (match: CandidateJobMatch) => {
+    console.log("candidate accepting match", match);
+    const jobs = getJobs();
+    const profile = getProfile();
+    const keys = getKeys();
+
+    if (!jobs || !jobs.candidateInput || !profile || !keys) {
+      toast.error("Failed to accept match. Please try again");
+      return;
+    }
+
+    const interests = [];
+    if (jobs.candidateInput.interestZk) {
+      interests.push("zk");
+    }
+    if (jobs.candidateInput.interestDefi) {
+      interests.push("defi");
+    }
+    if (jobs.candidateInput.interestConsumer) {
+      interests.push("consumer");
+    }
+    if (jobs.candidateInput.interestInfra) {
+      interests.push("infra");
+    }
+
+    const stage = [];
+    if (jobs.candidateInput.stageParadigm) {
+      stage.push("paradigm");
+    }
+    if (jobs.candidateInput.stageGrant) {
+      stage.push("grant");
+    }
+    if (jobs.candidateInput.stageSeed) {
+      stage.push("seed");
+    }
+    if (jobs.candidateInput.stageSeriesA) {
+      stage.push("seriesA");
+    }
+
+    const jubSignalMessage = await encryptCandidateSharedMessage({
+      displayName: profile.displayName,
+      encryptionPublicKey: profile.encryptionPublicKey,
+      bio: profile.bio,
+      email: jobs.candidateInput.email,
+      githubUserId: profile.githubUserId,
+      githubLogin: profile.githubLogin,
+      education: jobs.candidateInput.education,
+      interests,
+      experience: jobs.candidateInput.experience,
+      stage,
+      matchId: match.matchId,
+      senderPrivateKey: keys.encryptionPrivateKey,
+      recipientPublicKey: match.recruiterEncPubKey,
+    });
+
+    const newMessages = [
+      {
+        recipientPublicKey: match.recruiterEncPubKey,
+        encryptedMessage: jubSignalMessage,
+      },
+    ];
+    // send jubSignal messages
+    await loadMessages({
+      forceRefresh: false,
+      messageRequests: newMessages,
+    });
+
+    jobs.candidateAcceptedMatchIds = [...acceptedIds, match.matchId];
+    setAcceptedIds(jobs.candidateAcceptedMatchIds);
+    toast.success("You have accepted the match. Your contact will be shared.");
+    saveJobs(jobs);
+  };
 
   return (
     <>
