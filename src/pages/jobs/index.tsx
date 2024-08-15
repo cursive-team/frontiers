@@ -33,7 +33,7 @@ enum JobsDisplayState {
   RECRUITER_MATCHES = "RECRUITER_MATCHES",
 }
 
-const Jobs: React.FC = () => {
+export default function Jobs() {
   const [displayState, setDisplayState] = useState<JobsDisplayState>(
     JobsDisplayState.SELECT_ROLE
   );
@@ -292,6 +292,4 @@ const Jobs: React.FC = () => {
     case JobsDisplayState.RECRUITER_MATCHES:
       return <RecruiterMatchView matches={recruiterMatches} />;
   }
-};
-
-export default Jobs;
+}

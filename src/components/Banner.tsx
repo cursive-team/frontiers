@@ -12,7 +12,7 @@ export const Banner = ({ title, closable = true }: BannerProps) => {
   if (!isVisible) return null;
 
   return (
-    <div className="flex items-center justify-between bg-secondary p-2 text-white">
+    <div className="flex items-center justify-between bg-secondary p-4 gap-1 text-white">
       <span className="text-sm">{title}</span>
       {closable && (
         <button

@@ -6,13 +6,10 @@ import { Input } from "@/components/Input";
 import { InputRange } from "@/components/InputRange";
 import { Radio } from "@/components/Radio";
 import { FormStepLayout } from "@/layouts/FormStepLayout";
-import { getAuthToken } from "@/lib/client/localStorage";
-import { cn } from "@/lib/client/utils";
-import { toggleArrayElement } from "@/lib/shared/utils";
-import { register } from "module";
-import React, { ReactNode, useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Section } from "./Section";
 
 export type JobCandidateInput = {
   education: "high-school" | "bachelor" | "master" | "phd";
@@ -29,42 +26,6 @@ export type JobCandidateInput = {
   partTime: boolean;
   email: string;
 };
-
-interface SectionProps {
-  title?: string;
-  description?: string;
-  children?: ReactNode;
-  active?: boolean; // add background to label
-}
-const Section = ({
-  title,
-  children,
-  active = false,
-  description,
-}: SectionProps) => (
-  <div className="flex flex-col gap-2">
-    <div className="flex flex-col gap-1">
-      {title && (
-        <h3
-          className={cn(
-            "py-2 text-sm leading-6",
-            active
-              ? "bg-gray/20 font-medium text-white px-2"
-              : "font-normal text-white/75"
-          )}
-        >
-          {title}
-        </h3>
-      )}
-      {description && (
-        <span className="font-normal text-sm leading-5 text-white/50">
-          {description}
-        </span>
-      )}
-    </div>
-    <div className="flex flex-col gap-1">{children}</div>
-  </div>
-);
 
 interface CandidatePageProps {
   handleSubmitCandidateInput: (formValues: JobCandidateInput) => Promise<void>;
@@ -116,26 +77,31 @@ export default function CandidatePage({
   };
 
   return (
-    <AppContent className="overflow-hidden">
-      <FormStepLayout
-        childrenClassName="!gap-4"
-        onSubmit={handleSubmit(onSubmitForm)}
-        title="Candidate profile"
-        subtitle={
-          <span className="block pb-4 text-white/50">
-            {`We will show you opportunities that match your preferences and you can choose if you want to match with a recruiter.`}
+    <FormStepLayout
+      childrenClassName="!gap-4"
+      onSubmit={handleSubmit(onSubmitForm)}
+      titleClassName="px-4"
+      title={
+        <h3 className="font-semibold text-white text-[18px] leading-6">
+          Candidate profile
+        </h3>
+      }
+      subtitle={
+        <span className="block pb-4 text-white/50">
+          {`We will show you opportunities that match your preferences and you can choose if you want to match with a recruiter.`}
+        </span>
+      }
+      footer={
+        <div className="flex flex-col gap-4 bg-black px-4">
+          <Button type="submit">Save and continue</Button>
+          <span className="text-center text-secondary text-[12px] font-inter">
+            Review your answers. They cannot be edited later.
           </span>
-        }
-        footer={
-          <div className="flex flex-col gap-2 bg-black">
-            <Button type="submit">Save and continue</Button>
-            <span className="text-center text-secondary text-sm font-inter">
-              Review your answers. They cannot be edited later.
-            </span>
-          </div>
-        }
-      >
-        <Banner title="Your info is encrypted until you share it." />
+        </div>
+      }
+    >
+      <Banner title="Recruiters cannot see your profile until you privately match with them. " />
+      <div className="flex flex-col gap-4 mb-8">
         <Section title="What are your qualifications?" active />
         <Section title="Education">
           <div className="grid grid-cols-2 gap-2">
@@ -174,12 +140,12 @@ export default function CandidatePage({
             />
           </div>
         </Section>
-        <Section title="Experience (in years)">
+        <Section title="Development experience (in years)">
           <InputRange
             // @ts-ignore
             id="experience"
             // @ts-ignore
-            min={0}
+            min={1}
             // @ts-ignore
             value={experience}
             max={8}
@@ -189,7 +155,9 @@ export default function CandidatePage({
             }}
           />
         </Section>
+      </div>
 
+      <div className="flex flex-col gap-4 mb-8">
         <Section title="What opportunities are you seeking?" active />
 
         <Section title="Interests">
@@ -228,19 +196,7 @@ export default function CandidatePage({
             />
           </div>
         </Section>
-        <Section title="Salary (in thousands)">
-          <InputRange
-            id="salary"
-            min={0}
-            max={600}
-            // @ts-ignore
-            value={salary}
-            onChange={(e: any) => {
-              setValue("salary", e?.target?.value);
-            }}
-          />
-        </Section>
-        <Section title="Company stage">
+        <Section title="Project stage">
           <div className="grid grid-cols-2 gap-2">
             <Checkbox
               id="companyStage-1"
@@ -277,8 +233,7 @@ export default function CandidatePage({
             />
           </div>
         </Section>
-
-        <Section title="Commitment" active>
+        <Section title="Commitment">
           <Checkbox
             id="commitment"
             name="commitment"
@@ -289,18 +244,28 @@ export default function CandidatePage({
             }}
           />
         </Section>
+        <Section title="Annual salary minimum (in thousands)">
+          <InputRange
+            id="salary"
+            min={0}
+            max={750}
+            moreMax={true}
+            // @ts-ignore
+            value={salary}
+            onChange={(e: any) => {
+              setValue("salary", e?.target?.value);
+            }}
+          />
+        </Section>
+      </div>
 
-        <Section
-          title="Contact info"
-          description="Choose how you would like to be contacted by recruiters."
-          active
-        />
-
+      <div className="flex flex-col gap-4 mb-8">
+        <Section title="How can recruiters reach you?" active />
         <Section title="Email">
           <Input {...register("email")} border="full" />
         </Section>
-      </FormStepLayout>
-    </AppContent>
+      </div>
+    </FormStepLayout>
   );
 }
 
