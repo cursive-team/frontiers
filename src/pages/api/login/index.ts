@@ -56,8 +56,8 @@ export default async function handler(
     }
     const githubEmail = session.user.email;
     if (user.githubEmail !== githubEmail) {
-      console.log(user.githubEmail, githubEmail);
-      return res.status(401).json({ error: "Unauthorized, wrong email" });
+      console.error(user.githubEmail, githubEmail);
+      return res.status(403).json({ error: "Unauthorized, wrong email" });
     }
 
     // Generate auth token
