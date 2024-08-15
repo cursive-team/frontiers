@@ -67,7 +67,7 @@ const Section = ({
 );
 
 interface CandidatePageProps {
-  handleSubmitCandidateInput: (formValues: JobCandidateInput) => void;
+  handleSubmitCandidateInput: (formValues: JobCandidateInput) => Promise<void>;
 }
 
 export default function CandidatePage({
@@ -112,31 +112,7 @@ export default function CandidatePage({
       return;
     }
 
-    const authToken = getAuthToken();
-    if (!authToken || authToken.expiresAt < new Date()) {
-      toast.error("Please try logging in again.");
-      return;
-    }
-
-    const response = await fetch("/api/jobs/new_candidate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        inputData: JSON.stringify(formValues),
-        authToken: authToken.value,
-      }),
-    });
-
-    if (!response.ok) {
-      toast.error("Failed to submit your candidate profile.");
-      return;
-    }
-
-    toast.success("Your candidate profile has been submitted.");
-    console.log("submitted candidate profile", formValues);
-    handleSubmitCandidateInput(formValues);
+    await handleSubmitCandidateInput(formValues);
   };
 
   return (

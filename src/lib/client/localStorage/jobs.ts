@@ -9,6 +9,7 @@ import { JobRecruiterInput } from "@/components/jobs/RecruiterPage";
 export const JOBS_STORAGE_KEY = "jobs";
 
 export type Jobs = {
+  jobsPrivateKey?: string;
   candidateInput?: JobCandidateInput;
   recruiterInput?: JobRecruiterInput;
 };

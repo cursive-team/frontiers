@@ -7,10 +7,11 @@ import RecruiterMatchView from "@/components/jobs/RecruiterMatchView";
 import RecruiterPage, {
   JobRecruiterInput,
 } from "@/components/jobs/RecruiterPage";
-import { getAuthToken } from "@/lib/client/localStorage";
+import { getAuthToken, getProfile, getUsers } from "@/lib/client/localStorage";
 import { getJobs, saveJobs } from "@/lib/client/localStorage/jobs";
 import React, { useEffect, useState } from "react";
 import { CandidateJobMatch } from "../api/jobs/get_candidate_matches";
+import { toast } from "sonner";
 
 enum JobsDisplayState {
   SELECT_ROLE = "SELECT_ROLE",
@@ -24,6 +25,8 @@ const Jobs: React.FC = () => {
   const [displayState, setDisplayState] = useState<JobsDisplayState>(
     JobsDisplayState.SELECT_ROLE
   );
+  const [publicKeyLink, setPublicKeyLink] = useState<string>();
+  const [privateKey, setPrivateKey] = useState<string>();
   const [pendingMatches, setPendingMatches] = useState<CandidateJobMatch[]>([]);
   const [matches, setMatches] = useState<CandidateJobMatch[]>([]);
 
@@ -67,22 +70,134 @@ const Jobs: React.FC = () => {
     fetchMatches();
   }, []);
 
-  const handleIsCandidate = () => {
+  const generateJobsKeys = async (): Promise<{
+    publicKeyLink: string;
+    privateKey: string;
+  }> => {
+    // TODO: generate a public and private key pair
+    const publicKey = "pub";
+    const privateKey = "priv";
+    // TODO: upload the public key to the server
+    const publicKeyLink = "pubLink";
+    return {
+      publicKeyLink,
+      privateKey,
+    };
+  };
+
+  const handleIsCandidate = async () => {
     setDisplayState(JobsDisplayState.CANDIDATE_FORM);
+    const { publicKeyLink, privateKey } = await generateJobsKeys();
+    setPublicKeyLink(publicKeyLink);
+    setPrivateKey(privateKey);
   };
 
-  const handleIsRecruiter = () => {
+  const handleIsRecruiter = async () => {
     setDisplayState(JobsDisplayState.RECRUITER_FORM);
+    const { publicKeyLink, privateKey } = await generateJobsKeys();
+    setPublicKeyLink(publicKeyLink);
+    setPrivateKey(privateKey);
   };
 
-  const handleSubmitCandidateInput = (candidateInput: JobCandidateInput) => {
-    saveJobs({ candidateInput });
+  const handleSubmitCandidateInput = async (
+    candidateInput: JobCandidateInput
+  ) => {
+    if (!publicKeyLink || !privateKey) {
+      toast.error("Error generating keys");
+      return;
+    }
+
+    const authToken = getAuthToken();
+    if (!authToken || authToken.expiresAt < new Date()) {
+      toast.error("You must be logged in to submit a candidate profile");
+      return;
+    }
+
+    // TODO: upload encrypted candidate input to the server
+    const encryptedCandidateInput = candidateInput;
+    const encryptedCandidateInputLink = candidateInput;
+
+    const response = await fetch("/api/jobs/new_candidate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        authToken: authToken.value,
+        jobsPublicKeyLink: publicKeyLink,
+        jobsEncryptedDataLink: encryptedCandidateInputLink,
+        isCandidate: true,
+      }),
+    });
+
+    if (!response.ok) {
+      toast.error("Error submitting candidate profile");
+      return;
+    }
+
+    // update local storage with user jobs profile
+    // TODO: send jubsignal message to self
+    saveJobs({ jobsPrivateKey: privateKey, candidateInput });
     setDisplayState(JobsDisplayState.CANDIDATE_MATCHES);
+    toast.success("Your candidate profile has been added.");
+    console.log("submitted candidate profile", candidateInput);
   };
 
-  const handleSubmitRecruiterInput = (recruiterInput: JobRecruiterInput) => {
-    saveJobs({ recruiterInput });
+  const handleSubmitRecruiterInput = async (
+    recruiterInput: JobRecruiterInput
+  ) => {
+    if (!publicKeyLink || !privateKey) {
+      toast.error("Error generating keys");
+      return;
+    }
+
+    const authToken = getAuthToken();
+    if (!authToken || authToken.expiresAt < new Date()) {
+      toast.error("You must be logged in to submit a candidate profile");
+      return;
+    }
+
+    const profile = getProfile();
+    if (!profile) {
+      toast.error("Please try logging in again.");
+      return;
+    }
+
+    // TODO: upload encrypted recruiter input to the server
+    const encryptedRecruiterInput = recruiterInput;
+    const encryptedRecruiterInputLink = recruiterInput;
+
+    // send initial list of users to match with
+    const users = getUsers();
+    const userEncPubKeys = Object.values(users)
+      .filter((user) => user.encPk !== profile.encryptionPublicKey)
+      .map((user) => user.encPk);
+
+    const response = await fetch("/api/jobs/new_recruiter", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        authToken: authToken.value,
+        jobsPublicKeyLink: publicKeyLink,
+        jobsEncryptedDataLink: encryptedRecruiterInputLink,
+        isCandidate: false,
+        userEncPubKeys,
+      }),
+    });
+
+    if (!response.ok) {
+      toast.error("Error submitting recruiter profile");
+      return;
+    }
+
+    // update local storage with user jobs profile
+    // TODO: send jubsignal message to self
+    saveJobs({ jobsPrivateKey: privateKey, recruiterInput });
     setDisplayState(JobsDisplayState.RECRUITER_MATCHES);
+    toast.success("Your recruiter profile has been submitted.");
+    console.log("submitted recruiter profile", recruiterInput);
   };
 
   switch (displayState) {

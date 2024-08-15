@@ -67,7 +67,7 @@ export type JobRecruiterInput = {
 };
 
 interface RecruiterPageProps {
-  handleSubmitRecruiterInput: (formValues: JobRecruiterInput) => void;
+  handleSubmitRecruiterInput: (formValues: JobRecruiterInput) => Promise<void>;
 }
 
 export default function RecruiterPage({
@@ -105,43 +105,7 @@ export default function RecruiterPage({
   const partTime = watch("partTime", false);
 
   const onSubmitForm = async (formValues: JobRecruiterInput) => {
-    const authToken = getAuthToken();
-    if (!authToken || authToken.expiresAt < new Date()) {
-      toast.error("Please try logging in again.");
-      return;
-    }
-
-    const profile = getProfile();
-    if (!profile) {
-      toast.error("Please try logging in again.");
-      return;
-    }
-
-    const users = getUsers();
-    const userEncPubKeys = Object.values(users)
-      .filter((user) => user.encPk !== profile.encryptionPublicKey)
-      .map((user) => user.encPk);
-
-    const response = await fetch("/api/jobs/new_recruiter", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        inputData: JSON.stringify(formValues),
-        authToken: authToken.value,
-        userEncPubKeys,
-      }),
-    });
-
-    if (!response.ok) {
-      toast.error("Failed to submit your recruiter profile.");
-      return;
-    }
-
-    toast.success("Your recruiter profile has been submitted.");
-    console.log("submitted recruiter profile", formValues);
-    handleSubmitRecruiterInput(formValues);
+    await handleSubmitRecruiterInput(formValues);
   };
 
   return (
