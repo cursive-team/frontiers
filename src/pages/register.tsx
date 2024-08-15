@@ -473,7 +473,13 @@ export default function Register() {
           <Button
             icon={<Icons.Github className="mr-2" />}
             variant="black"
-            onClick={() => signIn("github")}
+            onClick={() => {
+              if (!chipEnc) {
+                toast.error("Please tap your NFC badge to register!");
+                return;
+              }
+              signIn("github");
+            }}
           >
             {status === "loading" ? "Signing in..." : "Sign In With Github"}
           </Button>
