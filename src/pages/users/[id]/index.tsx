@@ -131,6 +131,38 @@ const UserProfilePage = () => {
     { talkName: string; talkId: string }[]
   >([]);
 
+  const processInitiatePSI = () => {
+    console.log(
+      "Received initiate PSI from ",
+      otherEncPk,
+      psiState,
+      wantsToInitiatePSI,
+      otherUserWantsToInitiatePSI
+    );
+    setPsiState((prevState) => {
+      console.log(
+        "Current psi state when receiving initiatePSI",
+        prevState,
+        wantsToInitiatePSI,
+        otherUserWantsToInitiatePSI
+      );
+      if (wantsToInitiatePSI) {
+        console.log(
+          "Starting psi after other user responded with initiatePSI",
+          otherEncPk
+        );
+        // reset psi initation and start psi
+        setWantsToInitiatePSI(false);
+        setOtherUserWantsToInitiatePSI(false);
+        return PSIState.ROUND1;
+      } else {
+        console.log("Other user wants to initiate psi", otherEncPk);
+        setOtherUserWantsToInitiatePSI(true);
+        return prevState;
+      }
+    });
+  };
+
   // set up channel for PSI
   const setupChannel = () => {
     if (!selfEncPk || !otherEncPk || !channelName) return;
@@ -164,35 +196,7 @@ const UserProfilePage = () => {
       .on("broadcast", { event: "initiatePSI" }, async (event) => {
         // only respond to initiatePSI if it's for this user
         if (event.payload.to !== selfEncPk) return;
-        console.log(
-          "Received initiate PSI from ",
-          otherEncPk,
-          psiState,
-          wantsToInitiatePSI,
-          otherUserWantsToInitiatePSI
-        );
-        setPsiState((prevState) => {
-          console.log(
-            "Current psi state when receiving initiatePSI",
-            prevState,
-            wantsToInitiatePSI,
-            otherUserWantsToInitiatePSI
-          );
-          if (wantsToInitiatePSI) {
-            console.log(
-              "Starting psi after other user responded with initiatePSI",
-              otherEncPk
-            );
-            // reset psi initation and start psi
-            setWantsToInitiatePSI(false);
-            setOtherUserWantsToInitiatePSI(false);
-            return PSIState.ROUND1;
-          } else {
-            console.log("Other user wants to initiate psi", otherEncPk);
-            setOtherUserWantsToInitiatePSI(true);
-            return prevState;
-          }
-        });
+        processInitiatePSI();
       })
       .on("broadcast", { event: "message" }, (event) => {
         setBroadcastEvent(event);
