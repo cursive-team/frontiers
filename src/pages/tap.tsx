@@ -26,6 +26,7 @@ import {
   TapResponseCode,
   tapResponseSchema,
 } from "./api/tap/plain";
+import { getJobs } from "@/lib/client/localStorage/jobs";
 
 export default function Tap() {
   const router = useRouter();
@@ -105,6 +106,24 @@ export default function Tap() {
             },
           ],
         });
+
+        // try to find hiring match if this user is a recruiter
+        const jobs = getJobs();
+        if (jobs && jobs.recruiterInput) {
+          const response = await fetch("/api/jobs/request_match", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              authToken: authToken.value,
+              encryptionPublicKey: person.encryptionPublicKey,
+            }),
+          });
+          if (!response.ok) {
+            console.error("Error requesting hiring match: ", response);
+          }
+        }
       } catch (error) {
         console.error("Error sending message updates to server: ", error);
         toast.error(

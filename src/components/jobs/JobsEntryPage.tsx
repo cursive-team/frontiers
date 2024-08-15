@@ -6,27 +6,60 @@ import React from "react";
 type JobsEntryPageProps = {
   handleIsCandidate: () => void;
   handleIsRecruiter: () => void;
+  candidateLoading: boolean;
+  recruiterLoading: boolean;
 };
 
 export default function JobsEntryPage({
   handleIsCandidate,
   handleIsRecruiter,
+  candidateLoading,
+  recruiterLoading,
 }: JobsEntryPageProps) {
   return (
     <AppContent className="h-full">
       <FormStepLayout
-        title="Private job networking"
+        title={"Private job matching"}
         subtitle={
-          <span className="block pb-4 text-white/50">
-            {`As a job searcher, enter your preferences and store them privately. As a recruiter, enter your requirements and send out a query with MPC to get private matches. Searchers have to mark “interested” in a job opportunity for the recruiter to learn anything.`}
-          </span>
+          <div className="flex flex-col gap-1">
+            <span className="block pb-4 text-white/75">
+              <ul className="list-disc pl-5 space-y-2">
+                <li>
+                  <b>Recruiters</b>: Enter job requirements and privately share
+                  them with folks you meet using MPC.
+                </li>
+                <li>
+                  <b>Candidates</b>: Enter your job preferences and compare them
+                  privately with opportunities to discover matches.{" "}
+                  <i>Recruiters never see a match without your approval.</i>
+                </li>
+              </ul>
+            </span>
+
+            <span className="text-[12px] text-white/50 leading-snug">
+              This is an experimental feature that Cursive is testing at
+              Frontiers. Your data is encrypted using{" "}
+              <a
+                href="https://github.com/gausslabs/phantom-zone"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <u>phantom-zone</u>
+              </a>
+              , a new and unaudited Multi-Party FHE Rust VM.
+            </span>
+          </div>
         }
         className="pt-4 h-full"
         //onSubmit={handleSubmitWithPassword}
         footer={
           <div className="flex flex-col gap-4">
-            <Button variant="black" onClick={handleIsRecruiter}>
-              {`I'm hiring`}
+            <Button
+              variant="black"
+              onClick={handleIsRecruiter}
+              loading={recruiterLoading}
+            >
+              {`Recruiter / hiring for a role`}
             </Button>
 
             <span className="h-6 relative font-normal text-sm text-white font-inter text-center">
@@ -38,7 +71,8 @@ export default function JobsEntryPage({
             <Button
               variant="black"
               onClick={handleIsCandidate}
-            >{`I'm open to opportunities`}</Button>
+              loading={candidateLoading}
+            >{`Candidate / exploring new roles`}</Button>
           </div>
         }
       />
