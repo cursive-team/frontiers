@@ -161,6 +161,26 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
     acceptedIds.includes(match.matchId)
   );
 
+  const getActions = () => {
+    if (!match || acceptedIds.includes(match.matchId)) {
+      return null;
+    } else {
+      return (
+        <div className="flex flex-col gap-2 text-center">
+          <Button
+            className="mt-20"
+            onClick={async () => await handleAccept(match!)}
+          >
+            Share your contact
+          </Button>
+          <span className=" text-secondary text-sm font-inter font-medium">
+            This recruiter will receive your email.
+          </span>
+        </div>
+      );
+    }
+  };
+
   return (
     <>
       <Modal
@@ -168,23 +188,7 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
         setIsOpen={setShowJobDetailModal}
         withBackButton
       >
-        <FormStepLayout
-          className="h-full"
-          actions={
-            <div className="flex flex-col gap-2 text-center">
-              <Button
-                className="mt-20"
-                // TODO: no-op if already accepted
-                onClick={async () => await handleAccept(match!)}
-              >
-                Share your contact
-              </Button>
-              <span className=" text-secondary text-sm font-inter font-medium">
-                This recruiter will receive your email.
-              </span>
-            </div>
-          }
-        >
+        <FormStepLayout className="h-full" actions={getActions()}>
           <div className="flex flex-col gap-4">
             <Card.Base
               className="!border-white/20 !rounded-none bg-cover bg-center bg-no-repeat"
