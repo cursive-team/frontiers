@@ -75,6 +75,7 @@ export type RecruiterJobMatch = {
   candidateInterests: string[];
   candidateExperience: number;
   candidateStage: string[];
+  candidateEncryptionPublicKey: string;
 };
 
 type RecruiterMatchViewProps = {
@@ -85,29 +86,34 @@ export default function RecruiterMatchView({
   matches,
 }: RecruiterMatchViewProps) {
   const [showMatch, setShowMatch] = useState(false);
+  const [match, setMatch] = useState<RecruiterJobMatch | undefined>(undefined);
   const hasOpportunities = true;
   const hasOptedIn = true;
   const isBookmarked = false;
 
-  console.log(matches);
+  // console.log(matches);
 
   return (
     <>
       <Modal
-        isOpen={showMatch}
+        isOpen={showMatch && match !== undefined}
         setIsOpen={setShowMatch}
         withBackButton
-        actions={
-          <button className=" absolute right-6 cursor-pointer">
-            {isBookmarked ? <Icons.BookmarkActive /> : <Icons.Bookmark />}
-          </button>
-        }
+        // actions={
+        //   <button className=" absolute right-6 cursor-pointer">
+        //     {isBookmarked ? <Icons.BookmarkActive /> : <Icons.Bookmark />}
+        //   </button>
+        // }
       >
         <FormStepLayout className="h-full">
           <div className="flex flex-col gap-4">
             <div className="flex gap-4 xs:gap-5 items-center">
               <div className="w-32 h-32 rounded-[4px] relative flex-shrink-0">
-                <ArtworkSnapshot width={128} height={128} pubKey={""} />
+                <ArtworkSnapshot
+                  width={128}
+                  height={128}
+                  pubKey={match!.candidateEncryptionPublicKey}
+                />
                 <button type="button" className="absolute right-1 top-1 z-1">
                   <Icons.Zoom />
                 </button>
@@ -115,14 +121,14 @@ export default function RecruiterMatchView({
 
               <div className="flex flex-col gap-1">
                 <h2 className="text-xl text-white font-semibold font-inter leading-6 tracking-[-0.1px]">
-                  Name
+                  {match!.candidateDisplayName}
                 </h2>
                 <div className="flex items-center gap-1">
                   <span
                     className="text-white/50 text-xs font-inter font-medium mt-1 left-5"
                     style={{ whiteSpace: "pre-wrap" }}
                   >
-                    Bio
+                    {match!.candidateBio}
                   </span>
                 </div>
               </div>
@@ -130,33 +136,45 @@ export default function RecruiterMatchView({
             <Accordion label="Contact">
               <LinkCardBox
                 label="Email"
-                value="example@gmail.com"
+                value={match!.candidateEmail}
               ></LinkCardBox>
             </Accordion>
-            <Accordion label="Dev stats">
+            {/* <Accordion label="Dev stats">
               <LinkCardBox
                 label="Github"
                 value="example@gmail.com"
               ></LinkCardBox>
-            </Accordion>
+            </Accordion> */}
 
             <Accordion label="Qualifications">
               <div className="flex flex-col gap-2">
                 <LinkCardBox
                   label="Education"
-                  value={<span className="text-white">value</span>}
+                  value={
+                    <span className="text-white">
+                      {match!.candidateEducation}
+                    </span>
+                  }
                 />
                 <LinkCardBox
                   label="Interests"
-                  value={<span className="text-white">value</span>}
+                  value={
+                    <span className="text-white">
+                      {match!.candidateInterests.join(",")}
+                    </span>
+                  }
                 />
-                <LinkCardBox
+                {/* <LinkCardBox
                   label="Desired title "
                   value={<span className="text-white">value</span>}
-                />
+                /> */}
                 <LinkCardBox
                   label="Preferred stage "
-                  value={<span className="text-white">value</span>}
+                  value={
+                    <span className="text-white">
+                      {match!.candidateStage.join(",")}
+                    </span>
+                  }
                 />
               </div>
             </Accordion>
@@ -169,7 +187,7 @@ export default function RecruiterMatchView({
             label: "Respondents",
             children: (
               <div className="flex flex-col h-full">
-                {!hasOpportunities ? (
+                {matches.length === 0 ? (
                   <span className="mt-20 text-white/50 text-xs text-center">
                     No opportunities yet.{" "}
                   </span>
@@ -182,14 +200,15 @@ export default function RecruiterMatchView({
                     {matches.map((match, index) => (
                       <OpportunityCard
                         key={index}
-                        label={match.candidateEmail}
+                        label={match.candidateDisplayName}
                         description={match.candidateEmail}
                         onClick={() => {
                           setShowMatch(true);
+                          setMatch(match);
                         }}
                       />
                     ))}
-                    <OpportunityCard
+                    {/* <OpportunityCard
                       label="Tom Smith"
                       description="tomsmith@gmail.com"
                       onClick={() => {
@@ -202,34 +221,34 @@ export default function RecruiterMatchView({
                       onClick={() => {
                         setShowMatch(true);
                       }}
-                    />
+                    /> */}
                   </div>
                 )}
               </div>
             ),
           },
-          {
-            label: "Bookmarked",
-            children: (
-              <div className="flex flex-col h-full">
-                {!hasOptedIn ? (
-                  <span className="mt-20 text-white/50 text-xs text-center">
-                    No bookmarked yet.{" "}
-                  </span>
-                ) : (
-                  <div className="flex flex-col w-full">
-                    <OpportunityCard
-                      label="bookmark 1"
-                      description="example"
-                      onClick={() => {
-                        setShowMatch(true);
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-            ),
-          },
+          // {
+          //   label: "Bookmarked",
+          //   children: (
+          //     <div className="flex flex-col h-full">
+          //       {!hasOptedIn ? (
+          //         <span className="mt-20 text-white/50 text-xs text-center">
+          //           No bookmarked yet.{" "}
+          //         </span>
+          //       ) : (
+          //         <div className="flex flex-col w-full">
+          //           <OpportunityCard
+          //             label="bookmark 1"
+          //             description="example"
+          //             onClick={() => {
+          //               setShowMatch(true);
+          //             }}
+          //           />
+          //         </div>
+          //       )}
+          //     </div>
+          //   ),
+          // },
         ]}
       ></Tabs>
     </>

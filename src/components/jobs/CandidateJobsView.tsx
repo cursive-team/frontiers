@@ -5,9 +5,10 @@ import { Icons } from "@/components/Icons";
 import { Modal } from "@/components/modals/Modal";
 import { Tabs } from "@/components/Tabs";
 import { FormStepLayout } from "@/layouts/FormStepLayout";
+import { getJobs } from "@/lib/client/localStorage/jobs";
 import { classed } from "@tw-classed/react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Title = classed.span("text-white text-xs font-normal font-inter");
 const Description = classed.h5("text-white/50 font-inter font-normal text-sm");
@@ -63,15 +64,23 @@ type CandidateJobsViewProps = {
 };
 export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
   const [showJobDetailModal, setShowJobDetailModal] = useState(false);
+  const [match, setMatch] = useState<CandidateJobMatch | undefined>(undefined);
+  const [acceptedIds, setAcceptedIds] = useState<number[]>([]);
+
   const hasOpportunities = true;
   const hasOptedIn = true;
 
-  console.log(matches);
+  useEffect(() => {
+    const jobs = getJobs();
+    const acceptedIds = jobs?.candidateAcceptedMatchIds ?? [];
+  }, []);
+
+  const handleAccept = async (match: CandidateJobMatch) => {};
 
   return (
     <>
       <Modal
-        isOpen={showJobDetailModal}
+        isOpen={showJobDetailModal && match !== undefined}
         setIsOpen={setShowJobDetailModal}
         withBackButton
       >
@@ -79,9 +88,14 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
           className="h-full"
           actions={
             <div className="flex flex-col gap-2 text-center">
-              <Button className="mt-20">Share your contact</Button>
+              <Button
+                className="mt-20"
+                onClick={async () => await handleAccept(match!)}
+              >
+                Share your contact
+              </Button>
               <span className=" text-secondary text-sm font-inter font-medium">
-                This recruiter will receive your Telegram handle.
+                This recruiter will receive your email.
               </span>
             </div>
           }
@@ -95,15 +109,19 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
             >
               <div className="flex flex-col py-4 px-3 min-h-[180px]">
                 <h5 className="mt-auto text-white font-inter font-semibold text-xl leading-6">
-                  Opportunity title
+                  {match!.role}
                 </h5>
               </div>
             </Card.Base>
-            <div className="flex flex-col gap-1">
+            {/* <div className="flex flex-col gap-1">
               <Title>Level</Title>
               <Description>level</Description>
+            </div> */}
+            <div className="flex flex-col gap-1">
+              <Title>Recruiter</Title>
+              <Description>{match!.recruiterDisplayName}</Description>
             </div>
-            <Link href={"#"} target="_blank">
+            <Link href={match!.jobLink} target="_blank">
               <LinkCard className="flex w-full items-center justify-between">
                 <span className="text-white font-medium font-inter text-xs">
                   Job description
@@ -120,23 +138,27 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
             label: "Opportunities",
             children: (
               <div className="flex flex-col h-full">
-                {!hasOpportunities ? (
+                {matches.filter((match) => !acceptedIds.includes(match.matchId))
+                  .length === 0 ? (
                   <span className="mt-20 text-white/50 text-xs text-center">
                     No opportunities yet.{" "}
                   </span>
                 ) : (
                   <div className="flex flex-col w-full">
-                    {matches.map((match, index) => (
-                      <OpportunityCard
-                        key={index}
-                        label={match.role}
-                        description={match.project}
-                        onClick={() => {
-                          setShowJobDetailModal(true);
-                        }}
-                      />
-                    ))}
-                    <OpportunityCard
+                    {matches
+                      .filter((match) => !acceptedIds.includes(match.matchId))
+                      .map((match, index) => (
+                        <OpportunityCard
+                          key={index}
+                          label={match.role}
+                          description={match.project}
+                          onClick={() => {
+                            setShowJobDetailModal(true);
+                            setMatch(match);
+                          }}
+                        />
+                      ))}
+                    {/* <OpportunityCard
                       label="Software Engineer"
                       description="Reth"
                       onClick={() => {
@@ -149,7 +171,7 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
                       onClick={() => {
                         setShowJobDetailModal(true);
                       }}
-                    />
+                    /> */}
                   </div>
                 )}
               </div>
@@ -159,19 +181,26 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
             label: "You opted-in",
             children: (
               <div className="flex flex-col h-full">
-                {!hasOptedIn ? (
+                {matches.filter((match) => acceptedIds.includes(match.matchId))
+                  .length === 0 ? (
                   <span className="mt-20 text-white/50 text-xs text-center">
                     No opted-in yet.{" "}
                   </span>
                 ) : (
                   <div className="flex flex-col w-full">
-                    <OpportunityCard
-                      label="opportunity opted 1"
-                      description="example"
-                      onClick={() => {
-                        setShowJobDetailModal(true);
-                      }}
-                    />
+                    {matches
+                      .filter((match) => acceptedIds.includes(match.matchId))
+                      .map((match, index) => (
+                        <OpportunityCard
+                          key={index}
+                          label={match.role}
+                          description={match.project}
+                          onClick={() => {
+                            setShowJobDetailModal(true);
+                            setMatch(match);
+                          }}
+                        />
+                      ))}
                   </div>
                 )}
               </div>
