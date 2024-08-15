@@ -24,7 +24,7 @@ export default function JobsEntryPage({
         className="pt-4 h-full"
         //onSubmit={handleSubmitWithPassword}
         footer={
-          <div className="flex flex-col gap-4 px-4">
+          <div className="flex flex-col gap-4">
             <Button variant="black" onClick={handleIsRecruiter}>
               {`I'm hiring`}
             </Button>

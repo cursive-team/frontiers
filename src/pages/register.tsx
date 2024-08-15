@@ -37,6 +37,7 @@ import { AppHeaderLogo } from "@/components/AppHeader";
 import { Icon } from "@mui/material";
 import { Icons } from "@/components/Icons";
 import { AppLink } from "@/components/AppLink";
+import { AppContent } from "@/components/AppContent";
 
 enum DisplayState {
   GITHUB,
@@ -464,8 +465,8 @@ export default function Register() {
       <div className="grid grid-rows-[1fr_auto] h-full">
         <div className="flex flex-col  justify-center">
           <span className="text-center text-base leading-6 text-white/75 font-inter px-10">
-            This app will allow you to share and collect encrypted data with
-            other event attendees.
+            Tap NFC badges to share socials, make ZK proofs about your Frontiers
+            experience, and privately match on job opportunities using MPC.
           </span>
         </div>
         <div className="flex flex-col gap-4 mt-auto pb-4">
@@ -569,13 +570,13 @@ export default function Register() {
     ),
     [DisplayState.PASSKEY]: (
       <FormStepLayout
-        description="How do you want to save your information?"
+        description="You can choose to backup your information with a password or a passkey, which will generate an encryption key for your data."
         className="pt-4"
         onSubmit={handleSubmitWithPasskey}
         footer={
           <div className="flex flex-col gap-4">
             <Button variant="black" onClick={handleCreateWithPassword}>
-              Set a password
+              Backup with password
             </Button>
             <span className="h-6 relative font-normal text-sm text-white font-inter text-center">
               <div className="after:content-[''] after:top-[12px] after:absolute after:h-[1px] after:bg-white/40 after:w-full after:left-0"></div>
@@ -584,7 +585,7 @@ export default function Register() {
               </div>
             </span>
             <Button variant="black" type="submit" loading={loading}>
-              Register with passkey
+              Backup with passkey
             </Button>
           </div>
         }
@@ -608,7 +609,7 @@ export default function Register() {
               className="text-center text-white/50 text-sm"
               onClick={handleCreateWithPasskey}
             >
-              <u>Register with passkey instead</u>
+              <u>Backup with passkey instead</u>
             </span>
           </div>
         }
@@ -645,7 +646,7 @@ export default function Register() {
           <div className="flex flex-col gap-2 m-4">
             <Description>
               <span>
-                Tap other people{"'"}s NFC rings to connect and{" "}
+                Tap other people{"'"}s NFC badges to connect and{" "}
                 <Underline>receive socials</Underline>.
               </span>
             </Description>
@@ -684,7 +685,8 @@ export default function Register() {
   return (
     <div className="flex flex-col grow pb-4">
       <AppHeaderLogo className="mx-auto py-5" />
-      <div className="flex flex-col h-full">
+
+      <AppContent className="flex flex-col h-full">
         {StateContent?.[displayState]}
         <span className="text-xs text-white/50 text-center mt-auto font-inter ">
           App built by{" "}
@@ -696,7 +698,7 @@ export default function Register() {
           </AppLink>{" "}
           for Paradigm Frontiers.
         </span>
-      </div>
+      </AppContent>
     </div>
   );
 }

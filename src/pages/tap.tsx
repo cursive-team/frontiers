@@ -225,7 +225,7 @@ export default function Tap() {
 
     // ----- HANDLE CMAC TAP -----
 
-    if (!location.hash) {
+    if (!window.location.search) {
       toast.error("Invalid tap! Please try again.");
       router.push("/");
       return;
@@ -233,7 +233,7 @@ export default function Tap() {
 
     logClientEvent("tapProcessNewTap", {});
 
-    const urlParams = new URLSearchParams(location.hash.slice(1));
+    const urlParams = new URLSearchParams(window.location.search);
     const chipEnc = urlParams.get("e");
 
     if (!chipEnc) {
@@ -253,6 +253,7 @@ export default function Tap() {
         return response.json();
       })
       .then(async (data) => {
+        console.log("TAP RESPONSE", data);
         const tapResponse = tapResponseSchema.validateSync(data);
         switch (tapResponse.code) {
           case TapResponseCode.CMAC_INVALID:
@@ -287,7 +288,11 @@ export default function Tap() {
       })
       .catch((error) => {
         console.error(error);
-        toast.error("Error! Please contact a member of the Cursive team.");
+        toast.error(
+          `Error! ${
+            error.message || "Please contact a member of Cursive team."
+          }`
+        );
         router.push("/");
       });
   }, [router, processPersonTap, processLocationTap]);

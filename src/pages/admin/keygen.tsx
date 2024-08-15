@@ -43,7 +43,7 @@ export default function AdminKeygen() {
 
   return (
     <FormStepLayout
-      className="pt-4"
+      className="pt-4 px-4"
       title="Generate keys"
       onSubmit={handleKeygen}
     >

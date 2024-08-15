@@ -1,5 +1,5 @@
 export const APP_CONFIG = {
-  APP_NAME: "Backpocket Alpha",
+  APP_NAME: "Frontiers x Cursive",
   SUPPORT_EMAIL: "hello@cursive.team",
 };
 

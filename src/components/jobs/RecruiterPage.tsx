@@ -323,3 +323,7 @@ export default function RecruiterPage({
     </AppContent>
   );
 }
+
+RecruiterPage.getInitialProps = () => {
+  return { showHeader: false, showFooter: false };
+};
