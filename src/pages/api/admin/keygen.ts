@@ -1,9 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/server/prisma";
 import { generateSignatureKeyPair } from "@/lib/shared/signature";
-import { initialLocationData } from "@/shared/keygen";
+import { initialLocationData, userUids, speakerUids } from "@/shared/keygen";
 import { getServerRandomNullifierRandomness } from "@/lib/server/proving";
-import { cardUids } from "@/shared/logs";
 
 type CreateChipKeyData = {
   chipId: string;
@@ -66,14 +65,13 @@ export default async function handler(
     const allUserData: PrecreateUserData[] = [];
     const allLocationData: CreateLocationData[] = [];
 
-    const newKeyUids = [...cardUids];
+    const newKeyUids = [...userUids];
     for (let i = 1; i <= 50; i++) {
       newKeyUids.push("CURSIVE" + i.toString().padStart(2, "0"));
     }
 
-    for (let index = 0; index < newKeyUids.length; index++) {
-      const chipId = newKeyUids[index];
-
+    let userIndex = 1;
+    for (const chipId in newKeyUids) {
       // Generate and save signing keypair
       const { signingKey, verifyingKey } = generateSignatureKeyPair();
       allChipKeyData.push({
@@ -85,7 +83,7 @@ export default async function handler(
       allUserData.push({
         chipId,
         isRegistered: false,
-        isUserSpeaker: index % 10 === 0,
+        isUserSpeaker: false,
         displayName: chipId,
         encryptionPublicKey: "",
         signaturePublicKey: verifyingKey,
@@ -97,10 +95,37 @@ export default async function handler(
         githubLogin: "",
       });
 
-      if (index % 10 === 0) {
-        speakerUserIds.push(index + 1);
-      }
-      allUserIds.push(index + 1);
+      allUserIds.push(userIndex);
+      userIndex++;
+    }
+
+    for (const chipId in speakerUids) {
+      // Generate and save signing keypair
+      const { signingKey, verifyingKey } = generateSignatureKeyPair();
+      allChipKeyData.push({
+        chipId,
+        signaturePublicKey: verifyingKey,
+        signaturePrivateKey: signingKey,
+      });
+
+      allUserData.push({
+        chipId,
+        isRegistered: false,
+        isUserSpeaker: true,
+        displayName: chipId,
+        encryptionPublicKey: "",
+        signaturePublicKey: verifyingKey,
+        psiPublicKeysLink: "",
+        githubName: "",
+        githubEmail: "",
+        githubImage: "",
+        githubUserId: "",
+        githubLogin: "",
+      });
+
+      allUserIds.push(userIndex);
+      speakerUserIds.push(userIndex);
+      userIndex++;
     }
 
     // create all locations
