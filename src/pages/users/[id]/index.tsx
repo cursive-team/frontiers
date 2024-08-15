@@ -33,6 +33,7 @@ import { logClientEvent } from "@/lib/client/metrics";
 import { useSession } from "next-auth/react";
 import { Icon } from "@mui/material";
 import { AppContent } from "@/components/AppContent";
+import { Spinner } from "@/components/Spinner";
 
 const Label = classed.span("text-sm text-gray-12");
 
@@ -634,14 +635,6 @@ const UserProfilePage = () => {
           </div>
         )}
 
-        {user?.isSpeaker && (
-          <div className="flex flex-col p-3 bg-secondary rounded">
-            <span className="font-inter text-sm font-semibold leading-6 text-white">
-              Workshop Speaker
-            </span>
-          </div>
-        )}
-
         {user?.note && (
           <Accordion label="Notes">
             <span className="text-white/50 text-[14px] mt-1 left-5">
@@ -687,7 +680,7 @@ const UserProfilePage = () => {
               {userTalkInfo.map((talkInfo, index) => (
                 <span
                   key={index}
-                  className="text-white text-[14px] mt-1 left-5"
+                  className="text-primary text-[14px] mt-1 left-5"
                 >
                   <Link href={"/talks/" + talkInfo.talkId}>
                     {talkInfo.talkName}
@@ -698,7 +691,11 @@ const UserProfilePage = () => {
           </Accordion>
         )}
 
-        {githubInfoLoading && !userGithubInfo && <Accordion label="Github" />}
+        {githubInfoLoading && !userGithubInfo && (
+          <Accordion label="Github">
+            <Spinner />
+          </Accordion>
+        )}
 
         {userGithubInfo && (
           <Accordion label="Github">

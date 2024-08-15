@@ -469,7 +469,7 @@ export default function Register() {
             experience, and privately match on job opportunities using MPC.
           </span>
         </div>
-        <div className="flex flex-col gap-4 mt-auto pb-4">
+        <div className="flex flex-col gap-2 mt-auto pb-4">
           <Button
             icon={<Icons.Github className="mr-2" />}
             variant="black"
@@ -477,6 +477,14 @@ export default function Register() {
           >
             {status === "loading" ? "Signing in..." : "Sign In With Github"}
           </Button>
+          <div className="text-center">
+            <span
+              className="text-center text-white/50 text-sm"
+              onClick={() => router.push("/login")}
+            >
+              <u>Already have account</u>
+            </span>
+          </div>
         </div>
       </div>
     ),
@@ -646,7 +654,7 @@ export default function Register() {
           <div className="flex flex-col gap-2 m-4">
             <Description>
               <span>
-                Tap other people{"'"}s NFC badges to connect and{" "}
+                Tap attendee NFC badges to connect and{" "}
                 <Underline>receive socials</Underline>.
               </span>
             </Description>
@@ -665,8 +673,8 @@ export default function Register() {
             <Description>
               <span>
                 {" "}
-                Use MPC to <Underline> discover common contacts</Underline> and
-                to <Underline>query your social graph.</Underline>
+                Use MPC to <Underline> discover commonalities</Underline> and to{" "}
+                <Underline>privately match with job opportunities.</Underline>
               </span>
             </Description>
           </div>
