@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   fetchUserByUUID,
   getKeys,
@@ -131,7 +131,7 @@ const UserProfilePage = () => {
     { talkName: string; talkId: string }[]
   >([]);
 
-  const processInitiatePSI = () => {
+  const processInitiatePSI = useCallback(() => {
     console.log(
       "Received initiate PSI from ",
       otherEncPk,
@@ -151,7 +151,7 @@ const UserProfilePage = () => {
           "Starting psi after other user responded with initiatePSI",
           otherEncPk
         );
-        // reset psi initation and start psi
+        // reset psi initiation and start psi
         setWantsToInitiatePSI(false);
         setOtherUserWantsToInitiatePSI(false);
         return PSIState.ROUND1;
@@ -161,7 +161,7 @@ const UserProfilePage = () => {
         return prevState;
       }
     });
-  };
+  }, [wantsToInitiatePSI, otherUserWantsToInitiatePSI, psiState, otherEncPk]);
 
   // set up channel for PSI
   const setupChannel = () => {
