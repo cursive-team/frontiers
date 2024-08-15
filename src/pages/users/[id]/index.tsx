@@ -131,37 +131,14 @@ const UserProfilePage = () => {
     { talkName: string; talkId: string }[]
   >([]);
 
-  const processInitiatePSI = useCallback(() => {
-    console.log(
-      "Received initiate PSI from ",
-      otherEncPk,
-      psiState,
-      wantsToInitiatePSI,
-      otherUserWantsToInitiatePSI
-    );
-    setPsiState((prevState) => {
-      console.log(
-        "Current psi state when receiving initiatePSI",
-        prevState,
-        wantsToInitiatePSI,
-        otherUserWantsToInitiatePSI
-      );
-      if (wantsToInitiatePSI) {
-        console.log(
-          "Starting psi after other user responded with initiatePSI",
-          otherEncPk
-        );
-        // reset psi initiation and start psi
-        setWantsToInitiatePSI(false);
-        setOtherUserWantsToInitiatePSI(false);
-        return PSIState.ROUND1;
-      } else {
-        console.log("Other user wants to initiate psi", otherEncPk);
-        setOtherUserWantsToInitiatePSI(true);
-        return prevState;
-      }
-    });
-  }, [wantsToInitiatePSI, otherUserWantsToInitiatePSI, psiState, otherEncPk]);
+  useEffect(() => {
+    if (wantsToInitiatePSI && otherUserWantsToInitiatePSI) {
+      setWantsToInitiatePSI(false);
+      setOtherUserWantsToInitiatePSI(false);
+      setPsiState(PSIState.ROUND1);
+      console.log("Both users want to initiate psi, starting psi...");
+    }
+  }, [wantsToInitiatePSI, otherUserWantsToInitiatePSI]);
 
   // set up channel for PSI
   const setupChannel = () => {
@@ -196,7 +173,8 @@ const UserProfilePage = () => {
       .on("broadcast", { event: "initiatePSI" }, async (event) => {
         // only respond to initiatePSI if it's for this user
         if (event.payload.to !== selfEncPk) return;
-        processInitiatePSI();
+        console.log("Other user wants to initiate psi", otherEncPk);
+        setOtherUserWantsToInitiatePSI(true);
       })
       .on("broadcast", { event: "message" }, (event) => {
         setBroadcastEvent(event);
@@ -753,14 +731,6 @@ const UserProfilePage = () => {
             </div>
           </Accordion>
         )}
-
-        <Button
-          onClick={() =>
-            console.log(wantsToInitiatePSI, otherUserWantsToInitiatePSI)
-          }
-        >
-          Log PSI state
-        </Button>
 
         {userGithubInfo && (
           <Accordion className="flex flex-col gap-2" label="Dev stats">
