@@ -5,10 +5,11 @@ import { cn } from "@/lib/client/utils";
 
 interface AccordionProps {
   label: string;
+  className?: string;
   children?: ReactNode;
 }
 
-const Accordion = ({ label, children }: AccordionProps) => {
+const Accordion = ({ label, children, className = "" }: AccordionProps) => {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -42,7 +43,12 @@ const Accordion = ({ label, children }: AccordionProps) => {
               : "grid-rows-[0fr] opacity-0"
           )}
         >
-          <p className="block overflow-hidden pt-4 text-primary text-sm leading-5 font-inter font-normal">
+          <p
+            className={cn(
+              "block overflow-hidden pt-4 text-primary text-sm leading-5 font-inter font-normal",
+              className
+            )}
+          >
             {children}
           </p>
         </div>

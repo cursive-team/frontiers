@@ -35,6 +35,7 @@ import { Icon } from "@mui/material";
 import { AppContent } from "@/components/AppContent";
 import { Spinner } from "@/components/Spinner";
 import githubData from "@/lib/client/github.json";
+import { Stats } from "@/components/Stats";
 
 const Label = classed.span("text-sm text-gray-12");
 
@@ -619,23 +620,33 @@ const UserProfilePage = () => {
           </Accordion>
         )}
 
-        {githubInfoLoading && !userGithubInfo && (
-          <Accordion label="Github">
-            <Spinner />
-          </Accordion>
-        )}
-
         {userGithubInfo && (
-          <Accordion label="Github">
+          <Accordion className="flex flex-col gap-2" label="Dev stats">
+            <LinkCard
+              label="Github"
+              value={user.ghLogin}
+              href={"https://github.com/" + user.ghLogin}
+            ></LinkCard>
             <div className="flex flex-col gap-1">
               {userGithubInfo.map((repo, index) => (
-                <span
+                <Stats
                   key={index}
-                  className="text-white/50 text-[14px] mt-1 left-5"
-                >
-                  {repo.repo}: {repo.total} commits, first commit on{" "}
-                  {repo.first.toDateString()}, rank {repo.rank}
-                </span>
+                  title={repo.repo}
+                  items={[
+                    {
+                      label: "1st commit",
+                      value: repo.first.toDateString(),
+                    },
+                    {
+                      label: "Total",
+                      value: repo.total.toString(),
+                    },
+                    {
+                      label: "Rank",
+                      value: repo.rank.toString(),
+                    },
+                  ]}
+                />
               ))}
             </div>
           </Accordion>
