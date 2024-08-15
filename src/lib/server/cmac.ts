@@ -12,17 +12,20 @@ export const verifyCmac = async (
 
   // Fetch validation from the API
   try {
+    const params = new URLSearchParams({ e: hexData });
     const response = await fetch(
-      `https://791a-2601-281-8400-15-51e6-e9f5-e153-23a3.ngrok-free.app/api/validate?e=${hexData}`,
+      `http://ec2-54-176-6-140.us-west-1.compute.amazonaws.com:9091/api/validate?${params}`,
       {
         method: "GET",
         headers: {
           Authorization:
-            "Bearer 5d5a7266cf9bbb993317c860693fa4e43bfd71e17ae5513d46eeadb0444a1113",
+            "Bearer 2162b3965f92e6e6a7b91f10ddf4db9160559f1d473aaf2d8ab11c2e3f7f59fa",
         },
       }
     );
     const data = await response.json();
+
+    console.log(data);
 
     if (data.valid === true) {
       return data.tag.uid.toString();

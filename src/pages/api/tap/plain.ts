@@ -143,6 +143,7 @@ export default async function handler(
 
   // verify encryption
   const chipId = await verifyCmac(chipEnc);
+  console.log("CONSOLE LOG", chipId);
   if (!chipId) {
     return res.status(400).json({ error: "Invalid chipEnc provided" });
   }
@@ -171,7 +172,7 @@ export default async function handler(
     if (!user.isRegistered) {
       return res
         .status(200)
-        .json({ code: TapResponseCode.PERSON_NOT_REGISTERED });
+        .json({ code: TapResponseCode.PERSON_NOT_REGISTERED, uid: chipId });
     }
 
     // Get signature from chip

@@ -343,20 +343,18 @@ export default function Login() {
   return (
     <div className="flex flex-col grow pb-4">
       <AppHeaderLogo className="mx-auto py-5" />
-      <AppContent>
-        <div className="flex flex-col h-full">
-          {LoginStateContentMapping?.[displayState]}
-          <span className="text-xs text-white/50 text-center mt-auto font-inter ">
-            App built by{" "}
-            <AppLink
-              href="https://cursive.team/"
-              className="text-primary underline"
-            >
-              Cursive
-            </AppLink>{" "}
-            for Paradigm Frontiers.
-          </span>
-        </div>
+      <AppContent className="flex flex-col h-full">
+        {LoginStateContentMapping?.[displayState]}
+        <span className="text-xs text-white/50 text-center mt-auto font-inter ">
+          App built by{" "}
+          <AppLink
+            href="https://cursive.team/"
+            className="text-primary underline"
+          >
+            Cursive
+          </AppLink>{" "}
+          for Paradigm Frontiers.
+        </span>
       </AppContent>
     </div>
   );
