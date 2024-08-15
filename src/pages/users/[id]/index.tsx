@@ -162,17 +162,21 @@ const UserProfilePage = () => {
         }
       })
       .on("broadcast", { event: "initiatePSI" }, async (event) => {
-        console.log("Received initiate PSI from ", otherEncPk, psiState);
-        const newWantsToInitiatePSI = wantsToInitiatePSI;
-        const newOtherUserWantsToInitiatePSI = otherUserWantsToInitiatePSI;
+        console.log(
+          "Received initiate PSI from ",
+          otherEncPk,
+          psiState,
+          wantsToInitiatePSI,
+          otherUserWantsToInitiatePSI
+        );
         setPsiState((prevState) => {
           console.log(
             "Current psi state when receiving initiatePSI",
             prevState,
-            newWantsToInitiatePSI,
-            newOtherUserWantsToInitiatePSI
+            wantsToInitiatePSI,
+            otherUserWantsToInitiatePSI
           );
-          if (newWantsToInitiatePSI) {
+          if (wantsToInitiatePSI) {
             console.log(
               "Starting psi after other user responded with initiatePSI",
               otherEncPk
@@ -599,6 +603,7 @@ const UserProfilePage = () => {
       setOtherUserWantsToInitiatePSI(false);
       setPsiState(PSIState.ROUND1);
     } else {
+      console.log("Setting wants to initiate PSI after update", otherEncPk);
       setWantsToInitiatePSI(true);
       setPsiState(PSIState.NOT_STARTED);
     }
@@ -738,6 +743,14 @@ const UserProfilePage = () => {
             </div>
           </Accordion>
         )}
+
+        <Button
+          onClick={() =>
+            console.log(wantsToInitiatePSI, otherUserWantsToInitiatePSI)
+          }
+        >
+          Log PSI state
+        </Button>
 
         {userGithubInfo && (
           <Accordion className="flex flex-col gap-2" label="Dev stats">
