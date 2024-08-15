@@ -12,6 +12,7 @@ import { Banner } from "../Banner";
 import { ArtworkSnapshot } from "../artwork/ArtworkSnapshot";
 import { Accordion } from "../Accordion";
 import { CandidateJobMatch } from "@/pages/api/jobs/get_candidate_matches";
+import { Stats } from "../Stats";
 
 const Title = classed.span("text-white text-xs font-normal font-inter");
 const Description = classed.h5("text-white/50 font-inter font-normal text-sm");
@@ -78,8 +79,6 @@ export default function RecruiterMatchView({
   const hasOptedIn = true;
   const isBookmarked = false;
 
-  console.log(matches);
-
   return (
     <>
       <Modal
@@ -122,11 +121,45 @@ export default function RecruiterMatchView({
                 value="example@gmail.com"
               ></LinkCardBox>
             </Accordion>
-            <Accordion label="Dev stats">
+            <Accordion className="flex flex-col gap-2" label="Dev stats">
               <LinkCardBox
                 label="Github"
                 value="example@gmail.com"
               ></LinkCardBox>
+              <Stats
+                title="Foundry"
+                items={[
+                  {
+                    label: "1st commit",
+                    value: "2024",
+                  },
+                  {
+                    label: "Total",
+                    value: "22",
+                  },
+                  {
+                    label: "Rank",
+                    value: "1",
+                  },
+                ]}
+              />
+              <Stats
+                title="Rust"
+                items={[
+                  {
+                    label: "1st commit",
+                    value: "2024",
+                  },
+                  {
+                    label: "Total",
+                    value: "22",
+                  },
+                  {
+                    label: "Rank",
+                    value: "1",
+                  },
+                ]}
+              />
             </Accordion>
 
             <Accordion label="Qualifications">
@@ -155,7 +188,7 @@ export default function RecruiterMatchView({
       <Tabs
         items={[
           {
-            label: "Respondents",
+            label: <span className="px-2">Respondents</span>,
             children: (
               <div className="flex flex-col h-full">
                 {!hasOpportunities ? (

@@ -1,9 +1,10 @@
 import { Tab } from "@headlessui/react";
 import { classed } from "@tw-classed/react";
 import { AppContent } from "./AppContent";
+import { ReactNode } from "react";
 
 interface TabProps {
-  label: string;
+  label: ReactNode;
   badge?: boolean;
   children: React.ReactNode;
 }

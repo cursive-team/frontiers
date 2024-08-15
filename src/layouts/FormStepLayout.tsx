@@ -69,7 +69,7 @@ const FormStepLayout = ({
       {(children || footer) && (
         <div
           className={cn(
-            "flex flex-col gap-6 w-full h-full mb-4",
+            "flex flex-col gap-6 w-full h-full mb-4 px-1",
             childrenClassName
           )}
         >
@@ -78,7 +78,7 @@ const FormStepLayout = ({
         </div>
       )}
       {actions && (
-        <div className="sticky bottom-0 right-0 left-0 mt-4">
+        <div className="sticky bottom-0 right-0 left-0 mt-4 bg-[#000] ">
           <div className="pb-6 pt-2">{actions}</div>
         </div>
       )}
