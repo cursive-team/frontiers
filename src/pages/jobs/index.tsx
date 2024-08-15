@@ -320,14 +320,14 @@ export default function Jobs() {
       return (
         <CandidatePage
           handleSubmitCandidateInput={handleSubmitCandidateInput}
-          loading={candidateSubmitLoading}
+          submitLoading={candidateSubmitLoading}
         />
       );
     case JobsDisplayState.RECRUITER_FORM:
       return (
         <RecruiterPage
           handleSubmitRecruiterInput={handleSubmitRecruiterInput}
-          loading={recruiterSubmitLoading}
+          submitLoading={recruiterSubmitLoading}
         />
       );
     case JobsDisplayState.CANDIDATE_MATCHES:
