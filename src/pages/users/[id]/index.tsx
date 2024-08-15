@@ -34,6 +34,7 @@ import { useSession } from "next-auth/react";
 import { Icon } from "@mui/material";
 import { AppContent } from "@/components/AppContent";
 import { Spinner } from "@/components/Spinner";
+import githubData from "@/lib/client/github.json";
 
 const Label = classed.span("text-sm text-gray-12");
 
@@ -78,16 +79,10 @@ const PSIStateMapping: Record<PSIState, string> = {
 };
 
 type RepoContributionData = {
+  repo: string;
   first: Date;
   total: number;
   rank: number;
-};
-
-type UserGithubInfo = {
-  foundry?: RepoContributionData;
-  reth?: RepoContributionData;
-  cursiveZkSummit?: RepoContributionData;
-  cursiveDenver?: RepoContributionData;
 };
 
 const UserProfilePage = () => {
@@ -122,7 +117,8 @@ const UserProfilePage = () => {
   >([]);
 
   const { data: githubSession } = useSession();
-  const [userGithubInfo, setUserGithubInfo] = useState<UserGithubInfo>();
+  const [userGithubInfo, setUserGithubInfo] =
+    useState<RepoContributionData[]>();
   const [githubInfoLoading, setGithubInfoLoading] = useState<boolean>(false);
   const [userTalkInfo, setUserTalkInfo] = useState<
     { talkName: string; talkId: string }[]
@@ -385,91 +381,6 @@ const UserProfilePage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [psiState, selfEncPk, otherEncPk, channelName]);
 
-  const getRepoContributionStats = async (
-    owner: string,
-    repo: string,
-    userGithubId: number,
-    githubToken: string
-  ): Promise<RepoContributionData | undefined> => {
-    try {
-      const commits: any[] = [];
-      let page = 1;
-      const perPage = 100;
-      let isFetching = true;
-
-      // Fetch all commits from the repository
-      while (isFetching) {
-        const response = await fetch(
-          `https://api.github.com/repos/${owner}/${repo}/commits?per_page=${perPage}&page=${page}`,
-          {
-            headers: {
-              Authorization: `token ${githubToken}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `GitHub API responded with status ${response.status}`
-          );
-        }
-
-        const data = await response.json();
-        if (data.length === 0) break;
-        commits.push(...data);
-        page++;
-      }
-
-      // Filter commits by the given user's GitHub ID
-      const userCommits = commits.filter(
-        (commit) => commit.author && commit.author.id === userGithubId
-      );
-
-      if (userCommits.length === 0) {
-        return undefined;
-      }
-
-      // Determine the date of the user's first commit
-      const firstCommitDate = new Date(
-        userCommits[userCommits.length - 1].commit.author.date
-      );
-
-      // Count the total number of commits by the user
-      const totalUserCommits = userCommits.length;
-
-      // Rank the user across all committers
-      const contributorsMap: Map<string, number> = new Map();
-      commits.forEach((commit) => {
-        const authorLogin = commit.author?.login;
-        if (authorLogin) {
-          contributorsMap.set(
-            authorLogin,
-            (contributorsMap.get(authorLogin) || 0) + 1
-          );
-        }
-      });
-
-      const contributors: { login: string; commits: number }[] = Array.from(
-        contributorsMap,
-        ([login, commits]) => ({ login, commits })
-      ).sort((a, b) => b.commits - a.commits);
-
-      const userRank =
-        contributors.findIndex(
-          (contributor) => contributor.login === userCommits[0].author!.login
-        ) + 1;
-
-      return {
-        first: firstCommitDate,
-        total: totalUserCommits,
-        rank: userRank,
-      };
-    } catch (error) {
-      console.error("Error fetching commits:", error);
-      return undefined;
-    }
-  };
-
   useEffect(() => {
     const fetchUser = async () => {
       if (typeof id === "string") {
@@ -515,39 +426,56 @@ const UserProfilePage = () => {
           ) {
             setGithubInfoLoading(true);
             const userGithubId = parseInt(fetchedUser.ghUserId, 10);
-            const githubToken = (githubSession as any).accessToken as string;
-            // const foundryContribution = await getRepoContributionStats(
-            //   "paradigmxyz",
-            //   "foundry",
-            //   userGithubId,
-            //   githubToken
-            // );
-            // const rethContribution = await getRepoContributionStats(
-            //   "paradigmxyz",
-            //   "reth",
-            //   userGithubId,
-            //   githubToken
-            // );
-            const foundryContribution = undefined;
-            const rethContribution = undefined;
-            const zkSummitContribution = await getRepoContributionStats(
-              "cursive-team",
-              "zk-summit",
-              userGithubId,
-              githubToken
-            );
-            const denverContribution = await getRepoContributionStats(
-              "cursive-team",
-              "nfc-denver",
-              userGithubId,
-              githubToken
-            );
-            setUserGithubInfo({
-              foundry: foundryContribution,
-              reth: rethContribution,
-              cursiveZkSummit: zkSummitContribution,
-              cursiveDenver: denverContribution,
+            type GithubRepoData = {
+              author_id: number;
+              id: number;
+              commits: number;
+              first_commit_date: string;
+              name: string;
+              rank: number;
+            }[];
+            // type GithubData = {
+            //   "alloy-rs": GithubRepoData;
+            //   "axiom-crypto": GithubRepoData;
+            //   bluealloy: GithubRepoData;
+            //   chainbound: GithubRepoData;
+            //   "cursive-team": GithubRepoData;
+            //   "ethereum-optimism": GithubRepoData;
+            //   ethereum: GithubRepoData;
+            //   flashbots: GithubRepoData;
+            //   "foundry-rs": GithubRepoData;
+            //   paradigmxyz: GithubRepoData;
+            //   primitivefinance: GithubRepoData;
+            //   risc0: GithubRepoData;
+            //   risechain: GithubRepoData;
+            //   "shadow-hq": GithubRepoData;
+            //   sigp: GithubRepoData;
+            //   SorellaLabs: GithubRepoData;
+            //   succinctlabs: GithubRepoData;
+            //   wevm: GithubRepoData;
+            //   taikoxyz: GithubRepoData;
+            // };
+            const fetchedGithubData = githubData as Record<
+              string,
+              GithubRepoData
+            >;
+
+            const userContributions: RepoContributionData[] = [];
+            Object.keys(fetchedGithubData).forEach((repo) => {
+              const repoData = fetchedGithubData[repo];
+              repoData.forEach((entry) => {
+                if (entry.author_id === userGithubId) {
+                  userContributions.push({
+                    repo,
+                    first: new Date(entry.first_commit_date),
+                    total: entry.commits,
+                    rank: entry.rank,
+                  });
+                }
+              });
             });
+
+            setUserGithubInfo(userContributions);
             setGithubInfoLoading(false);
           }
         }
@@ -700,36 +628,15 @@ const UserProfilePage = () => {
         {userGithubInfo && (
           <Accordion label="Github">
             <div className="flex flex-col gap-1">
-              {userGithubInfo.foundry && (
-                <span className="text-white/50 text-[14px] mt-1 left-5">
-                  Foundry: {userGithubInfo.foundry.total} commits, first commit
-                  on {userGithubInfo.foundry.first.toDateString()}, rank{" "}
-                  {userGithubInfo.foundry.rank}
+              {userGithubInfo.map((repo, index) => (
+                <span
+                  key={index}
+                  className="text-white/50 text-[14px] mt-1 left-5"
+                >
+                  {repo.repo}: {repo.total} commits, first commit on{" "}
+                  {repo.first.toDateString()}, rank {repo.rank}
                 </span>
-              )}
-              {userGithubInfo.reth && (
-                <span className="text-white/50 text-[14px] mt-1 left-5">
-                  Reth: {userGithubInfo.reth.total} commits, first commit on{" "}
-                  {userGithubInfo.reth.first.toDateString()}, rank{" "}
-                  {userGithubInfo.reth.rank}
-                </span>
-              )}
-              {userGithubInfo.cursiveZkSummit && (
-                <span className="text-white/50 text-[14px] mt-1 left-5">
-                  Cursive ZK Summit: {userGithubInfo.cursiveZkSummit.total}{" "}
-                  commits, first commit on{" "}
-                  {userGithubInfo.cursiveZkSummit.first.toDateString()}, rank{" "}
-                  {userGithubInfo.cursiveZkSummit.rank}
-                </span>
-              )}
-              {userGithubInfo.cursiveDenver && (
-                <span className="text-white/50 text-[14px] mt-1 left-5">
-                  Cursive Denver: {userGithubInfo.cursiveDenver.total} commits,
-                  first commit on{" "}
-                  {userGithubInfo.cursiveDenver.first.toDateString()}, rank{" "}
-                  {userGithubInfo.cursiveDenver.rank}
-                </span>
-              )}
+              ))}
             </div>
           </Accordion>
         )}
