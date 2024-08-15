@@ -163,14 +163,16 @@ const UserProfilePage = () => {
       })
       .on("broadcast", { event: "initiatePSI" }, async (event) => {
         console.log("Received initiate PSI from ", otherEncPk, psiState);
+        const newWantsToInitiatePSI = wantsToInitiatePSI;
+        const newOtherUserWantsToInitiatePSI = otherUserWantsToInitiatePSI;
         setPsiState((prevState) => {
           console.log(
             "Current psi state when receiving initiatePSI",
             prevState,
-            wantsToInitiatePSI,
-            otherUserWantsToInitiatePSI
+            newWantsToInitiatePSI,
+            newOtherUserWantsToInitiatePSI
           );
-          if (wantsToInitiatePSI) {
+          if (newWantsToInitiatePSI) {
             console.log(
               "Starting psi after other user responded with initiatePSI",
               otherEncPk
@@ -180,7 +182,7 @@ const UserProfilePage = () => {
             setOtherUserWantsToInitiatePSI(false);
             return PSIState.ROUND1;
           } else {
-            console.log("other user wants to initiate psi", otherEncPk);
+            console.log("Other user wants to initiate psi", otherEncPk);
             setOtherUserWantsToInitiatePSI(true);
             return prevState;
           }
@@ -836,7 +838,7 @@ const UserProfilePage = () => {
                 type="button"
                 onClick={handleUpdatePSI}
                 size="small"
-                variant="tertiary"
+                variant="gray"
                 style={{
                   marginTop: "16px",
                 }}
