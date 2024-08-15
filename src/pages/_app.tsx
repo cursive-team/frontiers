@@ -97,7 +97,7 @@ export default function App({ Component, pageProps }: AppProps) {
             position="top-center"
             toastOptions={{
               duration: 5000,
-              className: "font-inter text-white",
+              className: "font-inter text-black",
             }}
           />
         </SessionProvider>

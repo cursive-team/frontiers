@@ -59,8 +59,6 @@ export default function CandidateJobsView({
   const hasOpportunities = true;
   const hasOptedIn = true;
 
-  console.log(pendingMatches);
-
   return (
     <>
       <Modal

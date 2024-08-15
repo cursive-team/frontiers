@@ -9,8 +9,9 @@ import RecruiterPage, {
 } from "@/components/jobs/RecruiterPage";
 import { getAuthToken } from "@/lib/client/localStorage";
 import { getJobs, saveJobs } from "@/lib/client/localStorage/jobs";
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { CandidateJobMatch } from "../api/jobs/get_candidate_matches";
+import { Modal } from "@/components/modals/Modal";
 
 enum JobsDisplayState {
   SELECT_ROLE = "SELECT_ROLE",
@@ -21,6 +22,8 @@ enum JobsDisplayState {
 }
 
 const Jobs: React.FC = () => {
+  const [candidateModal, setCandidateModal] = useState(false);
+  const [recruiterModal, setRecruiterModal] = useState(false);
   const [displayState, setDisplayState] = useState<JobsDisplayState>(
     JobsDisplayState.SELECT_ROLE
   );
@@ -68,48 +71,63 @@ const Jobs: React.FC = () => {
   }, []);
 
   const handleIsCandidate = () => {
-    setDisplayState(JobsDisplayState.CANDIDATE_FORM);
+    setCandidateModal(true);
   };
 
   const handleIsRecruiter = () => {
-    setDisplayState(JobsDisplayState.RECRUITER_FORM);
+    setRecruiterModal(true);
   };
 
   const handleSubmitCandidateInput = (candidateInput: JobCandidateInput) => {
     saveJobs({ candidateInput });
+    setCandidateModal(false);
     setDisplayState(JobsDisplayState.CANDIDATE_MATCHES);
   };
 
   const handleSubmitRecruiterInput = (recruiterInput: JobRecruiterInput) => {
     saveJobs({ recruiterInput });
+    setRecruiterModal(false);
     setDisplayState(JobsDisplayState.RECRUITER_MATCHES);
   };
 
-  switch (displayState) {
-    case JobsDisplayState.SELECT_ROLE:
-      return (
-        <JobsEntryPage
-          handleIsCandidate={handleIsCandidate}
-          handleIsRecruiter={handleIsRecruiter}
-        />
-      );
-    case JobsDisplayState.CANDIDATE_FORM:
-      return (
-        <CandidatePage
-          handleSubmitCandidateInput={handleSubmitCandidateInput}
-        />
-      );
-    case JobsDisplayState.RECRUITER_FORM:
-      return (
+  const JobViewMapping: Partial<Record<JobsDisplayState, ReactNode>> = {
+    [JobsDisplayState.SELECT_ROLE]: (
+      <JobsEntryPage
+        handleIsCandidate={handleIsCandidate}
+        handleIsRecruiter={handleIsRecruiter}
+      />
+    ),
+    [JobsDisplayState.CANDIDATE_MATCHES]: (
+      <CandidateJobsView pendingMatches={pendingMatches} />
+    ),
+    [JobsDisplayState.RECRUITER_MATCHES]: (
+      <RecruiterMatchView matches={matches} />
+    ),
+  };
+
+  return (
+    <>
+      <Modal
+        withBackButton
+        isOpen={recruiterModal}
+        setIsOpen={setRecruiterModal}
+      >
         <RecruiterPage
           handleSubmitRecruiterInput={handleSubmitRecruiterInput}
         />
-      );
-    case JobsDisplayState.CANDIDATE_MATCHES:
-      return <CandidateJobsView pendingMatches={pendingMatches} />;
-    case JobsDisplayState.RECRUITER_MATCHES:
-      return <RecruiterMatchView matches={matches} />;
-  }
+      </Modal>
+      <Modal
+        withBackButton
+        isOpen={candidateModal}
+        setIsOpen={setCandidateModal}
+      >
+        <CandidatePage
+          handleSubmitCandidateInput={handleSubmitCandidateInput}
+        />
+      </Modal>
+      {JobViewMapping[displayState]}
+    </>
+  );
 };
 
 export default Jobs;

@@ -15,11 +15,29 @@ export default function JobsEntryPage({
   return (
     <AppContent className="h-full">
       <FormStepLayout
-        title="Private job networking"
+        title="Private job matching"
         subtitle={
-          <span className="block pb-4 text-white/50">
-            {`As a job searcher, enter your preferences and store them privately. As a recruiter, enter your requirements and send out a query with MPC to get private matches. Searchers have to mark “interested” in a job opportunity for the recruiter to learn anything.`}
-          </span>
+          <div className="flex flex-col gap-2">
+            <ul className="flex flex-col gap-4 list-disc ml-2 pb-4 ">
+              <li className="text-white/75 [&>strong]:font-bold text-sm">
+                <strong>Recruiters:</strong> Enter job requirements and
+                privately share them with folks you meet using MPC.
+              </li>
+              <li className="text-white/75 [&>strong]:font-bold text-sm">
+                <strong>Candidates:</strong> Enter your job preferences and
+                compare them privately with opportunities to discover matches.
+                <span className="italic">
+                  Recruiters never see a match without your approval.
+                </span>
+              </li>
+            </ul>
+            <span className="text-white/50 text-sm">
+              This is an experimental feature that Cursive is testing at
+              Frontiers. Your data is encrypted using{" "}
+              <span className="underline">phantom-zone</span>, a new and
+              unaudited Multi-Party FHE Rust VM.{" "}
+            </span>
+          </div>
         }
         className="pt-4 h-full"
         //onSubmit={handleSubmitWithPassword}

@@ -145,182 +145,183 @@ export default function RecruiterPage({
   };
 
   return (
-    <AppContent>
-      <FormStepLayout
-        onSubmit={handleSubmit(onSubmitForm)}
-        title="What kind of opportunities are you hiring for?"
-        childrenClassName="overflow-hidden"
-        subtitle={
-          <span className="block pb-4 text-white/50">
-            {`We will show your opportunity to qualifying job seekers who will have the option to match with you.`}
-          </span>
-        }
-        actions={<Button type="submit">Save and continue</Button>}
-      >
-        <div className="flex flex-col gap-6">
-          <Section title="Title of role">
-            <Input {...register("title")} border="full" />
-          </Section>
-          <Section title="Project name">
-            <Input {...register("project")} border="full" />
-          </Section>
-          <Section title="Add link">
-            <Input {...register("link")} border="full" />
-          </Section>
-          <Section title="Candidate qualifications" active />
-          <Section title="Education">
-            <div className="grid grid-cols-2 gap-2">
-              <Radio
-                id="education-1"
-                label="High school"
-                value="high-school"
-                checked={education === "high-school"}
-                onChange={() => {
-                  setValue("education", "high-school");
-                }}
-              />
-              <Radio
-                id="education-2"
-                label="Bachelor's"
-                checked={education === "bachelor"}
-                onChange={() => {
-                  setValue("education", "bachelor");
-                }}
-              />
-              <Radio
-                id="education-3"
-                label="Master's"
-                checked={education === "master"}
-                onChange={() => {
-                  setValue("education", "master");
-                }}
-              />
-              <Radio
-                id="education-4"
-                label="PhD"
-                checked={education === "phd"}
-                onChange={() => {
-                  setValue("education", "phd");
-                }}
-              />
-            </div>
-          </Section>
-          <Section title="Minimum experience (in years)">
-            <InputRange
-              // @ts-ignore
-              id="experience"
-              // @ts-ignore
-              min={0}
-              // @ts-ignore
-              value={experience}
-              max={8}
-              moreMax
-              onChange={(e: any) => {
-                setValue("experience", e?.target?.value);
-              }}
-            />
-          </Section>
-          <Section title="Project tags">
-            <div className="grid grid-cols-2 gap-2">
-              <Checkbox
-                id="interests-1"
-                checked={interestZk}
-                onChange={(checked) => {
-                  setValue("tagZk", checked);
-                }}
-                label="ZK/MPC"
-              />
-              <Checkbox
-                id="interests-2"
-                label="DeFi"
-                checked={interestDefi}
-                onChange={(checked) => {
-                  setValue("tagDefi", checked);
-                }}
-              />
-              <Checkbox
-                id="interests-3"
-                label="Consumer"
-                checked={interestConsumer}
-                onChange={(checked) => {
-                  setValue("tagConsumer", checked);
-                }}
-              />
-              <Checkbox
-                id="interests-4"
-                label="Infrastructure"
-                checked={interestInfra}
-                onChange={(checked) => {
-                  setValue("tagInfra", checked);
-                }}
-              />
-            </div>
-          </Section>
-          <Section title="Opportunity constraints" active />
-          <Section title="Annual salary (in thousands)">
-            <InputRange
-              id="salary"
-              min={0}
-              max={600}
-              // @ts-ignore
-              value={salary}
-              onChange={(e: any) => {
-                setValue("salary", e?.target?.value);
-              }}
-            />
-          </Section>
-          <Section title="Project stage">
-            <div className="grid grid-cols-2 gap-2">
-              <Checkbox
-                id="companyStage-1"
-                checked={stageParadigm}
-                onChange={(checked) => {
-                  setValue("stageParadigm", checked);
-                }}
-                label="Paradigm project"
-              />
-              <Checkbox
-                id="companyStage-2"
-                label="Grant"
-                checked={stageGrant}
-                onChange={(checked) => {
-                  setValue("stageGrant", checked);
-                }}
-              />
-              <Checkbox
-                id="companyStage-3"
-                label="Seed"
-                checked={stageSeed}
-                onChange={(checked) => {
-                  setValue("stageSeed", checked);
-                }}
-              />
-              <Checkbox
-                id="companyStage-4"
-                name="companyStage"
-                label="Series A+"
-                checked={stageSeriesA}
-                onChange={(checked) => {
-                  setValue("stageSeriesA", checked);
-                }}
-              />
-            </div>
-          </Section>
-
-          <Section title="Commitment">
-            <Checkbox
-              id="commitment"
-              name="commitment"
-              label="This is a part-time contract"
-              checked={partTime}
-              onChange={(checked) => {
-                setValue("partTime", checked);
-              }}
-            />
-          </Section>
+    <FormStepLayout
+      onSubmit={handleSubmit(onSubmitForm)}
+      title="What kind of opportunities are you hiring for?"
+      subtitle={
+        <span className="block pb-4 text-white/50">
+          {`We will show your opportunity to qualifying job seekers who will have the option to match with you.`}
+        </span>
+      }
+      footer={
+        <div className="bg-[#000]">
+          <Button type="submit">Save and continue</Button>
         </div>
-      </FormStepLayout>
-    </AppContent>
+      }
+    >
+      <div className="flex flex-col gap-6">
+        <Section title="Title of role">
+          <Input {...register("title")} border="full" />
+        </Section>
+        <Section title="Project name">
+          <Input {...register("project")} border="full" />
+        </Section>
+        <Section title="Add link">
+          <Input {...register("link")} border="full" />
+        </Section>
+        <Section title="Candidate qualifications" active />
+        <Section title="Education">
+          <div className="grid grid-cols-2 gap-2">
+            <Radio
+              id="education-1"
+              label="High school"
+              value="high-school"
+              checked={education === "high-school"}
+              onChange={() => {
+                setValue("education", "high-school");
+              }}
+            />
+            <Radio
+              id="education-2"
+              label="Bachelor's"
+              checked={education === "bachelor"}
+              onChange={() => {
+                setValue("education", "bachelor");
+              }}
+            />
+            <Radio
+              id="education-3"
+              label="Master's"
+              checked={education === "master"}
+              onChange={() => {
+                setValue("education", "master");
+              }}
+            />
+            <Radio
+              id="education-4"
+              label="PhD"
+              checked={education === "phd"}
+              onChange={() => {
+                setValue("education", "phd");
+              }}
+            />
+          </div>
+        </Section>
+        <Section title="Minimum experience (in years)">
+          <InputRange
+            // @ts-ignore
+            id="experience"
+            // @ts-ignore
+            min={0}
+            // @ts-ignore
+            value={experience}
+            max={8}
+            moreMax
+            onChange={(e: any) => {
+              setValue("experience", e?.target?.value);
+            }}
+          />
+        </Section>
+        <Section title="Project tags">
+          <div className="grid grid-cols-2 gap-2">
+            <Checkbox
+              id="interests-1"
+              checked={interestZk}
+              onChange={(checked) => {
+                setValue("tagZk", checked);
+              }}
+              label="ZK/MPC"
+            />
+            <Checkbox
+              id="interests-2"
+              label="DeFi"
+              checked={interestDefi}
+              onChange={(checked) => {
+                setValue("tagDefi", checked);
+              }}
+            />
+            <Checkbox
+              id="interests-3"
+              label="Consumer"
+              checked={interestConsumer}
+              onChange={(checked) => {
+                setValue("tagConsumer", checked);
+              }}
+            />
+            <Checkbox
+              id="interests-4"
+              label="Infrastructure"
+              checked={interestInfra}
+              onChange={(checked) => {
+                setValue("tagInfra", checked);
+              }}
+            />
+          </div>
+        </Section>
+        <Section title="Opportunity constraints" active />
+        <Section title="Annual salary (in thousands)">
+          <InputRange
+            id="salary"
+            min={0}
+            max={600}
+            // @ts-ignore
+            value={salary}
+            onChange={(e: any) => {
+              setValue("salary", e?.target?.value);
+            }}
+          />
+        </Section>
+        <Section title="Project stage">
+          <div className="grid grid-cols-2 gap-2">
+            <Checkbox
+              id="companyStage-1"
+              checked={stageParadigm}
+              onChange={(checked) => {
+                setValue("stageParadigm", checked);
+              }}
+              label="Paradigm project"
+            />
+            <Checkbox
+              id="companyStage-2"
+              label="Grant"
+              checked={stageGrant}
+              onChange={(checked) => {
+                setValue("stageGrant", checked);
+              }}
+            />
+            <Checkbox
+              id="companyStage-3"
+              label="Seed"
+              checked={stageSeed}
+              onChange={(checked) => {
+                setValue("stageSeed", checked);
+              }}
+            />
+            <Checkbox
+              id="companyStage-4"
+              name="companyStage"
+              label="Series A+"
+              checked={stageSeriesA}
+              onChange={(checked) => {
+                setValue("stageSeriesA", checked);
+              }}
+            />
+          </div>
+        </Section>
+
+        <Section title="Commitment">
+          <Checkbox
+            id="commitment"
+            name="commitment"
+            label="This is a part-time contract"
+            checked={partTime}
+            onChange={(checked) => {
+              setValue("partTime", checked);
+            }}
+          />
+        </Section>
+      </div>
+    </FormStepLayout>
   );
 }
 

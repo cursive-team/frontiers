@@ -140,25 +140,25 @@ export default function CandidatePage({
   };
 
   return (
-    <AppContent className="overflow-hidden">
-      <FormStepLayout
-        childrenClassName="!gap-4"
-        onSubmit={handleSubmit(onSubmitForm)}
-        title="Candidate profile"
-        subtitle={
-          <span className="block pb-4 text-white/50">
-            {`We will show you opportunities that match your preferences and you can choose if you want to match with a recruiter.`}
+    <FormStepLayout
+      childrenClassName="!gap-4"
+      onSubmit={handleSubmit(onSubmitForm)}
+      title="Candidate profile"
+      subtitle={
+        <span className="block pb-4 text-white/50">
+          {`We will show you opportunities that match your preferences and you can choose if you want to match with a recruiter.`}
+        </span>
+      }
+      footer={
+        <div className="flex flex-col gap-2 bg-[#000]">
+          <Button type="submit">Save and continue</Button>
+          <span className="text-center text-secondary text-sm font-inter">
+            Review your answers. They cannot be edited later.
           </span>
-        }
-        footer={
-          <div className="flex flex-col gap-2 bg-black">
-            <Button type="submit">Save and continue</Button>
-            <span className="text-center text-secondary text-sm font-inter">
-              Review your answers. They cannot be edited later.
-            </span>
-          </div>
-        }
-      >
+        </div>
+      }
+    >
+      <div className="flex flex-col gap-4">
         <Banner title="Your info is encrypted until you share it." />
         <Section title="What are your qualifications?" active />
         <Section title="Education">
@@ -214,7 +214,9 @@ export default function CandidatePage({
           />
         </Section>
 
-        <Section title="What opportunities are you seeking?" active />
+        <div className="pt-4">
+          <Section title="What opportunities are you seeking?" active />
+        </div>
 
         <Section title="Interests">
           <div className="grid grid-cols-2 gap-2">
@@ -323,8 +325,8 @@ export default function CandidatePage({
         <Section title="Email">
           <Input {...register("email")} border="full" />
         </Section>
-      </FormStepLayout>
-    </AppContent>
+      </div>
+    </FormStepLayout>
   );
 }
 
