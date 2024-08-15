@@ -189,12 +189,12 @@ export default async function handler(
       data: {
         name: "🦋 Social Butterfly",
         description:
-          "Connect with 10 people to make this proof. Ask to tap their badge, share socials, and discover event activity that you have in common.",
+          "Connect with 2 people to make this proof. Ask to tap their badge, share socials, and discover event activity that you have in common.",
         userRequirements: {
           create: [
             {
-              name: "Connect with 10 people at SigSing",
-              numSigsRequired: 10,
+              name: "Connect with 2 people at Frontiers",
+              numSigsRequired: 2,
               sigNullifierRandomness: getServerRandomNullifierRandomness(), // Ensures signatures cannot be reused to meet this requirement
               users: {
                 connect: allUserIds.map((id) => ({ id })),
@@ -217,7 +217,7 @@ export default async function handler(
         userRequirements: {
           create: [
             {
-              name: "Connect with 3 speakers at the Sig Sing workshop",
+              name: "Connect with 3 speakers at Frontiers",
               numSigsRequired: 3,
               sigNullifierRandomness: getServerRandomNullifierRandomness(), // Ensures signatures cannot be reused to meet this requirement
               users: {
