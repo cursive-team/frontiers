@@ -164,6 +164,12 @@ const UserProfilePage = () => {
       .on("broadcast", { event: "initiatePSI" }, async (event) => {
         console.log("Received initiate PSI from ", otherEncPk, psiState);
         setPsiState((prevState) => {
+          console.log(
+            "Current psi state when receiving initiatePSI",
+            prevState,
+            wantsToInitiatePSI,
+            otherUserWantsToInitiatePSI
+          );
           if (wantsToInitiatePSI) {
             console.log(
               "Starting psi after other user responded with initiatePSI",
@@ -174,6 +180,7 @@ const UserProfilePage = () => {
             setOtherUserWantsToInitiatePSI(false);
             return PSIState.ROUND1;
           } else {
+            console.log("other user wants to initiate psi", otherEncPk);
             setOtherUserWantsToInitiatePSI(true);
             return prevState;
           }
@@ -539,6 +546,12 @@ const UserProfilePage = () => {
   const handleInitiatePSI = () => {
     if (!user || !channelName) return;
 
+    console.log(
+      "Initiating psi...",
+      wantsToInitiatePSI,
+      otherUserWantsToInitiatePSI
+    );
+
     logClientEvent("psiInitiatePSI", {});
     setWantsToInitiatePSI(true);
     supabase.channel(channelName).send({
@@ -558,6 +571,12 @@ const UserProfilePage = () => {
 
   const handleUpdatePSI = () => {
     if (!user || !channelName) return;
+
+    console.log(
+      "Updating psi...",
+      wantsToInitiatePSI,
+      otherUserWantsToInitiatePSI
+    );
 
     logClientEvent("psiUpdatePSI", {});
     setSelfRound1Output(undefined);
