@@ -71,7 +71,7 @@ export default async function handler(
     }
 
     let userIndex = 1;
-    for (const chipId in newKeyUids) {
+    for (const chipId of newKeyUids) {
       // Generate and save signing keypair
       const { signingKey, verifyingKey } = generateSignatureKeyPair();
       allChipKeyData.push({
@@ -99,7 +99,7 @@ export default async function handler(
       userIndex++;
     }
 
-    for (const chipId in speakerUids) {
+    for (const chipId of speakerUids) {
       // Generate and save signing keypair
       const { signingKey, verifyingKey } = generateSignatureKeyPair();
       allChipKeyData.push({
@@ -151,7 +151,7 @@ export default async function handler(
         ? chipData.talkStartTime
         : "12:00";
       const endTime = chipData.talkEndTime ? chipData.talkEndTime : "13:00";
-      const talkTime = chipData.talkTime ?? new Date();
+      const talkTime = chipData.talkTime ? chipData.talkTime : new Date();
       allLocationData.push({
         id: locationIndex,
         chipId,
