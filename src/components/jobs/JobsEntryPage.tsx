@@ -18,7 +18,7 @@ export default function JobsEntryPage({
         title="Private job networking"
         subtitle={
           <span className="block pb-4 text-white/50">
-            {`As a job searcher, enter your preferences and store them privately. As a recruiter, enter your requirements and send out a query with MPC to get private matches. Searchers have to mark “interested” in a job opportunity for the recruiter to learn anything.`}
+            {`As a job seeker, enter your preferences and store them privately. As a recruiter, enter your requirements and send out a query with MPC to get private matches. Searchers have to mark “interested” in a job opportunity for the recruiter to learn anything.`}
           </span>
         }
         className="pt-4 h-full"

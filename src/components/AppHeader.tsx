@@ -109,7 +109,7 @@ const AppHeaderContent = ({
           <ContentWrapper>
             <Title>About the app</Title>
             <Description className="!text-white">
-            The app allows you to verifiably digitize your Frontiers experience and make provable claims about the people you have met. Every single tap gives you a digital signature representing the fact that you met someone. You can make zk proofs about these signatures, like proving that you met 3 people without revealing who they were or the signatures themselves.
+            This app allows you to verifiably digitize your Frontiers experience and make provable claims about the people you have met. Every single tap gives you a digital signature representing the fact that you met someone. You can make zk proofs about these signatures, like proving that you met 3 people without revealing who they were or the signatures themselves.
             </Description>
             <Description className="!text-white">
             Crucially, all the data you collect in this app is yours - our servers only store an encrypted backup. You get to decide who sees your data and how it is used.

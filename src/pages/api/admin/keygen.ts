@@ -189,7 +189,7 @@ export default async function handler(
       data: {
         name: "🦋 Social Butterfly",
         description:
-          "Connect with 2 people to make this proof. Ask to tap their badge, share socials, and discover event activity that you have in common.",
+          "Connect with 2 people to make this proof. Ask to tap their badge, share socials, and discover what you have in common.",
         userRequirements: {
           create: [
             {

@@ -42,8 +42,8 @@ export default function QuestsPage() {
   return (
     <AppContent className="flex flex-col gap-4 pt-4">
       <span className="text-white/75 font-inter text-sm">
-        Post proofs about your Frontiers experience on Twitter, while preserving
-        privacy over the people you met.
+        Share proofs about your Frontiers experience on Twitter, while respecting the
+        privacy of the people you met.
       </span>
 
       <LoadingWrapper
