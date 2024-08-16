@@ -214,6 +214,7 @@ const processEncryptedMessages = async (args: {
     }
 
     const { metadata, type, data } = decryptedMessage;
+    console.log("Parsing jubSignal message: ", type);
 
     switch (type) {
       case JUB_SIGNAL_MESSAGE_TYPE.OVERLAP_COMPUTED:
@@ -662,6 +663,15 @@ const processEncryptedMessages = async (args: {
         }
       case JUB_SIGNAL_MESSAGE_TYPE.CANDIDATE_SHARED:
         try {
+          try {
+            await candidateSharedMessageSchema.validate(data);
+          } catch (error) {
+            console.error(
+              "Invalid candidate shared message received from server: ",
+              error
+            );
+            break;
+          }
           const {
             name,
             encPk,
@@ -689,11 +699,10 @@ const processEncryptedMessages = async (args: {
             candidateStage: stage,
           };
 
-          if (jobs.recruiterAcceptedMatches) {
-            jobs.recruiterAcceptedMatches[matchId] = match;
-          } else {
-            jobs.recruiterAcceptedMatches = { [matchId]: match };
+          if (!jobs.recruiterAcceptedMatches) {
+            jobs.recruiterAcceptedMatches = {};
           }
+          jobs.recruiterAcceptedMatches[matchId] = match;
 
           const activity = {
             type: JUB_SIGNAL_MESSAGE_TYPE.CANDIDATE_SHARED,
