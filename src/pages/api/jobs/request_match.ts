@@ -44,6 +44,18 @@ export default async function handler(
     return res.status(404).json({ error: "User not found" });
   }
 
+  const existingMatch = await prisma.jobMatchQueue.findFirst({
+    where: {
+      proposerId: userId,
+      accepterId: otherUser.id,
+    },
+  });
+  if (existingMatch) {
+    return res
+      .status(400)
+      .json({ error: "Match request already sent to this user" });
+  }
+
   try {
     await prisma.jobMatchQueue.create({
       data: {
