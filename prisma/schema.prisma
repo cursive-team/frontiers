@@ -253,6 +253,7 @@ model JobMatchQueue {
   proposerId       Int
   accepterId       Int
   matchResultsLink String?
+  computeLock      Boolean  @default(false)
   isInvalid        Boolean  @default(false)
   lastCheckedTime  DateTime @default(now())
   createdAt        DateTime @default(now())

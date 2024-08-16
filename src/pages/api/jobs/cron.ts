@@ -17,22 +17,23 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  // Fetch the next job match queue entry that is not completed or invalid
+  const nextJobMatch = await prisma.jobMatchQueue.findFirst({
+    where: {
+      matchResultsLink: { equals: null },
+      isInvalid: false,
+      computeLock: false,
+    },
+    orderBy: {
+      lastCheckedTime: "asc",
+    },
+  });
+
+  if (!nextJobMatch) {
+    return res.status(404).json({ error: "No job match queue entry found" });
+  }
+
   try {
-    // Fetch the next job match queue entry that is not completed or invalid
-    const nextJobMatch = await prisma.jobMatchQueue.findFirst({
-      where: {
-        matchResultsLink: { equals: null },
-        isInvalid: false,
-      },
-      orderBy: {
-        lastCheckedTime: "asc",
-      },
-    });
-
-    if (!nextJobMatch) {
-      return res.status(404).json({ error: "No job match queue entry found" });
-    }
-
     const proposer = await prisma.user.findUnique({
       where: {
         id: nextJobMatch.proposerId,
@@ -100,6 +101,17 @@ export default async function handler(
         message: "Proposer is not recruiter or accepter is not candidate",
       });
     }
+
+    // set compute lock
+    await prisma.jobMatchQueue.update({
+      where: {
+        id: nextJobMatch.id,
+      },
+      data: {
+        computeLock: true,
+        lastCheckedTime: new Date(),
+      },
+    });
 
     // fetch respective server key shares from blob
     console.time("fetching public keys");
@@ -197,6 +209,16 @@ export default async function handler(
       jobMatch: nextJobMatch,
     });
   } catch (error) {
+    // remove compute lock
+    await prisma.jobMatchQueue.update({
+      where: {
+        id: nextJobMatch.id,
+      },
+      data: {
+        computeLock: false,
+        lastCheckedTime: new Date(),
+      },
+    });
     console.error("Error executing job match:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
