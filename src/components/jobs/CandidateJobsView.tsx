@@ -9,6 +9,7 @@ import { encryptCandidateSharedMessage } from "@/lib/client/jubSignal/candidateS
 import { loadMessages } from "@/lib/client/jubSignalClient";
 import { getKeys, getProfile } from "@/lib/client/localStorage";
 import { getJobs, saveJobs } from "@/lib/client/localStorage/jobs";
+import { logClientEvent } from "@/lib/client/metrics";
 import { classed } from "@tw-classed/react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
@@ -86,6 +87,8 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
 
   const handleAccept = async (match: CandidateJobMatch) => {
     console.log("candidate accepting match", match);
+    logClientEvent("candidateAcceptMatch", {});
+
     const jobs = getJobs();
     const profile = getProfile();
     const keys = getKeys();
@@ -274,6 +277,7 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
                           label={match.role}
                           description={match.project}
                           onClick={() => {
+                            logClientEvent("viewPendingJobOpportunity", {});
                             setShowJobDetailModal(true);
                             setMatch(match);
                           }}
@@ -314,6 +318,7 @@ export default function CandidateJobsView({ matches }: CandidateJobsViewProps) {
                           label={match.role}
                           description={match.project}
                           onClick={() => {
+                            logClientEvent("viewAcceptedJobOpportunity", {});
                             setShowJobDetailModal(true);
                             setMatch(match);
                           }}

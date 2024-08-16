@@ -8,6 +8,7 @@ import init, {
   ni_hiring_client_dec_share_web,
   ni_hiring_init_web,
 } from "@/lib/ni_hiring_web";
+import { logClientEvent } from "./metrics";
 
 export const recruiterProcessNewMatches = async () => {
   console.log("recruiter processing new matches...");
@@ -52,6 +53,8 @@ export const recruiterProcessNewMatches = async () => {
     "old match ids",
     processedMatchIds
   );
+
+  logClientEvent("recruiterProcessMatches", { count: matches.length });
 
   for (const match of matches) {
     if (!processedMatchIds.includes(match.id)) {
