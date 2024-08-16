@@ -11,6 +11,7 @@ import React, { useState } from "react";
 import { Banner } from "../Banner";
 import { ArtworkSnapshot } from "../artwork/ArtworkSnapshot";
 import { Accordion } from "../Accordion";
+import { logClientEvent } from "@/lib/client/metrics";
 
 const Title = classed.span("text-white text-xs font-normal font-inter");
 const Description = classed.h5("text-white/50 font-inter font-normal text-sm");
@@ -207,6 +208,7 @@ export default function RecruiterMatchView({
                           label={match.candidateDisplayName}
                           description={match.candidateEmail}
                           onClick={() => {
+                            logClientEvent("viewJobRespondent", {});
                             setShowMatch(true);
                             setMatch(match);
                           }}

@@ -110,6 +110,8 @@ export default function Jobs() {
     publicKeyLink: string;
     privateKey: string;
   }> => {
+    logClientEvent("generateJobsKeys", { id });
+
     const keys = await generateMPCKeys(id);
 
     const publicKeyLink = await mpcBlobUploadClient(
