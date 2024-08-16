@@ -29,11 +29,13 @@ export type JobRecruiterInput = {
 };
 
 interface RecruiterPageProps {
+  keysLoading: boolean;
   handleSubmitRecruiterInput: (formValues: JobRecruiterInput) => Promise<void>;
   submitLoading: boolean;
 }
 
 export default function RecruiterPage({
+  keysLoading,
   handleSubmitRecruiterInput,
   submitLoading,
 }: RecruiterPageProps) {
@@ -97,8 +99,10 @@ export default function RecruiterPage({
       }
       footer={
         <div className="flex flex-col gap-4 bg-black px-4">
-          <Button type="submit" loading={submitLoading}>
-            Save and continue
+          <Button type="submit" loading={submitLoading} disabled={keysLoading}>
+            {keysLoading
+              ? "Please wait for FHE keys to generate..."
+              : "Save and continue"}
           </Button>
           <span className="text-center text-secondary text-[12px] font-inter">
             Review your answers. They cannot be edited later.

@@ -46,6 +46,7 @@ export default function Jobs() {
   const [displayState, setDisplayState] = useState<JobsDisplayState>(
     JobsDisplayState.SELECT_ROLE
   );
+  const [keysLoading, setKeysLoading] = useState(false);
   const [publicKeyLink, setPublicKeyLink] = useState<string>();
   const [privateKey, setPrivateKey] = useState<string>();
   const [candidateMatches, setCandidateMatches] = useState<CandidateJobMatch[]>(
@@ -112,12 +113,15 @@ export default function Jobs() {
   }> => {
     logClientEvent("generateJobsKeys", { id });
 
+    console.log("generating fhe keys");
     const keys = await generateMPCKeys(id);
+    console.log("generated fhe keys");
 
     const publicKeyLink = await mpcBlobUploadClient(
       "mpcPublicKey",
       gzip(serializeMPCData(keys.mpcPublicKey))
     );
+    console.log("uploaded fhe keys");
 
     return {
       publicKeyLink,
@@ -125,30 +129,37 @@ export default function Jobs() {
     };
   };
 
+  useEffect(() => {
+    if (displayState === JobsDisplayState.CANDIDATE_FORM) {
+      setKeysLoading(true);
+      generateJobsKeys(1).then(({ publicKeyLink, privateKey }) => {
+        setPublicKeyLink(publicKeyLink);
+        setPrivateKey(privateKey);
+        setKeysLoading(false);
+      });
+    } else if (displayState === JobsDisplayState.RECRUITER_FORM) {
+      setKeysLoading(true);
+      generateJobsKeys(0).then(({ publicKeyLink, privateKey }) => {
+        setPublicKeyLink(publicKeyLink);
+        setPrivateKey(privateKey);
+        setKeysLoading(false);
+      });
+    }
+  }, [displayState]);
+
   const handleIsCandidate = async () => {
-    setCandidateSetupLoading(true);
-    const { publicKeyLink, privateKey } = await generateJobsKeys(1);
-    setPublicKeyLink(publicKeyLink);
-    setPrivateKey(privateKey);
-    setCandidateSetupLoading(false);
     setDisplayState(JobsDisplayState.CANDIDATE_FORM);
   };
 
   const handleIsRecruiter = async () => {
-    setRecruiterSetupLoading(true);
-    const { publicKeyLink, privateKey } = await generateJobsKeys(0);
-    setPublicKeyLink(publicKeyLink);
-    setPrivateKey(privateKey);
-    setRecruiterSetupLoading(false);
     setDisplayState(JobsDisplayState.RECRUITER_FORM);
   };
 
   const handleSubmitCandidateInput = async (
     candidateInput: JobCandidateInput
   ) => {
-    setCandidateSubmitLoading(true);
     if (!publicKeyLink || !privateKey) {
-      toast.error("Error generating keys");
+      toast.error("Please wait for keys to generate");
       return;
     }
 
@@ -164,6 +175,8 @@ export default function Jobs() {
       toast.error("Please try logging in again.");
       return;
     }
+
+    setCandidateSubmitLoading(true);
 
     const encryptedCandidateInput = generateMPCCandidateEncryption(
       deserializeMPCData(privateKey),
@@ -225,9 +238,8 @@ export default function Jobs() {
   const handleSubmitRecruiterInput = async (
     recruiterInput: JobRecruiterInput
   ) => {
-    setRecruiterSubmitLoading(true);
     if (!publicKeyLink || !privateKey) {
-      toast.error("Error generating keys");
+      toast.error("Please wait for keys to generate");
       return;
     }
 
@@ -243,6 +255,8 @@ export default function Jobs() {
       toast.error("Please try logging in again.");
       return;
     }
+
+    setRecruiterSubmitLoading(true);
 
     const encryptedRecruiterInput = generateMPCRecruiterEncryption(
       deserializeMPCData(privateKey),
@@ -321,6 +335,7 @@ export default function Jobs() {
     case JobsDisplayState.CANDIDATE_FORM:
       return (
         <CandidatePage
+          keysLoading={keysLoading}
           handleSubmitCandidateInput={handleSubmitCandidateInput}
           submitLoading={candidateSubmitLoading}
         />
@@ -328,6 +343,7 @@ export default function Jobs() {
     case JobsDisplayState.RECRUITER_FORM:
       return (
         <RecruiterPage
+          keysLoading={keysLoading}
           handleSubmitRecruiterInput={handleSubmitRecruiterInput}
           submitLoading={recruiterSubmitLoading}
         />

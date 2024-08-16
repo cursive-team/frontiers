@@ -28,11 +28,13 @@ export type JobCandidateInput = {
 };
 
 interface CandidatePageProps {
+  keysLoading: boolean;
   handleSubmitCandidateInput: (formValues: JobCandidateInput) => Promise<void>;
   submitLoading: boolean;
 }
 
 export default function CandidatePage({
+  keysLoading,
   handleSubmitCandidateInput,
   submitLoading,
 }: CandidatePageProps) {
@@ -95,8 +97,10 @@ export default function CandidatePage({
       }
       footer={
         <div className="flex flex-col gap-4 bg-black px-4">
-          <Button type="submit" loading={submitLoading}>
-            Save and continue
+          <Button type="submit" loading={submitLoading} disabled={keysLoading}>
+            {keysLoading
+              ? "Please wait for FHE keys to generate..."
+              : "Save and continue"}
           </Button>
           <span className="text-center text-secondary text-[12px] font-inter">
             Review your answers. They cannot be edited later.
