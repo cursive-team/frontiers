@@ -34,20 +34,6 @@ import {
 import { hashPublicKeyToUUID } from "./utils";
 import { registeredMessageSchema } from "./jubSignal/registered";
 import { overlapComputedMessageSchema } from "./jubSignal/overlapComputed";
-import { getJobs, Jobs, saveJobs } from "./localStorage/jobs";
-import { jobInputMessageSchema } from "./jubSignal/jobInput";
-import { JobCandidateInput } from "@/components/jobs/CandidatePage";
-import { JobRecruiterInput } from "@/components/jobs/RecruiterPage";
-import { recruiterSharedMessageSchema } from "./jubSignal/recruiterShared";
-import { CandidateJobMatch } from "@/components/jobs/CandidateJobsView";
-import { candidateSharedMessageSchema } from "./jubSignal/candidateShared";
-import { RecruiterJobMatch } from "@/components/jobs/RecruiterMatchView";
-import { deserializeMPCData } from "./mpc";
-import init, {
-  ni_hiring_client_dec_share_web,
-  ni_hiring_client_full_dec_web,
-  ni_hiring_init_web,
-} from "@/lib/ni_hiring_web";
 
 export type LoadMessagesRequest = {
   forceRefresh: boolean;
@@ -61,7 +47,7 @@ export const loadMessages = async ({
   forceRefresh,
   messageRequests,
 }: LoadMessagesRequest): Promise<void> => {
-  const session = getSession();
+  const session = getSession() as any; // TODO: Fix this any
   if (!session || session.authToken.expiresAt < new Date()) {
     console.error("Invalid session while trying to load messages");
     throw new Error("Invalid session while trying to load messages");
@@ -133,14 +119,12 @@ export const loadMessages = async ({
     : getLocationSignatures();
   const existingQuestCompleted = forceRefresh ? {} : getAllQuestCompleted();
   const existingItemRedeemed = forceRefresh ? {} : getAllItemRedeemed();
-  const existingJobs = forceRefresh ? {} : getJobs() || {};
   const existingActivities = forceRefresh ? [] : getActivities();
   const {
     newUsers,
     newLocationSignatures,
     newQuestCompleted,
     newItemRedeemed,
-    newJobs,
     newActivities,
   } = await processEncryptedMessages({
     messages,
@@ -150,7 +134,6 @@ export const loadMessages = async ({
     existingLocationSignatures,
     existingQuestCompleted,
     existingItemRedeemed,
-    existingJobs,
     existingActivities,
   });
 
@@ -159,7 +142,6 @@ export const loadMessages = async ({
   saveLocationSignatures(newLocationSignatures);
   saveAllQuestCompleted(newQuestCompleted);
   saveAllItemRedeemed(newItemRedeemed);
-  saveJobs(newJobs);
   saveActivities(newActivities);
 
   // Update the session
@@ -176,14 +158,12 @@ const processEncryptedMessages = async (args: {
   existingLocationSignatures: Record<string, LocationSignature>;
   existingQuestCompleted: Record<string, QuestCompleted>;
   existingItemRedeemed: Record<string, ItemRedeemed>;
-  existingJobs: Jobs;
   existingActivities: Activity[];
 }): Promise<{
   newUsers: Record<string, User>;
   newLocationSignatures: Record<string, LocationSignature>;
   newQuestCompleted: Record<string, QuestCompleted>;
   newItemRedeemed: Record<string, ItemRedeemed>;
-  newJobs: Jobs;
   newActivities: Activity[];
 }> => {
   const {
@@ -194,7 +174,6 @@ const processEncryptedMessages = async (args: {
     existingLocationSignatures: locationSignatures,
     existingQuestCompleted: questCompleted,
     existingItemRedeemed: itemRedeemed,
-    existingJobs: jobs,
     existingActivities: activities,
   } = args;
 
@@ -547,169 +526,6 @@ const processEncryptedMessages = async (args: {
         } finally {
           break;
         }
-      case JUB_SIGNAL_MESSAGE_TYPE.JOB_INPUT:
-        try {
-          const { isCandidate, privateKey, serializedInput } =
-            await jobInputMessageSchema.validate(data);
-          if (isCandidate) {
-            jobs.candidateInput = JSON.parse(
-              serializedInput
-            ) as JobCandidateInput;
-            jobs.jobsPrivateKey = privateKey;
-          } else {
-            jobs.recruiterInput = JSON.parse(
-              serializedInput
-            ) as JobRecruiterInput;
-            jobs.jobsPrivateKey = privateKey;
-          }
-
-          const activity = {
-            type: JUB_SIGNAL_MESSAGE_TYPE.JOB_INPUT,
-            name: isCandidate ? "Candidate" : "Recruiter",
-            id: "",
-            ts: metadata.timestamp.toISOString(),
-          };
-          activities.push(activity);
-        } catch (error) {
-          console.error(
-            "Invalid job input message received from server: ",
-            message
-          );
-        } finally {
-          break;
-        }
-      case JUB_SIGNAL_MESSAGE_TYPE.RECRUITER_SHARED:
-        try {
-          const {
-            name,
-            encPk,
-            role,
-            project,
-            jobLink,
-            decryptionShareLink,
-            matchId,
-            matchResultsLink,
-            jobTags,
-            jobStage,
-            jobExperience,
-            jobPartTime,
-          } = await recruiterSharedMessageSchema.validate(data);
-
-          if (!jobs.jobsPrivateKey) {
-            break;
-          }
-
-          const jobsPrivateKey = deserializeMPCData(jobs.jobsPrivateKey);
-          const fheResResponse = await fetch(matchResultsLink);
-          const fheRes = deserializeMPCData(await fheResResponse.text());
-
-          await init();
-          try {
-            ni_hiring_init_web(BigInt(1));
-          } catch (e) {
-            console.log(e);
-          }
-
-          const decryptionShare = ni_hiring_client_dec_share_web(
-            jobsPrivateKey,
-            fheRes
-          );
-          const isMatch = ni_hiring_client_full_dec_web(
-            jobsPrivateKey,
-            fheRes,
-            deserializeMPCData(decryptionShareLink),
-            decryptionShare
-          );
-
-          const match: CandidateJobMatch = {
-            recruiterDisplayName: name,
-            recruiterEncPubKey: encPk,
-            role,
-            project,
-            jobLink,
-            matchId,
-            isMatch,
-            jobTags,
-            jobStage,
-            jobExperience,
-            jobPartTime,
-          };
-          console.log(match);
-
-          if (jobs.candidateProcessedMatches) {
-            jobs.candidateProcessedMatches[matchId] = match;
-          } else {
-            jobs.candidateProcessedMatches = { [matchId]: match };
-          }
-
-          const activity = {
-            type: JUB_SIGNAL_MESSAGE_TYPE.RECRUITER_SHARED,
-            name: role,
-            id: matchId.toString(),
-            ts: metadata.timestamp.toISOString(),
-          };
-          // only add activity if there is a match
-          if (isMatch) {
-            activities.push(activity);
-          }
-        } catch (error) {
-          console.error(
-            "Invalid recruiter shared message received from server: ",
-            message
-          );
-        } finally {
-          break;
-        }
-      case JUB_SIGNAL_MESSAGE_TYPE.CANDIDATE_SHARED:
-        try {
-          const {
-            name,
-            encPk,
-            bio,
-            email,
-            githubUserId,
-            githubLogin,
-            education,
-            interests,
-            experience,
-            stage,
-            matchId,
-          } = await candidateSharedMessageSchema.validate(data);
-
-          const match: RecruiterJobMatch = {
-            candidateDisplayName: name,
-            candidateEncryptionPublicKey: encPk,
-            candidateBio: bio,
-            candidateEmail: email,
-            candidateGithubUserId: githubUserId,
-            candidateGithubLogin: githubLogin,
-            candidateEducation: education,
-            candidateInterests: interests,
-            candidateExperience: experience,
-            candidateStage: stage,
-          };
-
-          if (jobs.recruiterAcceptedMatches) {
-            jobs.recruiterAcceptedMatches[matchId] = match;
-          } else {
-            jobs.recruiterAcceptedMatches = { [matchId]: match };
-          }
-
-          const activity = {
-            type: JUB_SIGNAL_MESSAGE_TYPE.CANDIDATE_SHARED,
-            name,
-            id: matchId.toString(),
-            ts: metadata.timestamp.toISOString(),
-          };
-          activities.push(activity);
-        } catch (error) {
-          console.error(
-            "Invalid candidate shared message received from server: ",
-            message
-          );
-        } finally {
-          break;
-        }
       default:
         console.error("Received invalid message type");
     }
@@ -722,7 +538,6 @@ const processEncryptedMessages = async (args: {
     newLocationSignatures: locationSignatures,
     newQuestCompleted: questCompleted,
     newItemRedeemed: itemRedeemed,
-    newJobs: jobs,
     newActivities: activities,
   };
 };

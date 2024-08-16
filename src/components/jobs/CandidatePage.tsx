@@ -6,13 +6,16 @@ import { Input } from "@/components/Input";
 import { InputRange } from "@/components/InputRange";
 import { Radio } from "@/components/Radio";
 import { FormStepLayout } from "@/layouts/FormStepLayout";
-import React from "react";
+import { getAuthToken } from "@/lib/client/localStorage";
+import { cn } from "@/lib/client/utils";
+import { toggleArrayElement } from "@/lib/shared/utils";
+import { register } from "module";
+import React, { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Section } from "./Section";
 
 export type JobCandidateInput = {
-  education: 0 | 1 | 2 | 3;
+  education: "high-school" | "bachelor" | "master" | "phd";
   experience: number;
   interestZk: boolean;
   interestDefi: boolean;
@@ -27,25 +30,59 @@ export type JobCandidateInput = {
   email: string;
 };
 
+interface SectionProps {
+  title?: string;
+  description?: string;
+  children?: ReactNode;
+  active?: boolean; // add background to label
+}
+const Section = ({
+  title,
+  children,
+  active = false,
+  description,
+}: SectionProps) => (
+  <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1">
+      {title && (
+        <h3
+          className={cn(
+            "py-2 text-sm leading-6",
+            active
+              ? "bg-gray/20 font-medium text-white px-2"
+              : "font-normal text-white/75"
+          )}
+        >
+          {title}
+        </h3>
+      )}
+      {description && (
+        <span className="font-normal text-sm leading-5 text-white/50">
+          {description}
+        </span>
+      )}
+    </div>
+    <div className="flex flex-col gap-1">{children}</div>
+  </div>
+);
+
 interface CandidatePageProps {
-  handleSubmitCandidateInput: (formValues: JobCandidateInput) => Promise<void>;
-  submitLoading: boolean;
+  handleSubmitCandidateInput: (formValues: JobCandidateInput) => void;
 }
 
 export default function CandidatePage({
   handleSubmitCandidateInput,
-  submitLoading,
 }: CandidatePageProps) {
   const { setValue, watch, register, handleSubmit } =
     useForm<JobCandidateInput>({
       defaultValues: {
-        education: 0,
-        experience: 1,
-        salary: 0,
+        education: "high-school",
+        experience: 0,
         interestZk: false,
         interestDefi: false,
         interestConsumer: false,
         interestInfra: false,
+        salary: 0,
         stageParadigm: false,
         stageGrant: false,
         stageSeed: false,
@@ -55,8 +92,8 @@ export default function CandidatePage({
       },
     });
 
-  const education = watch("education", 0);
-  const experience = watch("experience", 1);
+  const education = watch("education", "high-school");
+  const experience = watch("experience", 0);
   const interestZk = watch("interestZk", false);
   const interestDefi = watch("interestDefi", false);
   const interestConsumer = watch("interestConsumer", false);
@@ -75,37 +112,54 @@ export default function CandidatePage({
       return;
     }
 
-    await handleSubmitCandidateInput(formValues);
+    const authToken = getAuthToken();
+    if (!authToken || authToken.expiresAt < new Date()) {
+      toast.error("Please try logging in again.");
+      return;
+    }
+
+    const response = await fetch("/api/jobs/new_candidate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputData: JSON.stringify(formValues),
+        authToken: authToken.value,
+      }),
+    });
+
+    if (!response.ok) {
+      toast.error("Failed to submit your candidate profile.");
+      return;
+    }
+
+    toast.success("Your candidate profile has been submitted.");
+    console.log("submitted candidate profile", formValues);
+    handleSubmitCandidateInput(formValues);
   };
 
   return (
-    <FormStepLayout
-      childrenClassName="!gap-4"
-      onSubmit={handleSubmit(onSubmitForm)}
-      titleClassName="px-4"
-      title={
-        <h3 className="font-semibold text-white text-[18px] leading-6">
-          Candidate profile
-        </h3>
-      }
-      subtitle={
-        <span className="block pb-4 text-white/50">
-          {`We will show you opportunities that match your preferences and you can choose if you want to match with a recruiter.`}
-        </span>
-      }
-      footer={
-        <div className="flex flex-col gap-4 bg-black px-4">
-          <Button type="submit" loading={submitLoading}>
-            Save and continue
-          </Button>
-          <span className="text-center text-secondary text-[12px] font-inter">
-            Review your answers. They cannot be edited later.
+    <AppContent className="overflow-hidden">
+      <FormStepLayout
+        childrenClassName="!gap-4"
+        onSubmit={handleSubmit(onSubmitForm)}
+        title="Candidate profile"
+        subtitle={
+          <span className="block pb-4 text-white/50">
+            {`We will show you opportunities that match your preferences and you can choose if you want to match with a recruiter.`}
           </span>
-        </div>
-      }
-    >
-      <Banner title="Recruiters cannot see your profile until you privately match with them. " />
-      <div className="flex flex-col gap-4 mb-8">
+        }
+        footer={
+          <div className="flex flex-col gap-2 bg-black">
+            <Button type="submit">Save and continue</Button>
+            <span className="text-center text-secondary text-sm font-inter">
+              Review your answers. They cannot be edited later.
+            </span>
+          </div>
+        }
+      >
+        <Banner title="Your info is encrypted until you share it." />
         <Section title="What are your qualifications?" active />
         <Section title="Education">
           <div className="grid grid-cols-2 gap-2">
@@ -113,55 +167,53 @@ export default function CandidatePage({
               id="education-1"
               label="High school"
               value="high-school"
-              checked={education === 0}
+              checked={education === "high-school"}
               onChange={() => {
-                setValue("education", 0);
+                setValue("education", "high-school");
               }}
             />
             <Radio
               id="education-2"
               label="Bachelor's"
-              checked={education === 1}
+              checked={education === "bachelor"}
               onChange={() => {
-                setValue("education", 1);
+                setValue("education", "bachelor");
               }}
             />
             <Radio
               id="education-3"
               label="Master's"
-              checked={education === 2}
+              checked={education === "master"}
               onChange={() => {
-                setValue("education", 2);
+                setValue("education", "master");
               }}
             />
             <Radio
               id="education-4"
               label="PhD"
-              checked={education === 3}
+              checked={education === "phd"}
               onChange={() => {
-                setValue("education", 3);
+                setValue("education", "phd");
               }}
             />
           </div>
         </Section>
-        <Section title="Development experience (in years)">
+        <Section title="Experience (in years)">
           <InputRange
             // @ts-ignore
             id="experience"
             // @ts-ignore
-            min={1}
+            min={0}
             // @ts-ignore
             value={experience}
             max={8}
             moreMax
-            onChange={(value: number) => {
-              setValue("experience", value);
+            onChange={(e: any) => {
+              setValue("experience", e?.target?.value);
             }}
           />
         </Section>
-      </div>
 
-      <div className="flex flex-col gap-4 mb-8">
         <Section title="What opportunities are you seeking?" active />
 
         <Section title="Interests">
@@ -200,7 +252,19 @@ export default function CandidatePage({
             />
           </div>
         </Section>
-        <Section title="Project stage">
+        <Section title="Salary (in thousands)">
+          <InputRange
+            id="salary"
+            min={0}
+            max={600}
+            // @ts-ignore
+            value={salary}
+            onChange={(e: any) => {
+              setValue("salary", e?.target?.value);
+            }}
+          />
+        </Section>
+        <Section title="Company stage">
           <div className="grid grid-cols-2 gap-2">
             <Checkbox
               id="companyStage-1"
@@ -237,7 +301,8 @@ export default function CandidatePage({
             />
           </div>
         </Section>
-        <Section title="Commitment">
+
+        <Section title="Commitment" active>
           <Checkbox
             id="commitment"
             name="commitment"
@@ -248,28 +313,18 @@ export default function CandidatePage({
             }}
           />
         </Section>
-        <Section title="Annual salary minimum (in thousands)">
-          <InputRange
-            id="salary"
-            min={0}
-            max={750}
-            moreMax={true}
-            // @ts-ignore
-            value={salary}
-            onChange={(value: number) => {
-              setValue("salary", value);
-            }}
-          />
-        </Section>
-      </div>
 
-      <div className="flex flex-col gap-4 mb-8">
-        <Section title="How can recruiters reach you?" active />
+        <Section
+          title="Contact info"
+          description="Choose how you would like to be contacted by recruiters."
+          active
+        />
+
         <Section title="Email">
           <Input {...register("email")} border="full" />
         </Section>
-      </div>
-    </FormStepLayout>
+      </FormStepLayout>
+    </AppContent>
   );
 }
 

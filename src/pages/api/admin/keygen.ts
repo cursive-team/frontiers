@@ -211,7 +211,7 @@ export default async function handler(
     // Quest 2: Meet 3 speakers
     await prisma.quest.create({
       data: {
-        name: "🎤 Speaker Whisperer",
+        name: "🎤 Meet the speakers",
         description:
           "Ask 3 speakers a question or share feedback about their talk. Ask to tap their badge to collect a link to their presentation slides (if available)",
         userRequirements: {

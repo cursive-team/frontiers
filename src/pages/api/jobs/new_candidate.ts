@@ -10,37 +10,42 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { authToken, jobsPublicKeyLink, jobsEncryptedDataLink, isCandidate } =
-    req.body;
+  const { inputData, authToken } = req.body;
+
+  if (!inputData || typeof inputData !== "string") {
+    return res.status(400).json({ error: "Invalid input data" });
+  }
 
   const userId = await verifyAuthToken(authToken);
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-  });
-  if (!user) {
-    return res.status(404).json({ error: "User not found" });
+  const existingCandidateInput =
+    await prisma.testingJobCandidateInput.findFirst({
+      where: {
+        userId,
+      },
+    });
+  if (existingCandidateInput) {
+    return res.status(400).json({ error: "Candidate already exists" });
   }
 
-  if (user.isCandidate || user.isRecruiter) {
-    return res
-      .status(400)
-      .json({ error: "User is already a candidate or recruiter" });
+  const existingRecruiterInput =
+    await prisma.testingJobRecruiterInput.findFirst({
+      where: {
+        userId,
+      },
+    });
+  if (existingRecruiterInput) {
+    return res.status(400).json({ error: "Recruiter already exists" });
   }
 
   try {
-    await prisma.user.update({
-      where: { id: userId },
+    await prisma.testingJobCandidateInput.create({
       data: {
-        jobsPublicKeyLink,
-        jobsEncryptedDataLink,
-        isCandidate,
-        isRecruiter: !isCandidate,
+        userId,
+        inputData,
       },
     });
 
