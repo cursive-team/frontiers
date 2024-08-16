@@ -193,7 +193,7 @@ const AppHeaderContent = ({
   const showBackButton = activeMenuIndex !== null;
 
   return (
-    <div className="fixed inset-0 w-full overflow-auto px-4 xs:px-4 z-10 h-full bg-main">
+    <div className="fixed inset-0 w-full overflow-auto px-3 xs:px-4 z-10 h-full bg-main">
       <div className="flex xs:h-[60px] py-5">
         {showBackButton && (
           <button
@@ -288,7 +288,7 @@ const AppHeader = ({ isMenuOpen, setIsMenuOpen }: AppHeaderProps) => {
 
   return (
     <div
-      className={cn("flex w-full items-center p-4 py-5 xs:px-4 z-50", {
+      className={cn("flex w-full items-center p-3 py-5 xs:px-4 z-50", {
         "bg-main": isMenuOpen,
         "bg-transparent": !isMenuOpen,
       })}

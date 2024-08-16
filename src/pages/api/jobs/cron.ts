@@ -1,13 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/server/prisma";
-import pako from "pako";
-import { deserializeMPCData, serializeMPCData } from "@/lib/client/mpc";
-import {
-  ni_hiring_init_web,
-  ni_hiring_server_setup_web,
-  ni_hiring_server_compute_web,
-} from "pz-hiring";
-import { put } from "@vercel/blob";
+import { JobCandidateInput } from "@/components/jobs/CandidatePage";
+import { JobRecruiterInput } from "@/components/jobs/RecruiterPage";
+import { computeJobMatchOutput } from "@/lib/server/jobs";
 
 export default async function handler(
   req: NextApiRequest,
@@ -21,7 +16,7 @@ export default async function handler(
     // Fetch the next job match queue entry that is not completed or invalid
     const nextJobMatch = await prisma.jobMatchQueue.findFirst({
       where: {
-        matchResultsLink: { equals: null },
+        isCompleted: false,
         isInvalid: false,
       },
       orderBy: {
@@ -38,56 +33,66 @@ export default async function handler(
         id: nextJobMatch.proposerId,
       },
     });
+    if (!proposer) {
+      return res.status(404).json({ error: "Proposer not found" });
+    }
 
     const accepter = await prisma.user.findUnique({
       where: {
         id: nextJobMatch.accepterId,
       },
     });
-
-    // mark job invalid if proposer or accepter not found
-    if (!proposer || !accepter) {
-      await prisma.jobMatchQueue.update({
-        where: {
-          id: nextJobMatch.id,
-        },
-        data: {
-          isInvalid: true,
-          lastCheckedTime: new Date(),
-        },
-      });
-      return res.status(400).json({ error: "Proposer or accepter not found" });
+    if (!accepter) {
+      return res.status(404).json({ error: "Accepter not found" });
     }
 
-    // mark job invalid if proposer is candidate or accepter is recruiter
-    if (proposer.isCandidate || accepter.isRecruiter) {
-      await prisma.jobMatchQueue.update({
+    // get proposer input
+    const proposerRecruiterInput =
+      await prisma.testingJobRecruiterInput.findFirst({
         where: {
-          id: nextJobMatch.id,
-        },
-        data: {
-          isInvalid: true,
-          lastCheckedTime: new Date(),
+          userId: proposer.id,
         },
       });
+    if (!proposerRecruiterInput) {
       return res
-        .status(200)
-        .json({ message: "Proposer is candidate or accepter is recruiter" });
+        .status(400)
+        .json({ error: "Proposer has not submitted recruiter input" });
     }
 
-    // update job checked time if proposer is not recruiter or accepter is not candidate or if either party has not submitted encrypted data or keys
-    const proposerPublicKeyLink = proposer.jobsPublicKeyLink;
-    const accepterPublicKeyLink = accepter.jobsPublicKeyLink;
-    const proposerInputLink = proposer.jobsEncryptedDataLink;
-    const accepterInputLink = accepter.jobsEncryptedDataLink;
-    if (
-      !proposer.isRecruiter ||
-      !accepter.isCandidate ||
-      !proposerPublicKeyLink ||
-      !accepterPublicKeyLink ||
-      !proposerInputLink ||
-      !accepterInputLink
-    ) {
+    // if accepter is recruiter, mark job invalid
+    const accepterIsRecruiter = await prisma.testingJobRecruiterInput.findFirst(
+      {
+        where: {
+          userId: accepter.id,
+        },
+      }
+    );
+    if (accepterIsRecruiter) {
+      await prisma.jobMatchQueue.update({
+        where: {
+          id: nextJobMatch.id,
+        },
+        data: {
+          isInvalid: true,
+          lastCheckedTime: new Date(),
+        },
+      });
+
+      return res.status(200).json({
+        message: "Job match marked as invalid",
+        jobMatch: nextJobMatch,
+      });
+    }
+
+    // if accepter is not candidate, update last checked time and return
+    const accepterIsCandidate = await prisma.testingJobCandidateInput.findFirst(
+      {
+        where: {
+          userId: accepter.id,
+        },
+      }
+    );
+    if (!accepterIsCandidate) {
       await prisma.jobMatchQueue.update({
         where: {
           id: nextJobMatch.id,
@@ -96,98 +101,44 @@ export default async function handler(
           lastCheckedTime: new Date(),
         },
       });
+
       return res.status(200).json({
-        message: "Proposer is not recruiter or accepter is not candidate",
+        message: "Job match accepter has not submitted candidate input",
+        jobMatch: nextJobMatch,
       });
     }
 
-    // fetch respective server key shares from blob
-    console.time("fetching public keys");
-    const proposerPublicKeyResponse = await fetch(proposerPublicKeyLink);
-    const accepterPublicKeyResponse = await fetch(accepterPublicKeyLink);
-    if (!proposerPublicKeyResponse.ok || !accepterPublicKeyResponse.ok) {
-      throw new Error("Failed to fetch public key blobs");
+    // compute match output
+    const recruiterInput = JSON.parse(
+      proposerRecruiterInput.inputData
+    ) as JobRecruiterInput;
+    const candidateInput = JSON.parse(
+      accepterIsCandidate.inputData
+    ) as JobCandidateInput;
+    const isSuccessfulMatch = await computeJobMatchOutput(
+      recruiterInput,
+      candidateInput
+    );
+
+    // send match output to recruiter
+
+    // send match output to client
+    if (isSuccessfulMatch) {
+      await prisma.testingJobMatch.create({
+        data: {
+          jobMatchId: nextJobMatch.id,
+          candidateData: accepterIsCandidate.inputData,
+          recruiterData: proposerRecruiterInput.inputData,
+        },
+      });
     }
-    const proposerPublicKey = new Uint8Array(
-      await proposerPublicKeyResponse.arrayBuffer()
-    );
-    const accepterPublicKey = new Uint8Array(
-      await accepterPublicKeyResponse.arrayBuffer()
-    );
-    console.timeEnd("fetching public keys");
 
-    // inflate using pako/gzip
-    console.time("deserializing public keys");
-    const inflatedProposerPublicKey = pako.inflate(proposerPublicKey, {
-      to: "string",
-    });
-    const deserializedProposerPublicKey = deserializeMPCData(
-      inflatedProposerPublicKey
-    );
-    const inflatedAccepterPublicKey = pako.inflate(accepterPublicKey, {
-      to: "string",
-    });
-    const deserializedAccepterPublicKey = deserializeMPCData(
-      inflatedAccepterPublicKey
-    );
-    console.timeEnd("deserializing public keys");
-
-    // Fetch proposer and accepter encrypted data
-    console.time("fetching input data");
-    const proposerInputResponse = await fetch(proposerInputLink);
-    const accepterInputResponse = await fetch(accepterInputLink);
-    if (!proposerInputResponse.ok || !accepterInputResponse.ok) {
-      throw new Error("Failed to fetch input data blobs");
-    }
-    console.timeEnd("fetching input data");
-
-    // deserialize using bespoke function
-    console.time("deserializing input data");
-    const proposerInput = deserializeMPCData(
-      await proposerInputResponse.text()
-    );
-    const accepterInput = deserializeMPCData(
-      await accepterInputResponse.text()
-    );
-    console.timeEnd("deserializing input data");
-
-    // server creates shared key for proposer/accepter
-    console.time("setting up server keys");
-
-    // only need to run this once, running it more leads to error but doesn't
-    // break the rest of the code, so this is hacky way of getting around it
-    try {
-      ni_hiring_init_web(BigInt(1));
-    } catch (e) {
-      console.error("Error initializing server:", e);
-    }
-    try {
-      ni_hiring_server_setup_web(
-        deserializedProposerPublicKey,
-        deserializedAccepterPublicKey
-      );
-    } catch (e) {
-      console.error("Error setting up server keys:", e);
-    }
-    console.timeEnd("setting up server keys");
-
-    console.time("computing FHE computation");
-    let res_fhe = ni_hiring_server_compute_web(proposerInput, accepterInput);
-    console.timeEnd("computing FHE computation");
-
-    console.time("uploading FHE result");
-    const blob = await put("fhe_result", serializeMPCData(res_fhe), {
-      access: "public",
-    });
-    console.timeEnd("uploading FHE result");
-
-    // log match result
     await prisma.jobMatchQueue.update({
       where: {
         id: nextJobMatch.id,
       },
       data: {
-        matchResultsLink: blob.url,
+        isCompleted: true,
         lastCheckedTime: new Date(),
       },
     });
@@ -201,7 +152,3 @@ export default async function handler(
     return res.status(500).json({ error: "Internal server error" });
   }
 }
-
-export const config = {
-  maxDuration: 300, // 5 minutes in seconds
-};

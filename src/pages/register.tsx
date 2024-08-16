@@ -617,7 +617,7 @@ export default function Register() {
         footer={
           <div className="flex flex-col gap-4">
             <Button variant="black" type="submit" loading={loading}>
-              Backup with password
+              Register
             </Button>
             <span
               className="text-center text-white/50 text-sm"

@@ -4,6 +4,12 @@ import { JobRecruiterInput } from "@/components/jobs/RecruiterPage";
 import { JobCandidateInput } from "@/components/jobs/CandidatePage";
 import { verifyAuthToken } from "@/lib/server/auth";
 
+export type CandidateJobMatch = {
+  id: number;
+  candidateData: JobCandidateInput;
+  recruiterData: JobRecruiterInput;
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -25,7 +31,7 @@ export default async function handler(
         jobMatch: {
           proposerId: userId,
         },
-        candidateAccepted: true,
+        candidateAccepted: false,
       },
       include: {
         jobMatch: true,
