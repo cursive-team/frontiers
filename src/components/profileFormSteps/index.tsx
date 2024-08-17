@@ -168,7 +168,7 @@ const ProfileForm = ({
           <div className="flex flex-col gap-1 ">
             <Title>Your profile</Title>
             <Description>
-              This will be visible to anyone you interact with
+              This will be visible to anyone you interact with.
             </Description>
           </div>
           <Input
@@ -186,7 +186,7 @@ const ProfileForm = ({
             </div>
 
             <Description>
-              Updates are not shared with previous connections
+              Updates are not shared with previous connections.
             </Description>
           </div>
           <div className="flex flex-col gap-6">
