@@ -10,7 +10,7 @@ import { upload } from "@vercel/blob/client";
 
 export const mpcBlobUploadClient = async (
   name: string,
-  data: Uint8Array | string
+  data: Uint8Array | string | File
 ) => {
   const newBlob: PutBlobResult = await upload(name, data, {
     access: "public",
