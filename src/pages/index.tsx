@@ -32,6 +32,7 @@ import { classed } from "@tw-classed/react";
 import { logClientEvent } from "@/lib/client/metrics";
 import { Location } from "@prisma/client";
 import { AppContent } from "@/components/AppContent";
+import { recruiterProcessNewMatches } from "@/lib/client/jobs";
 
 interface LinkCardProps {
   name: string;
@@ -205,6 +206,59 @@ const ActivityFeed = ({ type, name, id, date }: ActivityFeedProps) => {
           description={date}
           icon={<Icons.Store className="!bg-[#1C1C1C]" />}
         />
+      );
+    case JUB_SIGNAL_MESSAGE_TYPE.JOB_INPUT:
+      return (
+        <Link href="/jobs">
+          <FeedContent
+            title={
+              <>
+                <span className="text-white/50 font-medium font-inter">
+                  {"Started "}
+                </span>
+                <span className="text-white font-medium">
+                  private job matching
+                </span>
+              </>
+            }
+            description={date}
+            icon={<Icons.Jobs className="!bg-[#1C1C1C]" />}
+          />
+        </Link>
+      );
+    case JUB_SIGNAL_MESSAGE_TYPE.RECRUITER_SHARED:
+      return (
+        <Link href="/jobs">
+          <FeedContent
+            title={
+              <>
+                <span className="text-white/50 font-medium font-inter">
+                  {"Matched with "}
+                </span>
+                <span className="text-white font-medium">{name}</span>
+              </>
+            }
+            description={date}
+            icon={<Icons.Jobs className="!bg-[#1C1C1C]" />}
+          />
+        </Link>
+      );
+    case JUB_SIGNAL_MESSAGE_TYPE.CANDIDATE_SHARED:
+      return (
+        <Link href="/jobs">
+          <FeedContent
+            title={
+              <>
+                <span className="text-white/50 font-medium font-inter">
+                  {"Job interest from "}
+                </span>
+                <span className="text-white font-medium">{name}</span>
+              </>
+            }
+            description={date}
+            icon={<Icons.Jobs className="!bg-[#1C1C1C]" />}
+          />
+        </Link>
       );
     default:
       return null;
@@ -446,6 +500,7 @@ export default function Social() {
         if (navigationEntry.type && navigationEntry.type === "reload") {
           try {
             logClientEvent("loadMessagesPageRefresh", {});
+            await recruiterProcessNewMatches();
             await loadMessages({ forceRefresh: false });
           } catch (error) {
             console.error("Failed to load messages upon page reload:", error);

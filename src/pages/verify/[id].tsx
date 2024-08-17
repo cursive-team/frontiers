@@ -140,11 +140,11 @@ const QRPage = () => {
         <span className="text-[32px] text-primary font-normal">
           {qrCodeData.userDisplayName}
         </span>
-        <div className="flex flex-col gap-4 mx-4 mt-6 text-center border-[2px] border-primary p-4 bg-teritiary">
-          <span className="text-teritiary text-[18px] font-bold">
+        <div className="flex flex-col gap-4 mx-4 mt-6 text-center border-[2px] border-tertiary p-4 bg-teritiary">
+          <span className="text-primary text-[18px] font-bold">
             {qrCodeData.questName}
           </span>
-          <span className="font-weight-400 text-[14px] font-normal">
+          <span className="text-secondary font-weight-400 text-[14px] font-normal">
             {qrCodeData.questDescription}
           </span>
           <div className="flex flex-row gap-2 justify-center align-center text-primary">
@@ -152,30 +152,28 @@ const QRPage = () => {
             <span className="text-[14px] font-bold">Valid proof</span>
           </div>
         </div>
-        <div
-          className="flex flex-col gap-4 mt-6 mx-16 p-2 bg-primary rounded"
-          onClick={() => {
-            navigator.clipboard.writeText(qrCodeData.serializedProof);
-            toast.success("Proof copied to clipboard");
-          }}
+        <div className="mt-4 mb-4">
+          <Button
+            onClick={() => {
+              navigator.clipboard.writeText(qrCodeData.serializedProof);
+              toast.success("Proof copied to clipboard");
+            }}
+            variant="primary"
+          >
+            Copy proof
+          </Button>
+        </div>
+        <Link
+          href="https://github.com/cursive-team/zk-summit/blob/5a97066c0c09ee7d2d388def1bec7b5547382c48/src/pages/api/quest/submit_proof.tsx#L50"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           <div className="flex flex-row gap-2 justify-center align-center">
-            <span className="text-[14px] font-bold text-white">Copy proof</span>
+            <span className="text-[14px] font-normal text-primary">
+              View verification code
+            </span>
           </div>
-        </div>
-        <div className="flex flex-col gap-4 mt-4 mx-16 p-2 border border-primary bg-teritiary rounded">
-          <Link
-            href="https://github.com/cursive-team/zk-summit/blob/5a97066c0c09ee7d2d388def1bec7b5547382c48/src/pages/api/quest/submit_proof.tsx#L50"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <div className="flex flex-row gap-2 justify-center align-center">
-              <span className="text-[14px] font-normal text-primary">
-                View verification code
-              </span>
-            </div>
-          </Link>
-        </div>
+        </Link>
       </div>
     </AppContent>
   );

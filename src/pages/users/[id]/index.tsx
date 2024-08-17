@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   fetchUserByUUID,
   getKeys,
@@ -35,6 +35,7 @@ import { Icon } from "@mui/material";
 import { AppContent } from "@/components/AppContent";
 import { Spinner } from "@/components/Spinner";
 import githubData from "@/lib/client/github.json";
+import { Stats } from "@/components/Stats";
 
 const Label = classed.span("text-sm text-gray-12");
 
@@ -60,7 +61,6 @@ const LinkCard = ({ label, value, href }: LinkCardProps) => {
 
 enum PSIState {
   NOT_STARTED,
-  WAITING,
   ROUND1,
   ROUND2,
   ROUND3,
@@ -70,7 +70,6 @@ enum PSIState {
 
 const PSIStateMapping: Record<PSIState, string> = {
   [PSIState.NOT_STARTED]: "Not started",
-  [PSIState.WAITING]: "Waiting for other user to connect...",
   [PSIState.ROUND1]: "Creating collective encryption pubkey with 2PC...",
   [PSIState.ROUND2]: "Performing PSI with FHE...",
   [PSIState.ROUND3]: "Decrypting encrypted results with 2PC...",
@@ -109,6 +108,14 @@ const UserProfilePage = () => {
     useState<string>();
   const [selfRound3Output, setSelfRound3Output] = useState<any>();
 
+  const [wantsToInitiatePSI, setWantsToInitiatePSI] = useState(false);
+  const [otherUserWantsToInitiatePSI, setOtherUserWantsToInitiatePSI] =
+    useState(false);
+  const [currentUserInChannel, setCurrentUserInChannel] = useState(false);
+  const [otherUserInChannel, setOtherUserInChannel] = useState(false);
+  const [otherUserTemporarilyLeft, setOtherUserTemporarilyLeft] =
+    useState(false);
+
   const [userOverlap, setUserOverlap] = useState<
     { userId: string; name: string }[]
   >([]);
@@ -124,13 +131,19 @@ const UserProfilePage = () => {
     { talkName: string; talkId: string }[]
   >([]);
 
+  useEffect(() => {
+    if (wantsToInitiatePSI && otherUserWantsToInitiatePSI) {
+      setWantsToInitiatePSI(false);
+      setOtherUserWantsToInitiatePSI(false);
+      setPsiState(PSIState.ROUND1);
+      console.log("Both users want to initiate psi, starting psi...");
+    }
+  }, [wantsToInitiatePSI, otherUserWantsToInitiatePSI]);
+
   // set up channel for PSI
   const setupChannel = () => {
     if (!selfEncPk || !otherEncPk || !channelName) return;
-
     logClientEvent("psiSetupChannel", {});
-
-    setPsiState(PSIState.WAITING);
 
     const channel = supabase.channel(channelName, {
       config: {
@@ -140,21 +153,28 @@ const UserProfilePage = () => {
 
     channel
       .on("presence", { event: "sync" }, () => {
+        setCurrentUserInChannel(true);
         const newState = channel.presenceState();
         if (Object.keys(newState).includes(otherEncPk)) {
-          setPsiState((prevState) => {
-            if (prevState === PSIState.WAITING) {
-              return PSIState.ROUND1;
-            }
-            return prevState;
-          });
+          console.log("Other user in channel ", otherEncPk);
+          setOtherUserInChannel(true);
+          setOtherUserTemporarilyLeft(false);
         }
       })
       .on("presence", { event: "leave" }, async ({ key }) => {
         if (key === otherEncPk) {
-          setPsiState(PSIState.NOT_STARTED);
-          await closeChannel();
+          console.log("Other user left channel ", otherEncPk);
+          setOtherUserTemporarilyLeft(true);
+          setOtherUserInChannel(false);
+        } else {
+          setCurrentUserInChannel(false);
         }
+      })
+      .on("broadcast", { event: "initiatePSI" }, async (event) => {
+        // only respond to initiatePSI if it's for this user
+        if (event.payload.to !== selfEncPk) return;
+        console.log("Other user wants to initiate psi", otherEncPk);
+        setOtherUserWantsToInitiatePSI(true);
       })
       .on("broadcast", { event: "message" }, (event) => {
         setBroadcastEvent(event);
@@ -382,6 +402,33 @@ const UserProfilePage = () => {
   }, [psiState, selfEncPk, otherEncPk, channelName]);
 
   useEffect(() => {
+    if (otherUserTemporarilyLeft) {
+      const currentState = psiState;
+      const timer = setTimeout(() => {
+        if (psiState === currentState) {
+          console.log(
+            "Resetting PSI due to other user temporarily leaving",
+            currentState,
+            psiState
+          );
+          setPsiState(PSIState.NOT_STARTED);
+          setSelfRound1Output(undefined);
+          setOtherRound2MessageLink(undefined);
+          setSelfRound2Output(undefined);
+          setOtherRound3MessageLink(undefined);
+          setSelfRound3Output(undefined);
+          setOtherUserInChannel(false);
+          setOtherUserTemporarilyLeft(false);
+          setWantsToInitiatePSI(false);
+          setOtherUserWantsToInitiatePSI(false);
+        }
+      }, 10000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [otherUserTemporarilyLeft, psiState]);
+
+  useEffect(() => {
     const fetchUser = async () => {
       if (typeof id === "string") {
         const profile = getProfile();
@@ -402,6 +449,8 @@ const UserProfilePage = () => {
           setChannelName(
             [fetchedUser.encPk, profile.encryptionPublicKey].sort().join("")
           );
+          // always set up channel
+          setupChannel();
           if (fetchedUser.oI) {
             processOverlap(JSON.parse(fetchedUser.oI));
             setPsiState(PSIState.COMPLETE);
@@ -483,6 +532,70 @@ const UserProfilePage = () => {
     };
     fetchUser();
   }, [id, router, githubSession, userGithubInfo]);
+
+  const handleInitiatePSI = () => {
+    if (!user || !channelName || !otherEncPk) return;
+
+    console.log(
+      "Initiating psi...",
+      wantsToInitiatePSI,
+      otherUserWantsToInitiatePSI
+    );
+
+    logClientEvent("psiInitiatePSI", {});
+    setWantsToInitiatePSI(true);
+    supabase.channel(channelName).send({
+      type: "broadcast",
+      event: "initiatePSI",
+      payload: {
+        to: otherEncPk,
+      },
+    });
+
+    // start psi if other user is already interested
+    if (otherUserWantsToInitiatePSI) {
+      console.log("Starting psi after other user initiating PSI", otherEncPk);
+      setWantsToInitiatePSI(false);
+      setOtherUserWantsToInitiatePSI(false);
+      setPsiState(PSIState.ROUND1);
+    }
+  };
+
+  const handleUpdatePSI = () => {
+    if (!user || !channelName || !otherEncPk) return;
+
+    console.log(
+      "Updating psi...",
+      wantsToInitiatePSI,
+      otherUserWantsToInitiatePSI
+    );
+
+    logClientEvent("psiUpdatePSI", {});
+    setSelfRound1Output(undefined);
+    setOtherRound2MessageLink(undefined);
+    setSelfRound2Output(undefined);
+    setOtherRound3MessageLink(undefined);
+    setSelfRound3Output(undefined);
+    supabase.channel(channelName).send({
+      type: "broadcast",
+      event: "initiatePSI",
+      payload: {
+        to: otherEncPk,
+      },
+    });
+
+    // start psi if other user is already interested
+    if (otherUserWantsToInitiatePSI) {
+      console.log("Starting psi after other user initiating PSI", otherEncPk);
+      setWantsToInitiatePSI(false);
+      setOtherUserWantsToInitiatePSI(false);
+      setPsiState(PSIState.ROUND1);
+    } else {
+      console.log("Setting wants to initiate PSI after update", otherEncPk);
+      setWantsToInitiatePSI(true);
+      setPsiState(PSIState.NOT_STARTED);
+    }
+  };
 
   if (!user) {
     return (
@@ -619,23 +732,33 @@ const UserProfilePage = () => {
           </Accordion>
         )}
 
-        {githubInfoLoading && !userGithubInfo && (
-          <Accordion label="Github">
-            <Spinner />
-          </Accordion>
-        )}
-
         {userGithubInfo && (
-          <Accordion label="Github">
+          <Accordion className="flex flex-col gap-2" label="Dev stats">
+            <LinkCard
+              label="Github"
+              value={user.ghLogin}
+              href={"https://github.com/" + user.ghLogin}
+            ></LinkCard>
             <div className="flex flex-col gap-1">
               {userGithubInfo.map((repo, index) => (
-                <span
+                <Stats
                   key={index}
-                  className="text-white/50 text-[14px] mt-1 left-5"
-                >
-                  {repo.repo}: {repo.total} commits, first commit on{" "}
-                  {repo.first.toDateString()}, rank {repo.rank}
-                </span>
+                  title={repo.repo}
+                  items={[
+                    {
+                      label: "1st commit",
+                      value: repo.first.toDateString(),
+                    },
+                    {
+                      label: "Total",
+                      value: repo.total.toString(),
+                    },
+                    {
+                      label: "Rank",
+                      value: repo.rank.toString(),
+                    },
+                  ]}
+                />
               ))}
             </div>
           </Accordion>
@@ -706,9 +829,9 @@ const UserProfilePage = () => {
               })}
               <Button
                 type="button"
-                onClick={setupChannel}
+                onClick={handleUpdatePSI}
                 size="small"
-                variant="tertiary"
+                variant="gray"
                 style={{
                   marginTop: "16px",
                 }}
@@ -719,11 +842,16 @@ const UserProfilePage = () => {
           ) : psiState === PSIState.NOT_STARTED ? (
             <Button
               type="button"
-              onClick={setupChannel}
+              onClick={handleInitiatePSI}
               size="small"
               variant="gray"
+              disabled={!otherUserInChannel}
             >
-              Discover
+              {wantsToInitiatePSI
+                ? "Waiting for other user to accept..."
+                : otherUserInChannel
+                ? "Discover"
+                : "Waiting for other user to connect..."}
             </Button>
           ) : (
             <div className="flex flex-col gap-2">

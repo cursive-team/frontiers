@@ -1,5 +1,6 @@
 import { deleteAllActivities } from "./activities";
 import { deleteAllItemRedeemed } from "./itemRedeemed";
+import { deleteJobs } from "./jobs";
 import { deleteAllKeys } from "./keys";
 import { deleteAllLocationSignatures } from "./locationSignatures";
 import { deleteProfile } from "./profile";
@@ -16,6 +17,7 @@ export * from "./locationSignatures";
 export * from "./activities";
 export * from "./questCompleted";
 export * from "./itemRedeemed";
+export * from "./jobs";
 
 export const saveToLocalStorage = (key: string, value: string): void => {
   localStorage.setItem(key, value);
@@ -39,4 +41,5 @@ export const deleteAccountFromLocalStorage = (): void => {
   deleteAllActivities();
   deleteAllQuestCompleted();
   deleteAllItemRedeemed();
+  deleteJobs();
 };

@@ -6,11 +6,5 @@
     "src/pages/api/quest/submit_proof.tsx": {
       "maxDuration": 300
     }
-  },
-  "crons": [
-    {
-      "path": "/api/jobs/cron",
-      "schedule": "* * * * *"
-    }
-  ]
+  }
 }

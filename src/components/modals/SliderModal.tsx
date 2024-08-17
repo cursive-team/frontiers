@@ -1,4 +1,6 @@
 import { ModalProps, Modal } from "./Modal";
+import { Button } from "../Button";
+import { Icons } from "../Icons";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useScripts } from "@/hooks/useScripts";
 import { classed } from "@tw-classed/react";
@@ -10,6 +12,7 @@ import {
   makeGarden,
 } from "@/lib/client/flower";
 import { logClientEvent } from "@/lib/client/metrics";
+import { useRouter } from "next/router";
 
 const Title = classed.span("text-center text-white text-[20px] font-bold");
 const Label = classed.span("text-iron-600 text-xs font-normal");
@@ -26,6 +29,7 @@ const SliderModal = ({ isOpen, setIsOpen, size = 320 }: SliderModalProps) => {
   const [signatures, setSignatures] = useState<PubKeyArrayElement[]>([]);
   const [spiral, setSpiral] = useState<number[][]>([]);
   const [rangeValue, setRangeValue] = useState<number>(1);
+  const [canvasReady, setCanvasReady] = useState(false);
 
   const onRangeChange = (e: ChangeEvent<HTMLInputElement>) => {
     logClientEvent("artRangeChange", {});
@@ -43,7 +47,15 @@ const SliderModal = ({ isOpen, setIsOpen, size = 320 }: SliderModalProps) => {
     if (!isLoaded || !signatures || !isOpen || !spiral) return;
     const stage = new window.createjs.Stage(document.getElementById("slider"));
     makeGarden(stage, signatures, spiral, size, rangeValue);
+    setCanvasReady(true);
   }, [isLoaded, signatures, isOpen, rangeValue, size, spiral]);
+
+  const handleShare = async () => {
+    const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      `Here's my Frontiers 2024 flower garden, a generative art representation of everyone I met. Built by @cursive_team`
+    )}`;
+    window.open(twitterShareUrl, "_blank");
+  };
 
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen} withBackButton>
@@ -55,7 +67,7 @@ const SliderModal = ({ isOpen, setIsOpen, size = 320 }: SliderModalProps) => {
 
               <div className="flex flex-col gap-2 border border-white/20 rounded-[8px]">
                 <canvas
-                  className="artwork-webgl flex p-0 m-0 rounded-[8px]"
+                  className="artwork-webgl flex p-0 m-0 rounded-[8px] bg-gray/20"
                   id="slider"
                   height={size}
                   width={size}
@@ -115,6 +127,20 @@ const SliderModal = ({ isOpen, setIsOpen, size = 320 }: SliderModalProps) => {
                           {person ? "meeting" : "attendance"}. This signature is
                           visualized as a generative art flower for your garden.
                         </Label>
+                      </div>
+                      <div className="mt-4 pb-16">
+                        <Button
+                          onClick={handleShare}
+                          variant="secondary"
+                          icon={
+                            <div className="mr-1">
+                              <Icons.Twitter />
+                            </div>
+                          }
+                          disabled={!canvasReady}
+                        >
+                          Share screenshot on Twitter
+                        </Button>
                       </div>
                     </div>
                   );
