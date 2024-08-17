@@ -68,6 +68,10 @@ export default function QuestsPage() {
             ) => {
               const key = `${id}-${index}`;
 
+              if (name === "🎤 Speaker Whisperer") {
+                return null;
+              }
+
               return (
                 <Link href={`/proofs/${id}`} key={key}>
                   <QuestCard
